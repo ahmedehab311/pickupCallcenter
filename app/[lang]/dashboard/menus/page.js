@@ -19,6 +19,7 @@ import {
   changeItemStatus,
   deleteItem,
   handleDeleteMenu,
+  deleteItemTest,
   restoreItem,
 } from "@/app/[lang]/dashboard/sections/apisSection";
 import useTranslate from "@/hooks/useTranslate";
@@ -163,33 +164,33 @@ const Menu = ({ params: { lang } }) => {
       setIsSettingDefaultLoading(false);
     }
   };
-  // const handleDelete = async (id) => {
-  //   try {
-  //     setIsSettingDefaultLoading(true);
-  //     const res = await deleteItem(token, apiBaseUrl, id, "menu");
-  //     if (res.messages?.[0]?.includes("so you can't delete")) {
-  //       toast.error(res.messages[0]);
-  //       return;
-  //     }
-  //     if (res.messages?.[0]?.includes("is deleted")) {
-  //       toast.error(res.messages[0]);
-  //       return;
-  //     }
-  //     if (
-  //       res?.responseStatus &&
-  //       Array.isArray(res.messages) &&
-  //       res.messages.length > 0
-  //     ) {
-  //       refetch();
-  //       toast.success(res.messages[0]);
-  //     }
-  //   } catch (error) {
-  //     toast.error("An error occurred while deleting the menu.");
-  //     console.error("Error default menu:", error);
-  //   } finally {
-  //     setIsSettingDefaultLoading(false);
-  //   }
-  // };
+  const handleDeleteTest = async (id) => {
+    try {
+      setIsSettingDefaultLoading(true);
+      const res = await deleteItemTest(apiBaseUrl, token, id, "menu");
+      if (res.messages?.[0]?.includes("so you can't delete")) {
+        toast.error(res.messages[0]);
+        return;
+      }
+      if (res.messages?.[0]?.includes("is deleted")) {
+        toast.error(res.messages[0]);
+        return;
+      }
+      if (
+        res?.responseStatus &&
+        Array.isArray(res.messages) &&
+        res.messages.length > 0
+      ) {
+        refetch();
+        toast.success(res.messages[0]);
+      }
+    } catch (error) {
+      toast.error("An error occurred while deleting the menu.");
+      console.error("Error default menu:", error);
+    } finally {
+      setIsSettingDefaultLoading(false);
+    }
+  };
   const handleRestore = async (id) => {
     try {
       setIsSettingDefaultLoading(true);
@@ -339,6 +340,7 @@ const Menu = ({ params: { lang } }) => {
         handleEnter={handleEnter}
         handleViewEdit={handleViewEdit}
         handleDelete={handleDelete}
+        handleDeleteTest={handleDeleteTest}
         handlechangeStatus={handlechangeStatus}
         isSettingLoading={isSettingLoading}
         subdomain={subdomain}

@@ -103,3 +103,18 @@ export const deleteItem = async (apiBaseUrl, token, id, name) => {
     throw err;
   }
 };
+export const deleteItemTest = async (apiBaseUrl, token, id, name) => {
+  try {
+    const url = `${apiBaseUrl}/v1/call-center/${name}/${id}?api_token=${token}`;
+    console.log("url", url);
+    console.log("apiBaseUrl", apiBaseUrl);
+
+    const res = await axios.delete(url);
+
+    console.log("res", res);
+    return res.data;
+  } catch (err) {
+    console.error("Error deleting item:", err);
+    throw err;
+  }
+};

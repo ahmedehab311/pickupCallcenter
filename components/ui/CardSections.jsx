@@ -95,44 +95,7 @@ const CardHeader = React.forwardRef(
 );
 CardHeader.displayName = "CardHeader";
 
-// const CardContent = React.forwardRef(
-//   (
-//     {
-//       sectionName,
-//       description,
-//       isActive,
-//       onToggleActive,
-//       handleToggleActive,
-//       trans,
-//       className,
-//       isSection,
-//       deletedAt,
-//       ...props
-//     },
-//     ref
 
-//   ) => (
-//     <div ref={ref} className={cn("p-4 space-y-3", className)} {...props}>
-//       <div className="flex items-center justify-between">
-//         <h3 className="text-lg font-bold">{sectionName}</h3>
-//         {/* <Switch checked={isActive} onCheckedChange={onToggleActive} /> */}
-
-//         {isSection && (
-//           <Switch
-//             checked={isActive}
-//             onCheckedChange={(checked) => {
-//               console.log(`Switch value for ${sectionName}:`, checked);
-//               onToggleActive(checked); // تأكد من تمرير الـ checked فقط
-//             }}
-//             aria-label={isActive ? trans?.active : trans?.inactive}
-//           />
-//         )}
-//       </div>
-
-//       <p className="text-sm text-gray-600  ">{description}</p>
-//     </div>
-//   )
-// );
 const CardContent = React.forwardRef(
   (
     {
@@ -206,6 +169,7 @@ const CardFooter = React.forwardRef(
       sectionItems,
       onViewEdit,
       onDelete,
+      onDeleteTest,
       onRestore,
       onEnter,
       className,
@@ -325,6 +289,7 @@ const CardFooter = React.forwardRef(
                   Set as default
                 </DropdownMenuItem>
               )}
+
               {!deletedAt ? (
                 <DropdownMenuItem className="cursor-pointer" onClick={onDelete}>
                   Delete
@@ -335,6 +300,14 @@ const CardFooter = React.forwardRef(
                   onClick={onRestore}
                 >
                   Restore
+                </DropdownMenuItem>
+              )}
+              {!deletedAt && (
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={onDeleteTest}
+                >
+                  Delete Test
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>

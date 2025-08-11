@@ -20,7 +20,7 @@ function CardGridRenderer({
   isSettingLoading,
   subdomain,
   handleViewEdit,
-  handleDelete,
+  handleDelete,handleDeleteTest,
   handleEnter,
   handlechangeStatus,
   labelLoading,
@@ -119,7 +119,7 @@ function CardGridRenderer({
             return (
               <div
                 key={section.id}
-                className={`card bg-popover ${
+                className={`card bg-popover  border border-gray-200 dark:border-none ${
                   draggedIndex === index ? "opacity-50" : ""
                 }`}
               >
@@ -148,6 +148,7 @@ function CardGridRenderer({
                   sectionName={section?.name}
                   onViewEdit={() => handleViewEdit(section.id)}
                   onDelete={() => handleDelete(section.id)}
+                  onDeleteTest={() => handleDeleteTest(section.id)}
                   onRestore={() => handleRestore(section.id)}
                   onEnter={() => handleEnter(section.id)}
                   // checked={getStatusDefault(section)}
