@@ -116,10 +116,7 @@ const CardContent = React.forwardRef(
     },
     ref
   ) => {
-    // console.log(
-    //   `Rendering CardContent for ${sectionName}, deletedAt:`,
-    //   deletedAt
-    // );
+
 
     return (
       <div ref={ref} className={cn("p-4 space-y-3", className)} {...props}>

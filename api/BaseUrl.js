@@ -8,7 +8,7 @@
       const host = window.location.hostname;
       const parts = host.split(".");
       
-      if (host === "localhost") return "happyjoes_test"; 
+      if (host === "localhost") return "nst"; 
       return parts.length > 2 ? parts[0] : "";
     };
     

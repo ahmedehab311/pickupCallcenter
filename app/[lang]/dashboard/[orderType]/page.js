@@ -74,7 +74,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSidebar } from "@/store/index";
 import { useSubdomin } from "@/provider/SubdomainContext";
 import Link from "next/link";
-import { useSelector } from "react-redux";
 // import DialogItemForMenu from "./components/DialogItemForMenu";
 // import NewAddressDialog from "./components/NewAddressDialog";
 // import NewUserDialog from "./components/NewUserDialog";
@@ -83,8 +82,10 @@ import { useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import CartItem from "./components/cartItem";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import placeholderImg from "./fsr-placeholder.webp"
+import InfiniteScroll from "react-infinite-scroll-component";
+import { CardItem } from "./CardItem";
 const editUserDataSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters long"),
   phone: z.string().regex(/^\d{3,15}$/, "Invalid phone number"),
@@ -242,7 +243,7 @@ function CreateOrder({ params }) {
   const router = useRouter();
 
   const searchParams = useSearchParams();
-    const { theme, color,setColor } = useThemeColor();
+  const { theme, color, setColor } = useThemeColor();
   const setCollapsed = useSidebar((state) => state.setCollapsed);
   const queryClient = useQueryClient();
   const [phone, setPhone] = useState("");
@@ -1219,25 +1220,25 @@ function CreateOrder({ params }) {
         const fullCondiments = cartItem.size_condiments?.length
           ? cartItem.size_condiments
           : [
-              ...(cartItem.selectedExtras || []).map((e) => ({
-                condiment_id: e.id,
-                count: e.quantity || 1,
-                price: e.price,
-                condiment_info: { name_en: e.name },
-              })),
-              ...(cartItem.selectedMainExtras || []).map((e) => ({
-                condiment_id: e.id,
-                count: e.quantity || 1,
-                price: e.price,
-                condiment_info: { name_en: e.name },
-              })),
-              ...(cartItem.selectedoption || []).map((e) => ({
-                condiment_id: e.id,
-                count: 1,
-                price: e.price,
-                condiment_info: { name_en: e.name },
-              })),
-            ];
+            ...(cartItem.selectedExtras || []).map((e) => ({
+              condiment_id: e.id,
+              count: e.quantity || 1,
+              price: e.price,
+              condiment_info: { name_en: e.name },
+            })),
+            ...(cartItem.selectedMainExtras || []).map((e) => ({
+              condiment_id: e.id,
+              count: e.quantity || 1,
+              price: e.price,
+              condiment_info: { name_en: e.name },
+            })),
+            ...(cartItem.selectedoption || []).map((e) => ({
+              condiment_id: e.id,
+              count: 1,
+              price: e.price,
+              condiment_info: { name_en: e.name },
+            })),
+          ];
 
         // 🟢 حساب الإضافات مرة واحدة
         const filledExtras = fullCondiments
@@ -1355,7 +1356,7 @@ function CreateOrder({ params }) {
           selectedoptionId: filledOptions.map((e) => e.id),
           quantity: cartItem.quantity,
           total, // حفظ التوتال الحالي فقط هنا
-          sub_total:total, // حفظ التوتال الحالي فقط هنا
+          sub_total: total, // حفظ التوتال الحالي فقط هنا
         });
 
         // 🟢 تحديث الكارت بالتوتال الصحيح (مرة واحدة فقط)
@@ -1893,7 +1894,7 @@ function CreateOrder({ params }) {
     setIsEditMode(false);
   };
 
- 
+
 
   const [selectedEditAddress, setSelectedEditAddress] = useState(null);
 
@@ -1902,10 +1903,10 @@ function CreateOrder({ params }) {
       prevItems.map((item) =>
         item.cartId === cartId
           ? {
-              ...item,
-              quantity: item.quantity + 1,
-              total: (item.quantity + 1) * item.price,
-            }
+            ...item,
+            quantity: item.quantity + 1,
+            total: (item.quantity + 1) * item.price,
+          }
           : item
       )
     );
@@ -1978,7 +1979,7 @@ function CreateOrder({ params }) {
       );
 
       return (
-       ( basePrice * counter )+ (extrasTotal + mainExtrasTotal + optionsTotal)
+        (basePrice * counter) + (extrasTotal + mainExtrasTotal + optionsTotal)
       );
     };
 
@@ -2019,7 +2020,7 @@ function CreateOrder({ params }) {
           id: selectedItem.id,
           quantity: counter,
           total: calculateTotal(),
-          sub_total:calculateTotal(),
+          sub_total: calculateTotal(),
           note: note,
           cartId: uuidv4(),
           mainExtras: [...(selectedItem.mainExtras || [])],
@@ -2121,11 +2122,11 @@ function CreateOrder({ params }) {
       prevItems.map((item) =>
         item.cartId === selectedItem.cartId
           ? {
-              ...item,
-              quantity: counter,
-              total: counter * item.price,
-              note: note,
-            }
+            ...item,
+            quantity: counter,
+            total: counter * item.price,
+            note: note,
+          }
           : item
       )
     );
@@ -2655,7 +2656,11 @@ function CreateOrder({ params }) {
   const [isOpenAddress, setIsOpenAddress] = useState(false);
   const [isOpenUserData, setIsOpenUserData] = useState(true);
   // console.log("apiBaseUrl create order", apiBaseUrl);
+  const [visibleItems, setVisibleItems] = useState(12);
 
+  const fetchMoreData = () => {
+    setVisibleItems((prev) => prev + 12); // كل مرة يزود 12
+  };
   const onSubmitEditUserAddress = async (data) => {
     console.log("apiBaseUrl onSubmitEditUserAddress", data);
 
@@ -2893,7 +2898,7 @@ function CreateOrder({ params }) {
     } finally {
       setLoading(false);
     }
-    const handleEditAddressTypeChange = (type) => {};
+    const handleEditAddressTypeChange = (type) => { };
     seEditAddressType(type);
 
     if (type === "other") {
@@ -2950,57 +2955,57 @@ function CreateOrder({ params }) {
 
   //   return sum + itemTotal;
   // }, 0);
-const grandTotal = cartItems.reduce((sum, item) => {
-  const basePrice = parseFloat(item.price) || 0;
-  const quantity = parseFloat(item.quantity) || 1;
+  const grandTotal = cartItems.reduce((sum, item) => {
+    const basePrice = parseFloat(item.price) || 0;
+    const quantity = parseFloat(item.quantity) || 1;
 
-  let extrasTotal = 0;
-  let optionTotal = 0;
-  let mainExtrasTotal = 0;
+    let extrasTotal = 0;
+    let optionTotal = 0;
+    let mainExtrasTotal = 0;
 
-  // 🟡 الحالة الأولى: size_condiments موجودة
-  if (Array.isArray(item.size_condiments) && item.size_condiments.length > 0) {
-    const sizeCondimentsTotal = item.size_condiments.reduce(
-      (acc, cond) =>
-        acc + (parseFloat(cond.price) || 0) * (cond.count || 1),
-      0
-    );
-    const itemTotal = (basePrice + sizeCondimentsTotal) * quantity;
+    // 🟡 الحالة الأولى: size_condiments موجودة
+    if (Array.isArray(item.size_condiments) && item.size_condiments.length > 0) {
+      const sizeCondimentsTotal = item.size_condiments.reduce(
+        (acc, cond) =>
+          acc + (parseFloat(cond.price) || 0) * (cond.count || 1),
+        0
+      );
+      const itemTotal = (basePrice + sizeCondimentsTotal) * quantity;
+      return sum + itemTotal;
+    }
+
+    // 🟢 الحالة الثانية: نحسب من selectedExtras و options
+    extrasTotal =
+      item.selectedExtras?.reduce(
+        (acc, extra) =>
+          acc + (parseFloat(extra.price) || 0) * (extra.quantity || 1),
+        0
+      ) || 0;
+
+    optionTotal =
+      item.selectedoption?.reduce(
+        (acc, option) => acc + (parseFloat(option.price) || 0),
+        0
+      ) || 0;
+
+    mainExtrasTotal =
+      item.selectedMainExtras?.reduce(
+        (acc, extra) => acc + (parseFloat(extra.price) || 0),
+        0
+      ) || 0;
+
+    const itemTotal =
+      (basePrice + extrasTotal + optionTotal + mainExtrasTotal) * quantity;
+
     return sum + itemTotal;
-  }
-
-  // 🟢 الحالة الثانية: نحسب من selectedExtras و options
-  extrasTotal =
-    item.selectedExtras?.reduce(
-      (acc, extra) =>
-        acc + (parseFloat(extra.price) || 0) * (extra.quantity || 1),
-      0
-    ) || 0;
-
-  optionTotal =
-    item.selectedoption?.reduce(
-      (acc, option) => acc + (parseFloat(option.price) || 0),
-      0
-    ) || 0;
-
-  mainExtrasTotal =
-    item.selectedMainExtras?.reduce(
-      (acc, extra) => acc + (parseFloat(extra.price) || 0),
-      0
-    ) || 0;
-
-  const itemTotal =
-    (basePrice  + extrasTotal + optionTotal + mainExtrasTotal)* quantity;
-
-  return sum + itemTotal;
-}, 0);
+  }, 0);
 
   // const formattedGrandTotal = parseFloat(grandTotal).toFixed(2);
 
   const [discountValue, setDiscountValue] = useState("");
   const [discountPercentage, setDiscountPercentage] = useState("");
   const [order, setOrder] = useState(null);
-
+  const [loaded, setLoaded] = useState(false);
   // const vatAmount = parseFloat(grandTotal * (parseFloat(Tax) / 100)); // .14
 
   const discount = 0;
@@ -3050,7 +3055,7 @@ const grandTotal = cartItems.reduce((sum, item) => {
       setDiscountValue("");
     }
   };
-  
+
   const handleCacelOrder = () => {
     setSearch("");
     setPhone("");
@@ -3200,11 +3205,10 @@ const grandTotal = cartItems.reduce((sum, item) => {
                   <button
                     key={section.id}
                     className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300
-        ${
-          activeSection === section.id
-            ? "bg-black text-white"
-            : "bg-gray-200 text-gray-600"
-        }
+        ${activeSection === section.id
+                        ? "bg-black text-white"
+                        : "bg-gray-200 text-gray-600"
+                      }
       `}
                     onClick={() => setActiveSection(section.id)}
                   >
@@ -3213,15 +3217,15 @@ const grandTotal = cartItems.reduce((sum, item) => {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                {displayedItems.map((item) => (
+              {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4"> */}
+                {/* {displayedItems.map((item) => (
                   <Card
                     onClick={() => handleItemClick(item)}
                     key={item.id}
                     className="p-0 shadow-md rounded-lg overflow-hidden mt-7 text-white cursor-pointer"
                   >
                     <div className="w-full h-40">
-                      <img
+                      <Image
                         src={item?.image}
                         alt={item?.name_en}
                         width={150}
@@ -3238,7 +3242,25 @@ const grandTotal = cartItems.reduce((sum, item) => {
                       </p>
                     </div>
                   </Card>
-                ))}
+                ))} */}
+<InfiniteScroll
+  dataLength={visibleItems}
+  next={fetchMoreData}
+  hasMore={visibleItems < displayedItems.length}
+  loader={<h4 className="text-center p-4">Loading...</h4>}
+>
+  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+    {displayedItems.slice(0, visibleItems).map((item) => (
+      <CardItem
+        key={item.id}
+        item={item}
+        language={language}
+        handleItemClick={handleItemClick}
+        placeholderImg={placeholderImg}
+      />
+    ))}
+  </div>
+</InfiniteScroll>
 
                 {/* <DialogItemForMenu
                     isItemDialogOpen={isItemDialogOpen}
@@ -3349,9 +3371,9 @@ const grandTotal = cartItems.reduce((sum, item) => {
                                   );
                                   const newGroupRules = newExtraGroup
                                     ? {
-                                        min: newExtraGroup?.min ?? 0,
-                                        max: newExtraGroup?.max ?? 0,
-                                      }
+                                      min: newExtraGroup?.min ?? 0,
+                                      max: newExtraGroup?.max ?? 0,
+                                    }
                                     : { min: 0, max: 0 };
                                   return setSelectedItem((prev) => ({
                                     ...prev,
@@ -3427,9 +3449,8 @@ const grandTotal = cartItems.reduce((sum, item) => {
 
                           {/* الاختيارات */}
                           <div
-                            className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                              isOpenMainOption ? "max-h-96" : "max-h-0"
-                            }`}
+                            className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpenMainOption ? "max-h-96" : "max-h-0"
+                              }`}
                           >
                             <div className="p-3 flex flex- flex-wrap gap-2">
                               {selectedItem?.optionSize?.map((extra, index) => (
@@ -3475,11 +3496,10 @@ const grandTotal = cartItems.reduce((sum, item) => {
                               onClick={toggleExtras}
                             >
                               <h3
-                                className={`font-bold text-[16px] ${
-                                  extrasError
+                                className={`font-bold text-[16px] ${extrasError
                                     ? "text-red-500"
                                     : "text-black dark:text-white"
-                                }`}
+                                  }`}
                               >
                                 {selectedItem?.groupNameExtrasData}
                               </h3>
@@ -3640,10 +3660,10 @@ const grandTotal = cartItems.reduce((sum, item) => {
                                                     (ex) =>
                                                       ex.id === extra.id
                                                         ? {
-                                                            ...ex,
-                                                            quantity:
-                                                              ex.quantity - 1,
-                                                          }
+                                                          ...ex,
+                                                          quantity:
+                                                            ex.quantity - 1,
+                                                        }
                                                         : ex
                                                   );
                                               }
@@ -3658,11 +3678,10 @@ const grandTotal = cartItems.reduce((sum, item) => {
                                               };
                                             });
                                           }}
-                                          className={`px-2 text-sm border rounded ${
-                                            !selected
+                                          className={`px-2 text-sm border rounded ${!selected
                                               ? "opacity-50 pointer-events-none"
                                               : ""
-                                          }`}
+                                            }`}
                                         >
                                           -
                                         </button>
@@ -3686,10 +3705,10 @@ const grandTotal = cartItems.reduce((sum, item) => {
                                                 prev.selectedExtras.map((ex) =>
                                                   ex.id === extra.id
                                                     ? {
-                                                        ...ex,
-                                                        quantity:
-                                                          ex.quantity + 1,
-                                                      }
+                                                      ...ex,
+                                                      quantity:
+                                                        ex.quantity + 1,
+                                                    }
                                                     : ex
                                                 );
 
@@ -3704,13 +3723,12 @@ const grandTotal = cartItems.reduce((sum, item) => {
                                             (groupMax > 0 &&
                                               totalSelectedCount >= groupMax)
                                           }
-                                          className={`px-2 text-sm border rounded ${
-                                            !selected ||
-                                            (extra.max > 0 &&
-                                              quantity >= extra.max)
+                                          className={`px-2 text-sm border rounded ${!selected ||
+                                              (extra.max > 0 &&
+                                                quantity >= extra.max)
                                               ? "opacity-50 pointer-events-none"
                                               : ""
-                                          }`}
+                                            }`}
                                         >
                                           +
                                         </button>
@@ -3755,9 +3773,8 @@ const grandTotal = cartItems.reduce((sum, item) => {
 
                           {/* الاختيارات */}
                           <div
-                            className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                              isOpenMainExtra ? "max-h-96" : "max-h-0"
-                            }`}
+                            className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpenMainExtra ? "max-h-96" : "max-h-0"
+                              }`}
                           >
                             <div className="p-3 flex flex- flex-wrap gap-2">
                               {selectedItem?.mainExtras?.map((extra, index) => (
@@ -3777,8 +3794,8 @@ const grandTotal = cartItems.reduce((sum, item) => {
                                         let updatedExtras = checked
                                           ? [...prev.selectedMainExtras, extra]
                                           : prev.selectedMainExtras.filter(
-                                              (ex) => ex.id !== extra.id
-                                            );
+                                            (ex) => ex.id !== extra.id
+                                          );
 
                                         let updatedExtrasIds =
                                           updatedExtras.map((ex) => ex.id); // تخزين الـ ID فقط
@@ -3853,9 +3870,9 @@ const grandTotal = cartItems.reduce((sum, item) => {
                             <p className="text-sm font-semibold mr-1">
                               {(
                                 (selectedItem?.price + totalExtrasPrices +
-                                totalOptionPrices +
-                                totalMainExtrasPrices  )  * counter
-                        
+                                  totalOptionPrices +
+                                  totalMainExtrasPrices) * counter
+
                               ).toFixed(2)}
                             </p>
                             <p className="text-sm font-semibold ">EGP</p>
@@ -3912,7 +3929,7 @@ const grandTotal = cartItems.reduce((sum, item) => {
 
                               <p className="text-sm font-semibold mr-1 ">
                                 {deliveryMethod === "pickup" &&
-                                !isBranchManuallySelected
+                                  !isBranchManuallySelected
                                   ? massegeNotSelectedBranch
                                   : ""}
                               </p>
@@ -4060,11 +4077,10 @@ const grandTotal = cartItems.reduce((sum, item) => {
                                   className="w-full text-[#000] dark:text-[#fff]"
                                 />
                                 <p
-                                  className={`text-red-500 text-sm mt-1 transition-all duration-200 ${
-                                    errorsAddNewUser.street
+                                  className={`text-red-500 text-sm mt-1 transition-all duration-200 ${errorsAddNewUser.street
                                       ? "h-auto opacity-100"
                                       : "h-0 opacity-0"
-                                  }`}
+                                    }`}
                                 >
                                   {errorsAddNewUser.street?.message}
                                 </p>
@@ -4224,11 +4240,10 @@ const grandTotal = cartItems.reduce((sum, item) => {
                                   className="w-full text-[#000] dark:text-[#fff] "
                                 />
                                 <p
-                                  className={`text-red-500 text-sm mt-1 transition-all duration-200 ${
-                                    errorsAddNewAddress.street
+                                  className={`text-red-500 text-sm mt-1 transition-all duration-200 ${errorsAddNewAddress.street
                                       ? "h-auto opacity-100"
                                       : "h-0 opacity-0"
-                                  }`}
+                                    }`}
                                 >
                                   {errorsAddNewAddress.street?.message}
                                 </p>
@@ -4323,7 +4338,7 @@ const grandTotal = cartItems.reduce((sum, item) => {
                     </Dialog>
                   )}
                 </>
-              </div>
+              {/* </div> */}
             </Card>
           </div>
         </div>
@@ -4888,7 +4903,7 @@ const grandTotal = cartItems.reduce((sum, item) => {
                                         }
                                         placeholder="No note added"
                                         className="w-full px-3 py- border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-700"
-                                        //  className="w-16 text-center border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:-blue-500 focus:border-transparent "
+                                      //  className="w-16 text-center border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:-blue-500 focus:border-transparent "
                                       />
                                     </div>
                                     <div className="flex items-center">
@@ -4914,10 +4929,10 @@ const grandTotal = cartItems.reduce((sum, item) => {
                                               prevItems.map((i) =>
                                                 i.cartId === item.cartId
                                                   ? {
-                                                      ...i,
-                                                      quantity: value,
-                                                      total: value * i.price,
-                                                    }
+                                                    ...i,
+                                                    quantity: value,
+                                                    total: value * i.price,
+                                                  }
                                                   : i
                                               )
                                             );
@@ -5035,43 +5050,43 @@ const grandTotal = cartItems.reduce((sum, item) => {
                                       })()}
                                     </span> */}
                                     <span>
-  {(() => {
-    const isUnchangedItem =
-      (item.selectedExtras?.length || 0) === 0 &&
-      (item.selectedMainExtras?.length || 0) === 0 &&
-      (item.selectedoption?.length || 0) === 0 &&
-      item.sub_total;
+                                      {(() => {
+                                        const isUnchangedItem =
+                                          (item.selectedExtras?.length || 0) === 0 &&
+                                          (item.selectedMainExtras?.length || 0) === 0 &&
+                                          (item.selectedoption?.length || 0) === 0 &&
+                                          item.sub_total;
 
-    if (isUnchangedItem) {
-      const baseSubTotal = Number(item.sub_total) || 0;
-      {/* const quantity = Number(item.quantity) || 1; */}
-      return `${(baseSubTotal ).toFixed(2)} EGP`;
-    }
+                                        if (isUnchangedItem) {
+                                          const baseSubTotal = Number(item.sub_total) || 0;
+                                          {/* const quantity = Number(item.quantity) || 1; */ }
+                                          return `${(baseSubTotal).toFixed(2)} EGP`;
+                                        }
 
-    const optionsTotal = (item.selectedoption || []).reduce(
-      (sum, o) => sum + (Number(o.price) || 0) * (Number(o.quantity) || 1),
-      0
-    );
+                                        const optionsTotal = (item.selectedoption || []).reduce(
+                                          (sum, o) => sum + (Number(o.price) || 0) * (Number(o.quantity) || 1),
+                                          0
+                                        );
 
-    const extrasTotal = (item.selectedExtras || []).reduce(
-      (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
-      0
-    );
+                                        const extrasTotal = (item.selectedExtras || []).reduce(
+                                          (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
+                                          0
+                                        );
 
-    const mainExtrasTotal = (item.selectedMainExtras || []).reduce(
-      (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
-      0
-    );
+                                        const mainExtrasTotal = (item.selectedMainExtras || []).reduce(
+                                          (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
+                                          0
+                                        );
 
-    const basePrice = Number(item.price) || 0;
-    const quantity = Number(item.quantity) || 1;
+                                        const basePrice = Number(item.price) || 0;
+                                        const quantity = Number(item.quantity) || 1;
 
-    const total =
-     ( basePrice  + optionsTotal + extrasTotal + mainExtrasTotal) * quantity;
+                                        const total =
+                                          (basePrice + optionsTotal + extrasTotal + mainExtrasTotal) * quantity;
 
-    return `${total.toFixed(2)} EGP`;
-  })()}
-</span>
+                                        return `${total.toFixed(2)} EGP`;
+                                      })()}
+                                    </span>
 
                                   </div>
                                   {index !== cartItems.length - 1 && (
@@ -5445,7 +5460,7 @@ const grandTotal = cartItems.reduce((sum, item) => {
                                     type="text"
                                     placeholder="insert Coupon"
                                     {...registerCreateOrder("insertcoupon")}
-                                    // className="w-full"
+                                  // className="w-full"
                                   />
                                 </div>
                                 <div className="flex flex-col w-1/2 ">
@@ -5650,9 +5665,8 @@ const grandTotal = cartItems.reduce((sum, item) => {
                     type="text"
                     placeholder="Username"
                     {...registerEdit("username")}
-                    className={`${
-                      errorsEdit.username ? "mb-1" : "mb-4"
-                    } text-[#000] dark:text-[#fff]`}
+                    className={`${errorsEdit.username ? "mb-1" : "mb-4"
+                      } text-[#000] dark:text-[#fff]`}
                   />
                   {errorsEdit.username && (
                     <p className="text-red-500 text-sm my-1">
@@ -5673,9 +5687,8 @@ const grandTotal = cartItems.reduce((sum, item) => {
                     type="number"
                     placeholder="Phone"
                     {...registerEdit("phone")}
-                    className={`${
-                      errorsEdit.phone ? "mb-1" : "mb-4"
-                    } text-[#000] dark:text-[#fff]`}
+                    className={`${errorsEdit.phone ? "mb-1" : "mb-4"
+                      } text-[#000] dark:text-[#fff]`}
                   />
                   {errorsEdit.phone && (
                     <p className="text-red-500 text-sm">
@@ -5695,9 +5708,8 @@ const grandTotal = cartItems.reduce((sum, item) => {
                     type="number"
                     placeholder="Phone 2"
                     {...registerEdit("phone2", { required: false })}
-                    className={`${
-                      errorsEdit.phone2 ? "mb-1" : "mb-4"
-                    } text-[#000] dark:text-[#fff]`}
+                    className={`${errorsEdit.phone2 ? "mb-1" : "mb-4"
+                      } text-[#000] dark:text-[#fff]`}
                   />
                   {errorsEdit.phone2 && (
                     <p className="text-red-500 text-sm mt-1">
@@ -5717,9 +5729,8 @@ const grandTotal = cartItems.reduce((sum, item) => {
                     type="text"
                     placeholder="Email"
                     {...registerEdit("email", { required: false })}
-                    className={`${
-                      errorsEdit.email ? "mb-1" : "mb-4"
-                    } text-[#000] dark:text-[#fff]`}
+                    className={`${errorsEdit.email ? "mb-1" : "mb-4"
+                      } text-[#000] dark:text-[#fff]`}
                   />
                   {errorsEdit.email && (
                     <p className="text-red-500 text-sm mt-1">
