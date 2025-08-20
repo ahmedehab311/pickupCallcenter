@@ -2656,7 +2656,7 @@ function CreateOrder({ params }) {
   const [isOpenAddress, setIsOpenAddress] = useState(false);
   const [isOpenUserData, setIsOpenUserData] = useState(true);
   // console.log("apiBaseUrl create order", apiBaseUrl);
-  const [visibleItems, setVisibleItems] = useState(12);
+  const [visibleItems, setVisibleItems] = useState(20);
 
   const fetchMoreData = () => {
     setVisibleItems((prev) => prev + 12); // كل مرة يزود 12
