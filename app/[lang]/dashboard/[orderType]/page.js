@@ -384,7 +384,7 @@ function CreateOrder({ params }) {
   //   },
   // });
   const [errorSearchUser, setErrorSearchUser] = useState("");
-  const [staticMassageError, setStaticMassageError] = useState("لا يوجد بيانات لهذا الرقم");
+  const [staticMassageError, setStaticMassageError] = useState("No data for this number");
 
   const {
     data: selectedUser,
@@ -1517,7 +1517,7 @@ function CreateOrder({ params }) {
   const [selectedBranchName, setSelectedBranchName] = useState("");
   const [selectedBranchInSelected, setSelectedBranchInSelected] =
     useState(null);
-  console.log("selectedBranchInSelected", selectedBranchInSelected);
+  // console.log("selectedBranchInSelected", selectedBranchInSelected);
 
   const [branchId, setBranchId] = useState(null);
   const [selectedBranchNew, setSelectedBranchNew] = useState(null);
@@ -1525,8 +1525,8 @@ function CreateOrder({ params }) {
 
   const [branchOptions, setBranchOptions] = useState([]);
   const [savedBranch, setSavedBranch] = useState(null);
-  console.log("savedBranch", savedBranch);
-  console.log("selectedBranchInSelected", selectedBranchInSelected);
+  // console.log("savedBranch", savedBranch);
+  // console.log("selectedBranchInSelected", selectedBranchInSelected);
 
   const [orderNote, setOrderNote] = useState("");
 
@@ -1814,9 +1814,9 @@ function CreateOrder({ params }) {
         setSelectedBranch(firstAddress.branch?.[0]);
       }
     } else {
-      if (deliveryMethod !== "pickup") {
-        setDeliveryMethod("pickup");
-      }
+      // if (deliveryMethod !== "pickup") {
+      //   setDeliveryMethod("pickup");
+      // }
 
       setSelectedAddress(null);
       setSelectedBranch(null);
@@ -1860,11 +1860,13 @@ function CreateOrder({ params }) {
       queryClient.removeQueries(["userSearch"]);
     };
   }, []);
-
+const [showManualLoading, setShowManualLoading] = useState(false);
   const handleSearch = () => {
     setHasSearched(true);
     if (search) {
+       setShowManualLoading(true);
       setPhone(search);
+          refetch().finally(()=> setShowManualLoading(false));
       if (selectedUser?.address?.length > 0) {
         if (!selectedAddress) {
           setSelectedAddress(selectedUser.address[0]);
@@ -1876,7 +1878,7 @@ function CreateOrder({ params }) {
         // setBranchId(null);
       }
       // queryClient.removeQueries(["userSearch"], { exact: false });
-      refetch();
+      // refetch();
       // setErrorSearchUser("");
       // setStaticMassageError("");
 
@@ -1900,8 +1902,6 @@ function CreateOrder({ params }) {
     setPhone("");
     // setErrorSearchUser("");
     setStaticMassageError("");
-    //  setErrorSearchUser("لا يوجد بيانات لهذا الرقم"); // أظهر الرسالة مباشرة
-    //  setStaticMassageError("لا يوجد بيانات لهذا الرقم");
     setAllUserData(null);
     setSelectedAddress(null);
     setSelectedAddressArray(null);
@@ -3083,6 +3083,7 @@ function CreateOrder({ params }) {
     setCartItems([]);
     setIsOpenUserData(true);
     setSelectedBranchPriceList(1);
+    setStaticMassageError("")
     queryClient.removeQueries(["userSearch"], { exact: false });
   };
   const handleEditAddress = (address) => {
@@ -4549,7 +4550,7 @@ function CreateOrder({ params }) {
               </div>
             )} */}
             {isOpenUserData && hasSearched ? (
-              isLoadingUserDataForSerach ? (
+              isLoadingUserDataForSerach || showManualLoading   ? (
                 <div className="mt-2 p-2 rounded-md">
                   <p className=" text-center">LOADING...</p>
                 </div>
@@ -4621,7 +4622,7 @@ function CreateOrder({ params }) {
 )} */}
           </Card>
 
-          {selectedUser && (
+          {selectedUser && !(isLoadingUserDataForSerach || showManualLoading) && (
             <>
               <Card className="p-4 s w-full mt-0">
                 <div
@@ -4646,7 +4647,7 @@ function CreateOrder({ params }) {
                   </span>
                 </div>
 
-                {isOpenAddress && selectedUser && (
+                {isOpenAddress && selectedUser &&  (
                   <div className="mt-2 p-2  rounded-md">
                     <div className="flex items-center justify-between gap-4 mb-4">
                       <div className="flex items-center gap-2">
@@ -4678,7 +4679,7 @@ function CreateOrder({ params }) {
                       </Button>
                     </div>
 
-                    {deliveryMethod === "delivery" && (
+                    {deliveryMethod === "delivery"   &&  (
                       <div className="my-3">
                         {selectedAddressArray?.length > 0 && (
                           <h4 className="font-medium my-3">Address:</h4>
@@ -5106,7 +5107,7 @@ function CreateOrder({ params }) {
                                         return `${total.toFixed(2)} EGP`;
                                       })()}
                                     </span> */}
-                                    <span>
+                                    {/* <span>
                                       {(() => {
                                         const isUnchangedItem =
                                           (item.selectedExtras?.length || 0) === 0 &&
@@ -5116,7 +5117,6 @@ function CreateOrder({ params }) {
 
                                         if (isUnchangedItem) {
                                           const baseSubTotal = Number(item.sub_total) || 0;
-                                          {/* const quantity = Number(item.quantity) || 1; */ }
                                           return `${(baseSubTotal).toFixed(2)} EGP`;
                                         }
 
@@ -5143,8 +5143,45 @@ function CreateOrder({ params }) {
 
                                         return `${total.toFixed(2)} EGP`;
                                       })()}
-                                    </span>
+                                    </span> */}
+<span>
+  {(() => {
+    const isUnchangedItem =
+      (item.selectedExtras?.length || 0) === 0 &&
+      (item.selectedMainExtras?.length || 0) === 0 &&
+      (item.selectedoption?.length || 0) === 0 &&
+      item.sub_total;
 
+    if (isUnchangedItem) {
+      const baseSubTotal = Number(item.sub_total) || 0;
+      const quantity = Number(item.quantity) || 1;
+      return `${(baseSubTotal * quantity).toFixed(2)} EGP`;
+    }
+
+    const optionsTotal = (item.selectedoption || []).reduce(
+      (sum, o) => sum + (Number(o.price) || 0) * (Number(o.quantity) || 1),
+      0
+    );
+
+    const extrasTotal = (item.selectedExtras || []).reduce(
+      (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
+      0
+    );
+
+    const mainExtrasTotal = (item.selectedMainExtras || []).reduce(
+      (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
+      0
+    );
+
+    const basePrice = Number(item.price) || 0;
+    const quantity = Number(item.quantity) || 1;
+
+    const total =
+      (basePrice + optionsTotal + extrasTotal + mainExtrasTotal) * quantity;
+
+    return `${total.toFixed(2)} EGP`;
+  })()}
+</span>
                                   </div>
                                   {index !== cartItems.length - 1 && (
                                     <div className="border-b border-gray-500 -mx-4 mt-4"></div>

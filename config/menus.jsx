@@ -49,13 +49,13 @@ const getLocalizedLinks = (language) => {
           isOpen: false,
           isHide: false,
         },
-        {
-          title: "Condiments",
-          icon: Branch,
-          href: `/${language}/dashboard/condiments`,
-          isOpen: false,
-          isHide: false,
-        },
+        // {
+        //   title: "Condiments",
+        //   icon: Branch,
+        //   href: `/${language}/dashboard/condiments`,
+        //   isOpen: false,
+        //   isHide: false,
+        // },
       ],
     },
   };
