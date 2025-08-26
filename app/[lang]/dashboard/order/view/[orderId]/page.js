@@ -156,9 +156,9 @@ export default function OrderViewPage({ params }) {
       setSelectedDelivery(foundDelivery || null);
     }
   }, [DeliveryOptions, OrderDetails?.delivery?.delivery_id]);
-  const handlePrint = () => {
-    window.print();
-  };
+  // const handlePrint = () => {
+  //   window.print();
+  // };
   const handleEditOrder = () => {
     localStorage.setItem("order", JSON.stringify(Order));
     // هنا سنوجه المستخدم إلى صفحة التعديل (edit-order) بدلاً من create-order
@@ -297,6 +297,7 @@ export default function OrderViewPage({ params }) {
       </Card>
  </div> */}
       <div className="flex justify-between">
+     {/* <div className="flex gap-4">
         <div className="flex justify-between items-center w-1/2">
           <div className="flex gap-2">
             <h3>Check: {OrderDetails?.check_id}</h3>
@@ -304,12 +305,10 @@ export default function OrderViewPage({ params }) {
           </div>
           <p>Status: {OrderDetails?.status}</p>
         </div>
-      </div>
-
-     <div className="flex gap-4">
-  {/* الجدول على الشمال */}
+      </div> */}
   <div className="w-1/2">
     <Card title="Order Info">
+     
       <BasicTable
         OrderDetailsItem={OrderDetailsItem}
         OrderDetails={OrderDetails}
@@ -362,9 +361,9 @@ export default function OrderViewPage({ params }) {
           <Button className="py-[6px]" onClick={handleEditOrder}>
             Edit
           </Button>
-          <Button className="py-[6px]" onClick={() => handlePrint()}>
+          {/* <Button className="py-[6px]" onClick={() => handlePrint()}>
             Print
-          </Button>
+          </Button> */}
         </div>
       </div>
     </Card>

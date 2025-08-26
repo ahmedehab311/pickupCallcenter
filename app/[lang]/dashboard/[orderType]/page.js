@@ -65,7 +65,7 @@ import { BASE_URL } from "@/api/BaseUrl";
 import { z } from "zod";
 import { useForm, Controller, set } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaSpinner } from "react-icons/fa";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { FiSearch } from "react-icons/fi";
@@ -364,25 +364,7 @@ function CreateOrder({ params }) {
       }))
     ) || [];
 
-  // const {
-  //   data: selectedUser,
-  //   isLoadingUserDataForSerach,
-  //   errorUserDataForSearch,
-  //   refetch
-  // } = useQuery({
-  //   queryKey: ["userSearch", phone],
-  //   queryFn: () => fetchUserByPhone(phone, token, apiBaseUrl),
-  //   enabled: false,
-  //   onSuccess: (data) => {
-  //     if (data) {
-  //       setAllUserData(data);
-  //     }
-  //   },
-  //   onError: (error) => {
-  //     setErrorSearchUser("Error fetching user data");
-  //     console.error("Error fetching user:", error);
-  //   },
-  // });
+
   const [errorSearchUser, setErrorSearchUser] = useState("");
   const [staticMassageError, setStaticMassageError] = useState("No data for this number");
 
@@ -398,10 +380,10 @@ function CreateOrder({ params }) {
     onSuccess: (data) => {
       if (data) {
         setAllUserData(data);
-        // setErrorSearchUser("");
+        setStaticMassageError(""); // داتا موجودة
       } else {
         setAllUserData(null);
-        // setErrorSearchUser("No user found");
+        setStaticMassageError("No data for this number"); // داتا فاضية
       }
     },
     onError: (error) => {
@@ -504,10 +486,7 @@ function CreateOrder({ params }) {
     setIsOpen(true); // يفتح تبويب extras
     setIsOpenMainExtra(true); // يفتح تبويب mainExtras
     setInitialized(false);
-    // if (!selectedUser) {
-    //   setMassegeNotSerachPhone("Select user first");
-    //   return;
-    // }
+
 
     if (
       (deliveryMethod === "pickup" && !isBranchManuallySelected) ||
@@ -594,18 +573,6 @@ function CreateOrder({ params }) {
     }
   };
 
-  // console.log("selectedExtras", selectedExtras);
-  // console.log(
-  //   "groupExtrasDataRule max",
-  //   selectedItem?.groupExtrasDataRule?.max
-  // );
-  // console.log(
-  //   "groupExtrasDataRule min",
-  //   selectedItem?.groupExtrasDataRule?.min
-  // );
-  // console.log("groupMax", groupMax);
-  // console.log("groupMin", groupMin);
-  // console.log("selectedCount", selectedCount);
   const contentRef = useRef(null);
   const [height, setHeight] = useState("0px");
 
@@ -628,567 +595,6 @@ function CreateOrder({ params }) {
     }
   }, [isOpen, selectedItem?.extrasData]);
 
-  // const handleEditItem = async (item) => {
-  //   setNote(item.note || "");
-  //   setCounter(item.quantity);
-  //   setTotalExtrasPrice(0);
-  //   setIsItemDialogOpen(true);
-
-  //   // نقوم بمقارنة العنصر في السلة باستخدام cartId
-  //   const cartItem = cartItems.find(
-  //     (cartItem) => cartItem.cartId === item.cartId
-  //   );
-
-  //   // إذا وجدنا العنصر في السلة، نقوم بتحديث selectedItem بناءً على الـ cartId
-  //   if (cartItem) {
-  //     setSelectedItem({
-  //       id: cartItem.id,
-  //       name: cartItem.selectedInfo,
-  //       image: cartItem.image,
-  //       price: cartItem.price,
-  //       selectedInfo: cartItem.selectedInfo || "",
-  //       selectedIdSize: cartItem.selectedIdSize || "",
-  //       selectedMainExtras: cartItem.selectedMainExtras || [],
-  //       selectedMainExtrasIds: cartItem.selectedMainExtrasIds || [],
-  //       selectedExtras: cartItem.selectedExtras || [],
-  //       selectedExtrasIds: cartItem.selectedExtrasIds || [],
-  //       selectedoption: cartItem.selectedoption || [],
-  //       selectedoptionId: cartItem.selectedoptionId || [],
-  //       extrasData: cartItem.extrasData || [],
-  //     });
-  //     // بعد ذلك، نستخدم الـ id لإجراء fetch
-  //     try {
-  //       const response = await fetchViewItem(
-  //         savedBranch?.value || selectedBranchInSelected?.value,
-  //         cartItem.id, // هنا نستخدم id للحصول على التفاصيل من الـ API
-  //         token,
-  //         apiBaseUrl
-  //       );
-  //       console.log("response", response);
-  //       if (response?.response === false) {
-  //         setMassegeInvaildToken(response.message);
-  //         return;
-  //       }
-
-  //       setMassegeInvaildToken(null);
-
-  //       if (response) {
-  //         setIsOpenMainOption(true);
-  //         setIsOpenMainExtra(true);
-  //         setIsOpen(true);
-  //         setInitialized(false);
-  //         // const firstInfo = response.info?.[0] || null;
-  //         // const firstInfo = response?.sizes?.[0] || null;
-  //         const selectedSizeInfo =
-  //           response?.sizes?.find((s) => s?.id === cartItem?.selectedIdSize) ||
-  //           response?.sizes?.[0];
-  //         const sizeCondiments = selectedSizeInfo?.size_condiments || [];
-  //         const itemCondiments = response?.item_condiments || [];
-
-  //         const extraMainGroup = itemCondiments.find(
-  //           (group) => group?.type === "extra"
-  //         );
-  //         const extraGroup = sizeCondiments.find(
-  //           (group) => group?.type === "extra"
-  //         );
-  //         const optionGroup = sizeCondiments.find(
-  //           (group) => group?.type === "option"
-  //         );
-
-  //         setSelectedItem((prev) => ({
-  //           ...prev,
-  //           cartId: item.cartId,
-  //           price: selectedSizeInfo?.price?.price,
-  //           availability: selectedSizeInfo?.availability?.availability,
-  //           info: response?.sizes || [],
-  //           mainExtras: extraMainGroup?.condiments || [],
-  //           groupNameMainExtras: extraMainGroup?.group_name || [],
-  //           itemExtras: selectedSizeInfo?.size_condiments || [],
-  //           extrasData: extraGroup?.condiments || [],
-  //           groupNameExtrasData: extraGroup?.group_name || [],
-  //           optionSize: optionGroup?.condiments || [],
-  //           groupNameSizes: optionGroup?.group_name || [],
-  //           selectedExtras: prev.selectedExtras || [],
-  //           selectedExtrasIds: prev.selectedExtrasIds || [],
-  //         }));
-  //         setIsItemDialogOpen(true);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching item details:", error);
-  //     }
-  //   }
-  // };
-
-  //   const handleEditItem = async (item) => {
-  //   setNote(item.note || "");
-  //   setCounter(item.quantity);
-  //   setTotalExtrasPrice(0);
-  //   setIsItemDialogOpen(true);
-
-  //   const cartItem = cartItems.find((cartItem) => cartItem.cartId === item.cartId);
-
-  //   if (!cartItem) return;
-
-  //   try {
-  //     const response = await fetchViewItem(
-  //       savedBranch?.value || selectedBranchInSelected?.value,
-  //       cartItem.id,
-  //       token,
-  //       apiBaseUrl
-  //     );
-
-  //     if (response?.response === false) {
-  //       setMassegeInvaildToken(response.message);
-  //       return;
-  //     }
-
-  //     setMassegeInvaildToken(null);
-
-  //     if (response) {
-  //       setIsOpenMainOption(true);
-  //       setIsOpenMainExtra(true);
-  //       setIsOpen(true);
-  //       setInitialized(false);
-  // console.log("response",response);
-
-  //       const selectedSizeInfo =
-  //         response?.sizes?.find((s) => s?.id === cartItem?.selectedIdSize) ||
-  //         response?.sizes?.[0];
-
-  //       const sizeCondiments = selectedSizeInfo?.size_condiments || [];
-  //       const itemCondiments = response?.item_condiments || [];
-
-  //       const extraMainGroup = itemCondiments.find((group) => group?.type === "extra");
-  //       const extraGroup = sizeCondiments.find((group) => group?.type === "extra");
-  //       const optionGroup = sizeCondiments.find((group) => group?.type === "option");
-
-  //       setSelectedItem({
-  //         id: cartItem.id,
-  //         name: response?.name_en,
-  //         description_en: response?.description_en,
-  //         description_ar: response?.description_ar,
-  //         image: response?.image,
-  //         price: selectedSizeInfo?.price?.price,
-  //         availability: selectedSizeInfo?.availability?.availability,
-  //         info: response?.sizes || [],
-  //         selectedInfo: cartItem?.selectedInfo || selectedSizeInfo?.size_en || "",
-  //         selectedIdSize: selectedSizeInfo?.id || "",
-  //         selectedMainExtras: cartItem?.selectedMainExtras || [],
-  //         selectedMainExtrasIds: cartItem?.selectedMainExtrasIds || [],
-  //         mainExtras: extraMainGroup?.condiments || [],
-  //         groupNameMainExtras: extraMainGroup?.group_name || [],
-  //         groupExtrasMainRule: {
-  //           max: extraMainGroup?.max,
-  //           min: extraMainGroup?.min,
-  //         },
-  //         itemExtras: selectedSizeInfo?.size_condiments || [],
-  //         extrasData: extraGroup?.condiments || [],
-  //         groupNameExtrasData: extraGroup?.group_name || [],
-  //         groupExtrasDataRule: {
-  //           max: extraGroup?.max,
-  //           min: extraGroup?.min,
-  //         },
-  //         optionSize: optionGroup?.condiments || [],
-  //         groupNameSizes: optionGroup?.group_name || [],
-  //         selectedExtras: cartItem?.selectedExtras || [],
-  //         selectedExtrasIds: cartItem?.selectedExtrasIds || [],
-  //         selectedoption: cartItem?.selectedoption || [],
-  //         selectedoptionId: cartItem?.selectedoptionId || [],
-  //         cartId: cartItem.cartId,
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching item details:", error);
-  //   }
-  // };
-
-  //   const handleEditItem = async (item) => {
-  //     setNote(item.note || "");
-  //     setCounter(item.quantity);
-  //     setTotalExtrasPrice(0);
-  //     setIsItemDialogOpen(true);
-
-  //     const cartItem = cartItems.find(
-  //       (cartItem) => cartItem.cartId === item.cartId
-  //     );
-  //     if (!cartItem) return;
-
-  //     try {
-  //       const response = await fetchViewItem(
-  //         savedBranch?.value || selectedBranchInSelected?.value,
-  //         item.id,
-  //         token,
-  //         apiBaseUrl
-  //       );
-
-  //       if (response?.response === false) {
-  //         setMassegeInvaildToken(response.message);
-  //         return;
-  //       }
-
-  //       setMassegeInvaildToken(null);
-
-  //       if (response) {
-  //         setIsOpenMainOption(true);
-  //         setIsOpenMainExtra(true);
-  //         setIsOpen(true);
-  //         setInitialized(false);
-
-  //         const selectedSizeInfo =
-  //           response?.sizes?.find((s) => s?.id === cartItem?.selectedIdSize) ||
-  //           response?.sizes?.[0];
-
-  //         const sizeCondiments = selectedSizeInfo?.size_condiments || [];
-  //         const itemCondiments = response?.item_condiments || [];
-
-  //         const extraMainGroup = itemCondiments.find(
-  //           (group) => group?.type === "extra"
-  //         );
-  //         const extraGroup = sizeCondiments.find(
-  //           (group) => group?.type === "extra"
-  //         );
-  //         const optionGroup = sizeCondiments.find(
-  //           (group) => group?.type === "option"
-  //         );
-
-  //         setSelectedItem({
-  //           id: response?.id,
-  //           name: response?.name_en, // ← الاسم الصحيح للمنتج
-  //           description_en: response?.description_en,
-  //           description_ar: response?.description_ar,
-  //           image: response?.image,
-  //           price: selectedSizeInfo?.price?.price,
-  //           availability: selectedSizeInfo?.availability?.availability,
-  //           info: response?.sizes || [],
-  //           selectedInfo:
-  //             cartItem?.selectedInfo || selectedSizeInfo?.size_en || "",
-  //           selectedIdSize: selectedSizeInfo?.id || "",
-  //           mainExtras: extraMainGroup?.condiments || [],
-  //           groupNameMainExtras: extraMainGroup?.group_name || [],
-  //           groupExtrasMainRule: {
-  //             max: extraMainGroup?.max,
-  //             min: extraMainGroup?.min,
-  //           },
-  //           itemExtras: selectedSizeInfo?.size_condiments || [],
-  //           extrasData: extraGroup?.condiments || [],
-  //           groupNameExtrasData: extraGroup?.group_name || [],
-  //           groupExtrasRules: {
-  //             max: extraGroup?.max,
-  //             min: extraGroup?.min,
-  //           },
-  //           groupExtrasMainRule: {
-  //             max: extraMainGroup?.max,
-  //             min: extraMainGroup?.min,
-  //           },
-
-  //           optionSize: optionGroup?.condiments || [],
-  //           groupNameSizes: optionGroup?.group_name || [],
-  //           selectedExtras: cartItem?.selectedExtras || [],
-  //           selectedExtrasIds: cartItem?.selectedExtrasIds || [],
-  //           selectedMainExtras: cartItem?.selectedMainExtras || [],
-  //           selectedMainExtrasIds: cartItem?.selectedMainExtrasIds || [],
-  //           selectedoption: cartItem?.selectedoption || [],
-  //           selectedoptionId: cartItem?.selectedoptionId || [],
-  //           cartId: cartItem.cartId,
-  //         });
-  //        setSelectedItem((prev) => {
-  //   const sizeCondiments = cartItem.size_condiments?.length
-  //     ? cartItem.size_condiments
-  //     : [
-  //         ...(cartItem.selectedExtras || []).map((e) => ({
-  //           condiment_id: e.id,
-  //           count: e.quantity || 1,
-  //           price: e.price,
-  //           condiment_info: { name_en: e.name },
-  //         })),
-  //         ...(cartItem.selectedMainExtras || []).map((e) => ({
-  //           condiment_id: e.id,
-  //           count: e.quantity || 1,
-  //           price: e.price,
-  //           condiment_info: { name_en: e.name },
-  //         })),
-  //         ...(cartItem.selectedoption || []).map((e) => ({
-  //           condiment_id: e.id,
-  //           count: 1,
-  //           price: e.price,
-  //           condiment_info: { name_en: e.name },
-  //         })),
-  //       ];
-
-  //   const extrasData = prev.extrasData || [];
-  //   const optionSize = prev.optionSize || [];
-  //   const mainExtras = prev.mainExtras || [];
-
-  //   const filledExtras = sizeCondiments.filter((cond) =>
-  //     extrasData.some((e) => e.id === cond.condiment_id)
-  //   ).map((cond) => {
-  //     const matched = extrasData.find((e) => e.id === cond.condiment_id);
-  //     return {
-  //       id: cond.condiment_id,
-  //       name: matched?.name || cond.condiment_info?.name_en,
-  //       price: parseFloat(cond.price),
-  //       quantity: cond.count,
-  //     };
-  //   });
-
-  //   const filledOptions = sizeCondiments.filter((cond) =>
-  //     optionSize.some((e) => e.id === cond.condiment_id)
-  //   ).map((cond) => {
-  //     const matched = optionSize.find((e) => e.id === cond.condiment_id);
-  //     return {
-  //       id: cond.condiment_id,
-  //       name: matched?.name || cond.condiment_info?.name_en,
-  //       price: parseFloat(cond.price),
-  //       quantity: cond.count,
-  //     };
-  //   });
-
-  //   const filledMainExtras = sizeCondiments.filter((cond) =>
-  //     mainExtras.some((e) => e.id === cond.condiment_id)
-  //   ).map((cond) => {
-  //     const matched = mainExtras.find((e) => e.id === cond.condiment_id);
-  //     return {
-  //       id: cond.condiment_id,
-  //       name: matched?.name || cond.condiment_info?.name_en,
-  //       price: parseFloat(cond.price),
-  //       quantity: cond.count,
-  //     };
-  //   });
-
-  //   // ✅ احسب التوتال هنا
-  //   const extrasTotal = filledExtras.reduce(
-  //     (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
-  //     0
-  //   );
-  //   const mainExtrasTotal = filledMainExtras.reduce(
-  //     (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
-  //     0
-  //   );
-  //   const optionsTotal = filledOptions.reduce(
-  //     (sum, o) => sum + (Number(o.price) || 0) * (Number(o.quantity) || 1),
-  //     0
-  //   );
-  //   const basePrice = Number(prev.price) || 0;
-  //   const quantity = cartItem.quantity || 1;
-  //   const total = (basePrice + extrasTotal + mainExtrasTotal + optionsTotal) * quantity;
-
-  //   return {
-  //     ...prev,
-  //     selectedMainExtras: filledMainExtras,
-  //     selectedMainExtrasIds: filledMainExtras.map((e) => e.id),
-  //     selectedExtras: filledExtras,
-  //     selectedExtrasIds: filledExtras.map((e) => e.id),
-  //     selectedoption: filledOptions,
-  //     selectedoptionId: filledOptions.map((o) => o.id),
-  //     total, // ✅ التوتال هنا
-  //   };
-  // });
-
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching item details:", error);
-  //     }
-  //   };
-
-  // const handleEditItem = async (item) => {
-  //   setNote(item.note || "");
-  //   setCounter(item.quantity);
-  //   setTotalExtrasPrice(0);
-  //   setIsItemDialogOpen(true);
-
-  //   const cartItem = cartItems.find(
-  //     (cartItem) => cartItem.cartId === item.cartId
-  //   );
-  //   if (!cartItem) return;
-
-  //   try {
-  //     const response = await fetchViewItem(
-  //       savedBranch?.value || selectedBranchInSelected?.value,
-  //       item.id,
-  //       token,
-  //       apiBaseUrl
-  //     );
-
-  //     if (response?.response === false) {
-  //       setMassegeInvaildToken(response.message);
-  //       return;
-  //     }
-
-  //     setMassegeInvaildToken(null);
-
-  //     if (response) {
-  //       setIsOpenMainOption(true);
-  //       setIsOpenMainExtra(true);
-  //       setIsOpen(true);
-  //       setInitialized(false);
-
-  //       const selectedSizeInfo =
-  //         response?.sizes?.find((s) => s?.id === cartItem?.selectedIdSize) ||
-  //         response?.sizes?.[0];
-
-  //       const sizeCondiments = selectedSizeInfo?.size_condiments || [];
-  //       const itemCondiments = response?.item_condiments || [];
-
-  //       const extraMainGroup = itemCondiments.find(
-  //         (group) => group?.type === "extra"
-  //       );
-  //       const extraGroup = sizeCondiments.find(
-  //         (group) => group?.type === "extra"
-  //       );
-  //       const optionGroup = sizeCondiments.find(
-  //         (group) => group?.type === "option"
-  //       );
-
-  //       setSelectedItem({
-  //         id: response?.id,
-  //         name: response?.name_en,
-  //         description_en: response?.description_en,
-  //         description_ar: response?.description_ar,
-  //         image: response?.image,
-  //         price: selectedSizeInfo?.price?.price,
-  //           // total: cartItem.total,
-  //         availability: selectedSizeInfo?.availability?.availability,
-  //         info: response?.sizes || [],
-  //         selectedInfo:
-  //           cartItem?.selectedInfo || selectedSizeInfo?.size_en || "",
-  //         selectedIdSize: selectedSizeInfo?.id || "",
-  //         mainExtras: extraMainGroup?.condiments || [],
-  //         groupNameMainExtras: extraMainGroup?.group_name || [],
-  //         groupExtrasMainRule: {
-  //           max: extraMainGroup?.max,
-  //           min: extraMainGroup?.min,
-  //         },
-  //         itemExtras: selectedSizeInfo?.size_condiments || [],
-  //         extrasData: extraGroup?.condiments || [],
-  //         groupNameExtrasData: extraGroup?.group_name || [],
-  //         groupExtrasRules: {
-  //           max: extraGroup?.max,
-  //           min: extraGroup?.min,
-  //         },
-  //         groupExtrasMainRule: {
-  //           max: extraMainGroup?.max,
-  //           min: extraMainGroup?.min,
-  //         },
-  //         optionSize: optionGroup?.condiments || [],
-  //         groupNameSizes: optionGroup?.group_name || [],
-  //         cartId: cartItem.cartId,
-  //       });
-
-  //       // حساب التوتال داخل setSelectedItem الثاني
-  //       setSelectedItem((prev) => {
-  //         const sizeCondiments = cartItem.size_condiments?.length
-  //           ? cartItem.size_condiments
-  //           : [
-  //               ...(cartItem.selectedExtras || []).map((e) => ({
-  //                 condiment_id: e.id,
-  //                 count: e.quantity || 1,
-  //                 price: e.price,
-  //                 condiment_info: { name_en: e.name },
-  //               })),
-  //               ...(cartItem.selectedMainExtras || []).map((e) => ({
-  //                 condiment_id: e.id,
-  //                 count: e.quantity || 1,
-  //                 price: e.price,
-  //                 condiment_info: { name_en: e.name },
-  //               })),
-  //               ...(cartItem.selectedoption || []).map((e) => ({
-  //                 condiment_id: e.id,
-  //                 count: 1,
-  //                 price: e.price,
-  //                 condiment_info: { name_en: e.name },
-  //               })),
-  //             ];
-
-  //         const extrasData = prev.extrasData || [];
-  //         const optionSize = prev.optionSize || [];
-  //         const mainExtras = prev.mainExtras || [];
-
-  //         const filledExtras = sizeCondiments
-  //           .filter((cond) =>
-  //             extrasData.some((e) => e.id === cond.condiment_id)
-  //           )
-  //           .map((cond) => {
-  //             const matched = extrasData.find(
-  //               (e) => e.id === cond.condiment_id
-  //             );
-  //             return {
-  //               id: cond.condiment_id,
-  //               name: matched?.name || cond.condiment_info?.name_en,
-  //               price: parseFloat(cond.price),
-  //               quantity: cond.count,
-  //             };
-  //           });
-
-  //         const filledOptions = sizeCondiments
-  //           .filter((cond) =>
-  //             optionSize.some((e) => e.id === cond.condiment_id)
-  //           )
-  //           .map((cond) => {
-  //             const matched = optionSize.find(
-  //               (e) => e.id === cond.condiment_id
-  //             );
-  //             return {
-  //               id: cond.condiment_id,
-  //               name: matched?.name || cond.condiment_info?.name_en,
-  //               price: parseFloat(cond.price),
-  //               quantity: cond.count,
-  //             };
-  //           });
-
-  //         const filledMainExtras = sizeCondiments
-  //           .filter((cond) =>
-  //             mainExtras.some((e) => e.id === cond.condiment_id)
-  //           )
-  //           .map((cond) => {
-  //             const matched = mainExtras.find(
-  //               (e) => e.id === cond.condiment_id
-  //             );
-  //             return {
-  //               id: cond.condiment_id,
-  //               name: matched?.name || cond.condiment_info?.name_en,
-  //               price: parseFloat(cond.price),
-  //               quantity: cond.count,
-  //             };
-  //           });
-
-  //         const basePrice = Number(prev.price) || 0;
-  //         const quantity = cartItem.quantity || 1;
-
-  //         const extrasTotal = filledExtras.reduce(
-  //           (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
-  //           0
-  //         );
-  //         const mainExtrasTotal = filledMainExtras.reduce(
-  //           (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
-  //           0
-  //         );
-  //         const optionsTotal = filledOptions.reduce(
-  //           (sum, o) => sum + (Number(o.price) || 0) * (Number(o.quantity) || 1),
-  //           0
-  //         );
-
-  //         const total =
-  //           (basePrice + extrasTotal + mainExtrasTotal + optionsTotal) *
-  //           quantity;
-
-  //         return {
-  //           ...prev,
-  //           selectedMainExtras: filledMainExtras,
-  //           selectedMainExtrasIds: filledMainExtras.map((e) => e.id),
-  //           selectedExtras: filledExtras,
-  //           selectedExtrasIds: filledExtras.map((e) => e.id),
-  //           selectedoption: filledOptions,
-  //           selectedoptionId: filledOptions.map((o) => o.id),
-  //           quantity,
-  //         total: cartItem.total,
-  //         };
-  //       });
-
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching item details:", error);
-  //   }
-  // };
   const handleEditItem = async (item) => {
     setNote(item.note || "");
     setCounter(item.quantity);
@@ -1321,7 +727,7 @@ function CreateOrder({ params }) {
           (cartItem.quantity || 1);
         console.log("total", total);
 
-        // 🟡 حفظ بيانات العنصر المفتوح حاليًا
+
         setSelectedItem({
           id: response?.id,
           name: response?.name_en,
@@ -1393,23 +799,7 @@ function CreateOrder({ params }) {
 
     setInitialized(true);
   }, [selectedItem, initialized]);
-  // useEffect(() => {
-  //   if (!selectedItem) return;
 
-  //   const groupMax = selectedItem?.groupExtrasDataRule?.max
-  //   const totalSelected = selectedItem?.selectedExtras?.reduce(
-  //     (sum, ex) => sum + (ex.quantity || 0),
-  //     0
-  //   );
-
-  //   console.log("groupMax",groupMax);
-  //   console.log("totalSelected",totalSelected);
-  //   // لو max مش بصفر ووصلنا للحد الأقصى، اقفل التاب
-  //   if (groupMax > 0 && totalSelected === groupMax) {
-  //     setIsOpen(false); // اقفل تاب الإكسترا
-  //      setIsOpenMainOption(false);
-  //   }
-  // }, [selectedItem,selectedItem?.selectedExtras]);
   const [extrasError, setExtrasError] = useState("");
   const selectedExtras = selectedItem?.selectedExtras;
   const groupMainExtraMax = selectedItem?.groupExtrasMainRule?.max;
@@ -1430,12 +820,6 @@ function CreateOrder({ params }) {
     );
     const totalMainSelected = selectedItem?.selectedMainExtras?.length;
 
-    // console.log("groupMax", groupMax)";
-    // console.log("totalSelected", totalSelected);"
-
-    // if (groupMax > 0 && totalSelected === groupMax ) {
-    //   setIsOpen(false);
-    // }
     if (
       (groupMax > 0 && totalSelected === groupMax) ||
       (groupMax === 0 && totalSelected === extrasCount)
@@ -1536,19 +920,7 @@ function CreateOrder({ params }) {
     useState(false);
   const [addressWasManuallySelected, setAddressWasManuallySelected] =
     useState(false);
-  //   useEffect(() => {
-  //     // تعيين isEditMode بناءً على الباث
-  //     setIsEditMode(orderType === 'edit-order');
-  //   }, [orderType]);
-  // // console.log("selectedUser", selectedUser);
-  // // console.log("selectedAddress", selectedAddress);
-  // useEffect(() => {
-  //   if (isEditMode) {
-  //     const currentPath = window.location.pathname;
-  //     const newPathName = currentPath.replace("create", "edit");
-  //     window.history.replaceState(null, "", newPathName);
-  //   }
-  // }, [isEditMode]);
+
   useEffect(() => {
     const orderData = localStorage.getItem("order");
 
@@ -1564,15 +936,7 @@ function CreateOrder({ params }) {
     }
   }, [orderType]);
 
-  // useEffect(() => {
-  //   if (isEditMode) {
-  //     // تغيير المسار إلى edit-order إذا كان isEditMode = true
-  //     const newPathName = window.location.pathname.replace('create', 'edit');
-  //     router.replace(newPathName); // استخدام router.replace بدلاً من replaceState
-  //   }
-  // }, [isEditMode, router]);
 
-  // console.log("isEditMode:", isEditMode);
   const [orderData, setOrderData] = useState(null);
   useEffect(() => {
     const orderData = localStorage.getItem("order");
@@ -1674,32 +1038,7 @@ function CreateOrder({ params }) {
       const items = orderData?.items;
       console.log("orderData", orderData);
 
-      // if (Array.isArray(items)) {
-      //   const transformedItems = items.map((item) => {
-      //     const id = item?.info?.item_code;
 
-      //     return {
-      //       id: id ? `${id}` : undefined,
-      //       quantity: item?.count || 1,
-      //       price: parseFloat(
-      //         item?.info?.price?.price
-      //       ),
-      //       selectedInfo:
-      //         item?.info?.price?.size_en || item?.info?.size_en || "",
-      //       selectedExtras: item?.extras || [],
-      //       selectedIdSize: item?.info?.id,
-      //       selectedMainExtras: [],
-      //       size_condiments: item?.size_condiments,
-      //       note: item?.special || "",
-      //       total: item?.sub_total,
-      //       sub_total: item?.sub_total,
-      //       cartId: uuidv4(),
-      //     };
-      //   });
-
-      //   console.log("loaded cart items:", transformedItems);
-      //   setCartItems(transformedItems);
-      // }
       if (Array.isArray(items)) {
         const transformedItems = items.map((item) => {
           const id = item?.info?.item_code;
@@ -1777,28 +1116,6 @@ function CreateOrder({ params }) {
     }
   }, [branches, isEditMode]);
   const [addressId, setAddressId] = useState(null);
-  // useEffect(() => {
-  //   if (selectedUser?.address?.length > 0) {
-  //     setSelectedAddressArray(selectedUser.address);
-
-  //     if (!selectedAddress) {
-  //       const firstAddress = selectedUser.address[0];
-  //       setSelectedAddress(firstAddress);
-
-  //       // console.log("firstAddress", firstAddress);
-  //       setSelectedBranch(firstAddress.branch?.[0]);
-
-  //       // console.log("SelectedBranch (قبل التحديث)", firstAddress.branch?.[0]);
-  //     }
-  //   } else {
-  //     setSelectedAddress(null);
-  //     setSelectedAddressArray([]);
-  //     setSelectedBranch(null);
-  //     setBranchId(null);
-  //   }
-  // }, [selectedUser, selectedAddress]);
-  // console.log("selectedUser.address", selectedUser?.address[0].branch[0].id);
-  // console.log("setSelectedAddress", selectedAddress);
 
   useEffect(() => {
     if (!selectedUser) return;
@@ -1860,13 +1177,15 @@ function CreateOrder({ params }) {
       queryClient.removeQueries(["userSearch"]);
     };
   }, []);
-const [showManualLoading, setShowManualLoading] = useState(false);
+  const [showManualLoading, setShowManualLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+
   const handleSearch = () => {
     setHasSearched(true);
     if (search) {
-       setShowManualLoading(true);
+      setShowManualLoading(true);
       setPhone(search);
-          refetch().finally(()=> setShowManualLoading(false));
+      refetch().finally(() => setShowManualLoading(false));
       if (selectedUser?.address?.length > 0) {
         if (!selectedAddress) {
           setSelectedAddress(selectedUser.address[0]);
@@ -1889,7 +1208,6 @@ const [showManualLoading, setShowManualLoading] = useState(false);
       setErrorSearchUser("Please enter a valid search.");
     }
   };
-  const [hasSearched, setHasSearched] = useState(false);
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -1900,8 +1218,9 @@ const [showManualLoading, setShowManualLoading] = useState(false);
   const handleClear = () => {
     setSearch("");
     setPhone("");
-    // setErrorSearchUser("");
     setStaticMassageError("");
+    setHasSearched(false);
+    setShowManualLoading(false);
     setAllUserData(null);
     setSelectedAddress(null);
     setSelectedAddressArray(null);
@@ -2054,82 +1373,7 @@ const [showManualLoading, setShowManualLoading] = useState(false);
     setIsItemDialogOpen(false);
   };
 
-  //   const handleAddToCart = () => {
-  //   console.log("NOTE عند الإضافة:", note);
 
-  //   if (groupMin === 1 && selectedExtras.length === 0) {
-  //     setExtrasError("Please select at least one from this group.");
-  //     setIsOpen(true);
-  //     return;
-  //   }
-
-  //   setExtrasError("");
-
-  //   const calculateTotal = () => {
-  //     const basePrice =
-  //       Number(
-  //         selectedItem.info?.find(
-  //           (s) => s?.id === selectedItem.selectedIdSize
-  //         )?.price?.price
-  //       ) || 0;
-
-  //     const extrasTotal = (selectedItem.selectedExtras || []).reduce(
-  //       (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
-  //       0
-  //     );
-  //     const mainExtrasTotal = (selectedItem.selectedMainExtras || []).reduce(
-  //       (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
-  //       0
-  //     );
-  //     const optionsTotal = (selectedItem.selectedoption || []).reduce(
-  //       (sum, o) => sum + (Number(o.price) || 0) * (Number(o.quantity) || 1),
-  //       0
-  //     );
-
-  //     return (basePrice + extrasTotal + mainExtrasTotal + optionsTotal) * counter;
-  //   };
-
-  //   console.log("calculateTotal",calculateTotal());
-
-  //   // ✅ نعمل نسخة مستقلة من selectedItem
-
-  //   setCartItems((prevItems) => {
-  //     const isEditing = !!selectedItem.cartId;
-
-  //     if (isEditing) {
-  //       const existingItemIndex = prevItems.findIndex(
-  //         (item) => item.cartId === selectedItem.cartId
-  //       );
-
-  //       if (existingItemIndex !== -1) {
-  //         const updatedItems = [...prevItems];
-  //         updatedItems[existingItemIndex] = {
-  //           ...deepClonedItem,
-  //           quantity: counter,
-  //           total: calculateTotal(),
-  //           note: note,
-  //           cartId: selectedItem.cartId,
-  //         };
-  //         return updatedItems;
-  //       }
-  //     }
-
-  //     return [
-  //       ...prevItems,
-  //       {
-  //         ...deepClonedItem,
-  //         id: `${selectedItem.id}`,
-  //         quantity: counter,
-  //         total: calculateTotal(),
-  //         note: note,
-  //         cartId: uuidv4(),
-  //       },
-  //     ];
-  //   });
-
-  //   setEditingItemIndex(null);
-  //   setIsItemDialogOpen(false);
-  // };
 
   useEffect(() => {
     if (!selectedItem || isItemDialogOpen) return;
@@ -2274,26 +1518,6 @@ const [showManualLoading, setShowManualLoading] = useState(false);
     refetchMenu();
   };
 
-  // useEffect(() => {
-  //   if (deliveryMethod === "pickup" && !isEditMode) {
-  //     setSelectedBranchInSelected(null);
-  //     setSavedBranch(null);
-  //     setSelectedBranchId(null);
-  //     // setSelectedBranchPriceList(null);
-  //     setMassegeNotSelectedBranch("Select branch first");
-  //   } else if (
-  //     deliveryMethod === "delivery" &&
-  //     branchOptions.length > 0 &&
-  //     !isEditMode
-  //   ) {
-  //     const firstBranch = branchOptions[0];
-  //     setSelectedBranchId(firstBranch.value);
-  //     setSelectedBranchName(firstBranch.label);
-  //     setSavedBranch(firstBranch);
-  //     setMassegeNotSelectedBranch(null); // إزالة الرسالة إن وجدت
-  //   }
-  // }, [deliveryMethod, branchOptions]);
-  //  console.log("branchOptions",branchOptions);
 
   useEffect(() => {
     if (
@@ -2353,6 +1577,7 @@ const [showManualLoading, setShowManualLoading] = useState(false);
       setDeliveryMethod(
         selectedUser?.address?.length > 0 ? "delivery" : "pickup"
       );
+      prevUserRef.current = selectedUser;
       if (!isEditMode) {
         setSelectedBranch(null);
         setSelectedBranchName("");
@@ -2497,19 +1722,6 @@ const [showManualLoading, setShowManualLoading] = useState(false);
     setValueCreateOrder("orderpayment", orderPaymenyOptions[0].value);
   }, [setValueCreateOrder]);
 
-  // useEffect(() => {
-  //   if (selectedOrderPaymeny?.value === 2) {
-  //     setNotesOrderNotes("الدفع فيزا");
-  //     setValueCreateOrder("notes", "الدفع فيزا");
-  //   } else {
-  //     setNotesOrderNotes("");
-  //     setValueCreateOrder("notes", "");
-  //   }
-  // }, [selectedOrderPaymeny, setValueCreateOrder]);
-  // const handleTextareaChange = (e) => {
-  //   setNotesOrderNotes(e.target.value);
-  //   setValueCreateOrder("notes", e.target.value);
-  // };
   useEffect(() => {
     if (!isNoteModified) {
       if (selectedOrderPaymeny?.value === 2) {
@@ -2565,29 +1777,6 @@ const [showManualLoading, setShowManualLoading] = useState(false);
     }
   }, [selectedUser, selectedAddress, setValueEdit]);
 
-  // useEffect(() => {
-  //   if (selectedEditAddress) {
-  //     const selectedAreaOption = areasOptions?.find(
-  //       (option) => option.value === selectedEditAddress.area
-  //     );
-
-  //     setValueEditAddressUser("area", selectedAreaOption);
-
-  //     if (["home", "work"].includes(selectedEditAddress.address_name)) {
-  //       seEditAddressType(selectedEditAddress.address_name);
-  //       setCustomAddressName("");
-  //     } else {
-  //       seEditAddressType("other");
-  //       setCustomAddressName(selectedEditAddress.address_name);
-  //     }
-
-  //     setValueEditAddressUser("street", selectedEditAddress.street);
-  //     setValueEditAddressUser("building", selectedEditAddress.building);
-  //     setValueEditAddressUser("floor", selectedEditAddress.floor);
-  //     setValueEditAddressUser("apt", selectedEditAddress.apartment);
-  //     setValueEditAddressUser("additionalInfo", selectedEditAddress.additional);
-  //   }
-  // }, [selectedEditAddress, setValueEditAddressUser]);
 
   useEffect(() => {
     if (selectedEditAddress) {
@@ -2621,8 +1810,14 @@ const [showManualLoading, setShowManualLoading] = useState(false);
   }, [selectedEditAddress, setValueEditAddressUser]);
   const [totalExtrasPrice, setTotalExtrasPrice] = useState(0);
   // console.log("selectedEditAddress", selectedEditAddress);
+  const [lodaingCreateOrder, setLodaingCreateOrder] = useState(false);
+  const [lodaingCreateUserData, setLodaingCreateUserData] = useState(false);
   const [lodaingEditUserData, setLodaingEditUserData] = useState(false);
+  const [lodaingCreateAddressData, setLodaingCreateAddressData] = useState(false);
+  const [lodaingEditAddressData, setLodaingEditAddressData] = useState(false);
+  const [lodaingEditDeletedAddress, setLodaingDeletedAddress] = useState(false);
   const onSubmitEditUserData = async (data) => {
+    setLodaingEditUserData(true);
     const formattedData = Object.entries({
       username: data.username,
       email: data.email,
@@ -2663,6 +1858,8 @@ const [showManualLoading, setShowManualLoading] = useState(false);
       }
     } catch {
       console.error("Error updating user data:", error);
+    } finally {
+      setLodaingEditUserData(false);
     }
   };
   // console.log("set slected ", selectedAddress);
@@ -2681,7 +1878,7 @@ const [showManualLoading, setShowManualLoading] = useState(false);
   };
   const onSubmitEditUserAddress = async (data) => {
     // console.log("apiBaseUrl onSubmitEditUserAddress", data);
-
+    setLodaingEditAddressData(true);
     const nameValue =
       typeof data.name === "string" && data.name.trim() !== ""
         ? data.name
@@ -2715,6 +1912,9 @@ const [showManualLoading, setShowManualLoading] = useState(false);
     } catch (error) {
       console.error("Error updating user address:", error);
       toast.error("Failed to update address. Please try again.");
+    } finally {
+      setLodaingEditAddressData(false);
+
     }
   };
 
@@ -2726,7 +1926,14 @@ const [showManualLoading, setShowManualLoading] = useState(false);
     }
     trigger("name");
   }, [selectedAddressType]);
-
+  useEffect(() => {
+    if (selectedAddressType !== "other") {
+      setValueAddNewUser("name", selectedAddressType);
+    } else {
+      setValueAddNewUser("name", "");
+    }
+    trigger("name");
+  }, [selectedAddressType]);
   const handleAddressTypeAdd = (type) => {
     setaddAddressType(type);
     if (type !== "other") {
@@ -2736,17 +1943,9 @@ const [showManualLoading, setShowManualLoading] = useState(false);
     }
     trigger("name");
   };
-  useEffect(() => {
-    if (selectedAddressType !== "other") {
-      setValueAddNewUser("name", selectedAddressType);
-    } else {
-      setValueAddNewUser("name", "");
-    }
-    trigger("name");
-  }, [selectedAddressType]);
+
   const onSubmitAddAddress = async (data) => {
-    // console.log("data", data);
-    setLoading(true);
+    setLodaingCreateAddressData(true)
     const userId = selectedUser?.id;
     try {
       const nameValue =
@@ -2778,7 +1977,7 @@ const [showManualLoading, setShowManualLoading] = useState(false);
       console.error(error);
       // toast.error(errorMessage);
     } finally {
-      setLoading(false);
+      setLodaingCreateAddressData(false);
     }
   };
   const [orderId, setOrderId] = useState(null);
@@ -2786,7 +1985,7 @@ const [showManualLoading, setShowManualLoading] = useState(false);
   // console.log("savedBranch", savedBranch);
   const onSubmithandleCreateOrder = async (data) => {
     // console.log(" بيانات الطلب:", data);
-    setLoading(true);
+    setLodaingCreateOrder(true);
 
     try {
       await createOrder({
@@ -2818,7 +2017,7 @@ const [showManualLoading, setShowManualLoading] = useState(false);
 
       toast.success(`Order ${isEditMode ? "updated" : "created"} successfully`);
       setCreateOrderDialogOpen(false);
-
+      setStaticMassageError("")
       if (isEditMode) {
         router.push(`/${language}/dashboard`);
       }
@@ -2858,7 +2057,7 @@ const [showManualLoading, setShowManualLoading] = useState(false);
       console.error(" خطأ في إنشاء الطلب:", error);
       toast.error(error.message || "حدث خطأ غير متوقع!");
     } finally {
-      setLoading(false);
+      setLodaingCreateOrder(false);
       localStorage.removeItem("order");
     }
   };
@@ -2875,7 +2074,7 @@ const [showManualLoading, setShowManualLoading] = useState(false);
   };
   const onSubmitAddUserData = async (data) => {
     // console.log("data", data);
-    setLoading(true);
+    setLodaingCreateUserData(true);
     try {
       const userId = await createUser(
         data.username,
@@ -2914,9 +2113,20 @@ const [showManualLoading, setShowManualLoading] = useState(false);
       console.error(error);
       // toast.error(errorMessage);
     } finally {
-      setLoading(false);
+      setLodaingCreateUserData(false);
     }
-    // const handleEditAddressTypeChange = (type) => { };
+    // seEditAddressType(type);
+
+    if (editAddressType === "other") {
+      setCustomAddressName("");
+      setValueEditAddressUser("name", "");
+    } else {
+      setCustomAddressName("");
+      // setValueEditAddressUser("name", type);
+    }
+  };
+
+  const handleEditAddressTypeChange = (type) => {
     seEditAddressType(type);
 
     if (type === "other") {
@@ -2928,51 +2138,6 @@ const [showManualLoading, setShowManualLoading] = useState(false);
     }
   };
 
-  // const grandTotal = cartItems.reduce((sum, item) => {
-  //   const itemPrice = parseFloat(item.price) || 0;
-  //   const itemQuantity = parseFloat(item.quantity) || 0;
-
-  //   const extrasTotal =
-  //     item.selectedMainExtras?.reduce(
-  //       (acc, extra) => acc + (parseFloat(extra.price_en) || 0),
-  //       0
-  //     ) || 0;
-
-  //   const itemTotal = itemPrice * itemQuantity + extrasTotal ;
-
-  //   return sum + itemTotal;
-  // }, 0);
-  // const grandTotal = cartItems.reduce((sum, item) => {
-  //   const basePrice = parseFloat(item.price) || 0;
-  //   const quantity = parseFloat(item.quantity) || 1;
-
-  //   // Extras
-  //   const extrasTotal =
-  //     item.selectedExtras?.reduce(
-  //       (acc, extra) =>
-  //         acc + (parseFloat(extra.price) || 0) * (extra.quantity || 1),
-  //       0
-  //     ) || 0;
-
-  //   // Options (radio)
-  //   const optionTotal =
-  //     item.selectedoption?.reduce(
-  //       (acc, option) => acc + (parseFloat(option.price) || 0),
-  //       0
-  //     ) || 0;
-
-  //   // Main Extras
-  //   const mainExtrasTotal =
-  //     item.selectedMainExtras?.reduce(
-  //       (acc, extra) => acc + (parseFloat(extra.price_en) || 0),
-  //       0
-  //     ) || 0;
-
-  //   const itemTotal =
-  //     (basePrice * quantity )  + extrasTotal + optionTotal + mainExtrasTotal; 
-
-  //   return sum + itemTotal;
-  // }, 0);
   const grandTotal = cartItems.reduce((sum, item) => {
     const basePrice = parseFloat(item.price) || 0;
     const quantity = parseFloat(item.quantity) || 1;
@@ -3090,8 +2255,10 @@ const [showManualLoading, setShowManualLoading] = useState(false);
     setSelectedEditAddress(address);
     setOpenEditAddressDialog(true);
   };
+
   const handleDeleteAddress = async (id) => {
     // console.log("id remove", id);
+    setLodaingDeletedAddress(true);
     try {
       const response = await deleteAddress(id, token, apiBaseUrl);
 
@@ -3102,6 +2269,8 @@ const [showManualLoading, setShowManualLoading] = useState(false);
     } catch (error) {
       console.error("Error updating user address:", error);
       toast.error("Failed to update address. Please try again.");
+    } finally {
+      setLodaingDeletedAddress(false);
     }
     const updatedAddresses = selectedAddressArray.filter(
       (addr) => addr.id !== id
@@ -3113,6 +2282,8 @@ const [showManualLoading, setShowManualLoading] = useState(false);
         updatedAddresses.length > 0 ? updatedAddresses[0] : null
       );
     }
+
+
   };
 
   useEffect(() => {
@@ -3139,22 +2310,6 @@ const [showManualLoading, setShowManualLoading] = useState(false);
     };
   }, [queryClient]);
 
-  // useEffect(() => {
-  //   // تحقق إذا كان الرقم موجود في search
-  //   if (search) {
-  //     // إذا كان رقم الهاتف في order موجود، نفذ البحث
-  //     if (order?.details?.user_data?.phone) {
-  //       handleSearch();
-  //     } else {
-  //       // إذا ما في order، نفذ البحث مباشرة مع الرقم المدخل في search
-  //       handleSearch();
-  //     }
-  //   }
-  // }, [search, order]);
-  // useEffect(() => {
-
-  //   console.log("orderphone:", order?.user_data?.phone);
-  // }, []);
   if (isLoadingBranchs) return <p>Loading branches...</p>;
   if (errorBranchs) return <p>Error loading branches: {error.message}</p>;
   return (
@@ -3235,33 +2390,6 @@ const [showManualLoading, setShowManualLoading] = useState(false);
                   </button>
                 ))}
               </div>
-
-              {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4"> */}
-              {/* {displayedItems.map((item) => (
-                  <Card
-                    onClick={() => handleItemClick(item)}
-                    key={item.id}
-                    className="p-0 shadow-md rounded-lg overflow-hidden mt-7 text-white cursor-pointer"
-                  >
-                    <div className="w-full h-40">
-                      <Image
-                        src={item?.image}
-                        alt={item?.name_en}
-                        width={150}
-                        height={150}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex justify-between items-center gap-3 p-3">
-                      <h3 className="text-sm text-muted-foreground mt-2">
-                        {language === "en" ? item.name_en : item.name_ar}
-                      </h3>
-                      <p className=" text-sm text-[#000] dark:text-[#fff] ">
-                        {item?.price?.toFixed(2)} EGP
-                      </p>
-                    </div>
-                  </Card>
-                ))} */}
               <InfiniteScroll
                 dataLength={visibleItems}
                 next={fetchMoreData}
@@ -4183,7 +3311,19 @@ const [showManualLoading, setShowManualLoading] = useState(false);
                                 Close
                               </Button>
                             </DialogClose>
-                            <Button type="submit">Create User</Button>
+                            {lodaingCreateUserData ? (
+                              <Button
+                                type="submit"
+                                disabled
+                                className="w-[150px] flex items-center justify-center"
+                              >
+                                <FaSpinner className="animate-spin mr-2" />
+
+                              </Button>
+                            ) : (
+                              <Button type="submit">Create User</Button>
+                            )}
+
                           </DialogFooter>
                         </form>
                       </div>
@@ -4348,8 +3488,20 @@ const [showManualLoading, setShowManualLoading] = useState(false);
                                 Close
                               </Button>
                             </DialogClose>
+                            {lodaingCreateAddressData ? (
+                              <Button
+                                type="submit"
+                                disabled
+                                className="w-[150px] flex items-center justify-center"
+                              >
+                                <FaSpinner className="animate-spin mr-2" />
 
-                            <Button type="submit">Add address</Button>
+                              </Button>
+                            ) : (
+                              <Button type="submit">Add address</Button>
+                            )}
+
+
                           </DialogFooter>
                         </form>
                       </div>
@@ -4376,7 +3528,7 @@ const [showManualLoading, setShowManualLoading] = useState(false);
               styles={selectStyles(theme, color)}
             />
           )}
-           <Card className="p-4 shadow-m rounded-lg w-full mt-0 ">
+          <Card className="p-4 shadow-m rounded-lg w-full mt-0 ">
             <div className="flex gap-1 items-center justify-between mb-3">
               <div className="relative flex-grow">
                 <span className="absolute top-1/2 left-2 -translate-y-1/2">
@@ -4550,7 +3702,7 @@ const [showManualLoading, setShowManualLoading] = useState(false);
               </div>
             )} */}
             {isOpenUserData && hasSearched ? (
-              isLoadingUserDataForSerach || showManualLoading   ? (
+              isLoadingUserDataForSerach || showManualLoading ? (
                 <div className="mt-2 p-2 rounded-md">
                   <p className=" text-center">LOADING...</p>
                 </div>
@@ -4647,7 +3799,7 @@ const [showManualLoading, setShowManualLoading] = useState(false);
                   </span>
                 </div>
 
-                {isOpenAddress && selectedUser &&  (
+                {isOpenAddress && selectedUser && (
                   <div className="mt-2 p-2  rounded-md">
                     <div className="flex items-center justify-between gap-4 mb-4">
                       <div className="flex items-center gap-2">
@@ -4679,7 +3831,7 @@ const [showManualLoading, setShowManualLoading] = useState(false);
                       </Button>
                     </div>
 
-                    {deliveryMethod === "delivery"   &&  (
+                    {deliveryMethod === "delivery" && (
                       <div className="my-3">
                         {selectedAddressArray?.length > 0 && (
                           <h4 className="font-medium my-3">Address:</h4>
@@ -4737,14 +3889,21 @@ const [showManualLoading, setShowManualLoading] = useState(false);
                                     >
                                       Cancel
                                     </AlertDialogCancel>
+
                                     <AlertDialogAction
                                       className="bg-destructive hover:bg-destructive/80"
-                                      onClick={() =>
-                                        handleDeleteAddress(address.id)
-                                      }
+                                      onClick={() => handleDeleteAddress(address.id)}
+                                      disabled={lodaingEditDeletedAddress}
                                     >
-                                      Ok
+                                      {lodaingEditDeletedAddress ? (
+                                        <span className="flex items-center justify-center">
+                                          <FaSpinner className="animate-spin mr-2" />
+                                        </span>
+                                      ) : (
+                                        "Ok"
+                                      )}
                                     </AlertDialogAction>
+
                                   </AlertDialogFooter>
                                 </AlertDialogContent>
                               </AlertDialog>
@@ -4800,7 +3959,7 @@ const [showManualLoading, setShowManualLoading] = useState(false);
               </Card>
             </>
           )}
-       
+
           {cartItems.length > 0 && (
             <>
               <h3 className="text-lg font-semibold"></h3>
@@ -5144,44 +4303,44 @@ const [showManualLoading, setShowManualLoading] = useState(false);
                                         return `${total.toFixed(2)} EGP`;
                                       })()}
                                     </span> */}
-<span>
-  {(() => {
-    const isUnchangedItem =
-      (item.selectedExtras?.length || 0) === 0 &&
-      (item.selectedMainExtras?.length || 0) === 0 &&
-      (item.selectedoption?.length || 0) === 0 &&
-      item.sub_total;
+                                    <span>
+                                      {(() => {
+                                        const isUnchangedItem =
+                                          (item.selectedExtras?.length || 0) === 0 &&
+                                          (item.selectedMainExtras?.length || 0) === 0 &&
+                                          (item.selectedoption?.length || 0) === 0 &&
+                                          item.sub_total;
 
-    if (isUnchangedItem) {
-      const baseSubTotal = Number(item.sub_total) || 0;
-      const quantity = Number(item.quantity) || 1;
-      return `${(baseSubTotal * quantity).toFixed(2)} EGP`;
-    }
+                                        if (isUnchangedItem) {
+                                          const baseSubTotal = Number(item.sub_total) || 0;
+                                          const quantity = Number(item.quantity) || 1;
+                                          return `${(baseSubTotal * quantity).toFixed(2)} EGP`;
+                                        }
 
-    const optionsTotal = (item.selectedoption || []).reduce(
-      (sum, o) => sum + (Number(o.price) || 0) * (Number(o.quantity) || 1),
-      0
-    );
+                                        const optionsTotal = (item.selectedoption || []).reduce(
+                                          (sum, o) => sum + (Number(o.price) || 0) * (Number(o.quantity) || 1),
+                                          0
+                                        );
 
-    const extrasTotal = (item.selectedExtras || []).reduce(
-      (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
-      0
-    );
+                                        const extrasTotal = (item.selectedExtras || []).reduce(
+                                          (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
+                                          0
+                                        );
 
-    const mainExtrasTotal = (item.selectedMainExtras || []).reduce(
-      (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
-      0
-    );
+                                        const mainExtrasTotal = (item.selectedMainExtras || []).reduce(
+                                          (sum, e) => sum + (Number(e.price) || 0) * (Number(e.quantity) || 1),
+                                          0
+                                        );
 
-    const basePrice = Number(item.price) || 0;
-    const quantity = Number(item.quantity) || 1;
+                                        const basePrice = Number(item.price) || 0;
+                                        const quantity = Number(item.quantity) || 1;
 
-    const total =
-      (basePrice + optionsTotal + extrasTotal + mainExtrasTotal) * quantity;
+                                        const total =
+                                          (basePrice + optionsTotal + extrasTotal + mainExtrasTotal) * quantity;
 
-    return `${total.toFixed(2)} EGP`;
-  })()}
-</span>
+                                        return `${total.toFixed(2)} EGP`;
+                                      })()}
+                                    </span>
                                   </div>
                                   {index !== cartItems.length - 1 && (
                                     <div className="border-b border-gray-500 -mx-4 mt-4"></div>
@@ -5672,11 +4831,25 @@ const [showManualLoading, setShowManualLoading] = useState(false);
 
                                 <DialogFooter>
                                   <DialogClose asChild></DialogClose>
-                                  <Button type="submit">Send order</Button>
+
+                                  {lodaingCreateOrder ? (
+                                    <Button
+                                      type="submit"
+                                      disabled
+                                      className="w-[150px] flex items-center justify-center"
+                                    >
+                                      <FaSpinner className="animate-spin mr-2" />
+
+                                    </Button>
+                                  ) : (
+                                    <Button type="submit">Send order</Button>
+                                  )}
+
                                   {/* <Button type="submit">
                                     {" "}
                                     {isEditMode ? "Edit order" : "Send order"}
                                   </Button> */}
+
                                 </DialogFooter>
                               </div>
                             </form>
@@ -5836,14 +5009,25 @@ const [showManualLoading, setShowManualLoading] = useState(false);
                   <div className="mt-3">
                     <DialogFooter className="flex justify-between items-center mt-4">
                       <DialogClose asChild>
-                        <Button
-                          variant="outline"
-                          onClick={() => setOpenEditDialog(false)}
-                        >
-                          Close
-                        </Button>
+
+
                       </DialogClose>
-                      <Button type="submit">Save Changes</Button>
+
+                      {lodaingEditUserData ? (
+                        <Button
+                          type="submit"
+                          disabled
+                          className="w-[150px] flex items-center justify-center"
+                        >
+                          <FaSpinner className="animate-spin mr-2" />
+
+                        </Button>
+                      ) : (
+                        <Button type="submit" className="w-[150px]">
+                          Save Changes
+                        </Button>
+                      )}
+                      {/* <Button type="submit">Save Changes</Button> */}
                     </DialogFooter>
                   </div>
                 </form>
@@ -6003,7 +5187,19 @@ const [showManualLoading, setShowManualLoading] = useState(false);
                         Close
                       </Button>
                     </DialogClose>
-                    <Button type="submit">Save Changes</Button>
+                    {lodaingEditAddressData ? (
+                      <Button
+                        type="submit"
+                        disabled
+                        className="w-[150px] flex items-center justify-center"
+                      >
+                        <FaSpinner className="animate-spin mr-2" />
+
+                      </Button>
+                    ) : (
+                      <Button type="submit">Save Changes</Button>
+                    )}
+
                   </DialogFooter>
                 </form>
               </DialogContent>

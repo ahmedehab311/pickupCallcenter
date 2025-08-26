@@ -7,6 +7,8 @@ import {
   Settings,
   Truck,
   CheckCheck,
+  Ban,
+  XCircle,
 } from "lucide-react";
 import { useSubdomin } from "@/provider/SubdomainContext";
 import { useQuery } from "@tanstack/react-query";
@@ -23,81 +25,35 @@ function OrdersType() {
   const [selectedStatus, setSelectedStatus] = useState("Total");
   const [selectedDayNumber, setSelectedDayNumber] = useState(1);
   const [token, setToken] = useState(null);
+  const {
+    data: orders,
+    isLoading: isLoadingorders,
+    isError: errororders,
+    error,
+  } = useQuery({
+    queryKey: ["ordersList", selectedDayNumber],
+    queryFn: () => fetchOrders(token, apiBaseUrl, selectedDayNumber),
+    enabled: !!token,
+    onSuccess: (orders) => {
+      const message = orders?.data?.message;
 
-  // const {
-  //   data: orders,
-  //   isLoading: isLoadingorders,
-  //   isError: errororders,
-  //   error,
-  // } = useQuery({
-  //   queryKey: ["ordersList", selectedDayNumber],
-  //   queryFn: () => fetchOrders(token, apiBaseUrl, selectedDayNumber),
-  //   enabled: !!token,
-  //   onSuccess: (data) => {
-  //     setAllOrders(data);
-  //     setDisplayOrders(data);
-  //   },
-  // });
-  
-//   const {
-//   data: orders,
-//   isLoading: isLoadingorders,
-//   isError: errororders,
-//   error,
-// } = useQuery({
-//   queryKey: ["ordersList", selectedDayNumber],
-//   queryFn: () => fetchOrders(token, apiBaseUrl, selectedDayNumber),
-//   enabled: !!token,
-//   select: (response) => response.data.data, // 👈 كده orders فيها فقط response.data.data
-//   onSuccess: (response) => {
-//     const message = response?.data?.message;
+      if (
+        typeof message === "string" &&
+        message.toLowerCase().includes("invalid token")
+      ) {
+        toast.error("Session expired. Please login again.");
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        return;
+      }
 
-//     if (typeof message === "string" && message.toLowerCase().includes("invalid token")) {
-//       toast.error("Session expired. Please login again.");
-//       localStorage.removeItem("token");
-//       window.location.href = "/login";
-//       return;
-//     }
-
-//     // عادي نكمل التعامل مع الداتا
-//     setAllOrders(response.data.data);
-//     setDisplayOrders(response.data.data);
-//   },
-// });
-
-const {
-  data: orders,
-  isLoading: isLoadingorders,
-  isError: errororders,
-  error,
-} = useQuery({
-  queryKey: ["ordersList", selectedDayNumber],
-  queryFn: () => fetchOrders(token, apiBaseUrl, selectedDayNumber),
-  enabled: !!token,
-  onSuccess: (orders) => {
-    const message = orders?.data?.message;
-
-    if (
-      typeof message === "string" &&
-      message.toLowerCase().includes("invalid token")
-    ) {
-      toast.error("Session expired. Please login again.");
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-      return;
-    }
-
-    // ✅ بيانات سليمة
-    setAllOrders(orders.data.data);
-    setDisplayOrders(orders.data.data);
-  },
-});
-  // console.log("orders",orders);
-
-
+      // ✅ بيانات سليمة
+      setAllOrders(orders.data.data);
+      setDisplayOrders(orders.data.data);
+    },
+  });
   const [orderIdOrPhone, setOrderIdOrPhone] = useState("");
   const [searchTrigger, setSearchTrigger] = useState(false);
-  // const [searchQuery, setSearchQuery] = useState("");
   const {
     data: searchUser,
     isLoading: isLoadingSearchUser,
@@ -116,12 +72,12 @@ const {
       setToken(storedToken);
     }
   }, []);
-const { handleInvalidToken } = useSession();
+  const { handleInvalidToken } = useSession();
 
-// في onError مثلاً:
-if (error?.message === "Invalid token") {
-  handleInvalidToken(); // 👈 هيظهر الديالوج
-}
+
+  if (error?.message === "Invalid token") {
+    handleInvalidToken();
+  }
   const language =
     typeof window !== "undefined" ? localStorage.getItem("language") : null;
 
@@ -137,28 +93,26 @@ if (error?.message === "Invalid token") {
     {
       icon: PlusSquare,
       number: orders?.countByStatus?.new?.count ?? "—",
-      label: "New Orders",
+      label: "New",
       statusKey: "New",
       bg: "bg-green-100",
     },
     {
       icon: Hourglass,
       number: orders?.countByStatus?.pending?.count ?? "—",
-      label: "Pending Orders",
+      label: "Pending",
       statusKey: "Pending",
       bg: "bg-yellow-100",
     },
     {
       icon: Settings,
       number: orders?.countByStatus?.processing?.count ?? "—",
-      // number: 45,
-      label: "Processing Orders",
+      label: "Processing",
       statusKey: "Processing",
       bg: "bg-purple-100",
     },
     {
       icon: Truck,
-      // number: 23,
       number: orders?.countByStatus?.inWay?.count ?? "—",
       label: "In way Orders",
       statusKey: "Processing",
@@ -167,33 +121,132 @@ if (error?.message === "Invalid token") {
     },
     {
       icon: CheckCheck,
-      // number: 13,
       number: orders?.countByStatus?.delivered?.count ?? "—",
-      label: "Delivered Orders",
+      label: "Delivered",
       statusKey: "Delivered",
-      href: "/orders/delivered",
       bg: "bg-emerald-100",
     },
+    {
+      icon: XCircle,
+      number: orders?.countByStatus?.canceled?.count ?? "—",
+      label: "Cancelled",
+      statusKey: "canceled",
+      bg: "bg-emerald-100",
+    },
+    {
+      icon: Ban,
+      number: orders?.countByStatus?.rejected?.count ?? "—",
+      label: "Rejected",
+      statusKey: "rejected",
+      bg: "bg-emerald-100",
+    },
+
   ];
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 w-full p-2 custom-grid ">
-        {/* <div
-  className="grid gap-4 w-full p-2 mb-"
-  style={{ gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))" }}
-> */}
+
+      {selectedStatus === "Total" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full p-2 mb-1">
+          <Card className="">
+            <CardHeader className="border-none p-4 pb-1 text-primary font-semibold">Order Source</CardHeader>
+            <CardContent className="p-2 pt-0">
+              <div className="dashtail-legend ">
+                <UserDeviceReport
+                  orders={orders}
+                  errororders={errororders}
+                  isLoadingorders={isLoadingorders}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="">
+            <CardHeader className="border-none p-4 pb-1 text-primary font-semibold">Delivery Types</CardHeader>
+            <CardContent className="p-2 pt-0">
+              <div className="dashtail-legend">
+                <PickupReport
+                  orders={orders}
+                  selectedStatus={selectedStatus}
+                  errororders={errororders}
+                  isLoadingorders={isLoadingorders}
+                  error={error}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="">
+            <CardHeader className="border-none p-4 pb-1 text-primary font-semibold">Branches</CardHeader>
+            <CardContent className="p-2 pt-0">
+              <div className="dashtail-legend">
+                <BranchesReport
+                  orders={orders}
+                  selectedStatus={selectedStatus}
+                  errororders={errororders}
+                  isLoadingorders={isLoadingorders}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      {/* {selectedStatus === "Total" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full p-2 mb-1">
+          <Card >
+            <CardHeader className="border-none p-4 pb-1">User Devices</CardHeader>
+            <CardContent className="p-2 pt-0">
+              <div className="dashtail-legend h-[50px]">
+                <UserDeviceReport
+                  orders={orders}
+                  errororders={errororders}
+                  isLoadingorders={isLoadingorders}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card >
+            <CardHeader className="border-none p-4 pb-1"></CardHeader>
+            <CardContent>
+              <div className="dashtail-legend">
+                <PickupReport
+                  orders={orders}
+                  selectedStatus={selectedStatus}
+                  errororders={errororders}
+                  isLoadingorders={isLoadingorders}
+                  error={error}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card >
+            <CardHeader className="border-none p-4 pb-1"></CardHeader>
+            <CardContent>
+              <div className="dashtail-legend">
+                <BranchesReport
+                  orders={orders}
+                  selectedStatus={selectedStatus}
+                  errororders={errororders}
+                  isLoadingorders={isLoadingorders}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )} */}
+
+      <div className="w-full p-2 mb-4">
         {selectedStatus === "Total" ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 col-span-3 ">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {stats.map((stat, index) => (
               <StatCard
                 key={index}
                 icon={stat.icon}
                 number={stat.number}
                 label={stat.label}
-                onClick={() => {
-                  setSelectedStatus(stat.statusKey);
-                }}
+                onClick={() => setSelectedStatus(stat.statusKey)}
                 bg={stat.bg}
                 language={language}
                 errororders={errororders}
@@ -203,7 +256,7 @@ if (error?.message === "Invalid token") {
             ))}
           </div>
         ) : (
-          <div className="flex flex-w gap-4 col-span-6">
+          <div className="flex flex-wrap gap-4">
             {stats.map((stat, index) => (
               <StatCard
                 key={index}
@@ -220,59 +273,11 @@ if (error?.message === "Invalid token") {
             ))}
           </div>
         )}
-
-        {selectedStatus === "Total" && (
-          <Card className="col-span- h-full mt-0">
-            <CardHeader className="border-none p-6 pt-5 "></CardHeader>
-            <CardContent>
-              <div className="dashtail-legend">
-                <UserDeviceReport
-                  orders={orders}
-                  errororders={errororders}
-                  isLoadingorders={isLoadingorders}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        )}
-        {selectedStatus === "Total" && (
-          <Card className="col-span- h-ful mt-1">
-            <CardHeader className="border-none p-6 pt-5 ">
-              {/* <CardTitle className="text-lg font-semibold text-default-900 p-0">
-        Device Breakdown
-      </CardTitle> */}
-            </CardHeader>
-            <CardContent>
-              <div className="dashtail-legend">
-                <PickupReport
-                  orders={orders}
-                  selectedStatus={selectedStatus}
-                  errororders={errororders}
-                  isLoadingorders={isLoadingorders} 
-                  error={error}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        )}
-        {selectedStatus === "Total" && (
-          <Card className="col-span- h-ful mt-1">
-            <CardHeader className="border-none p-6 pt-5 "></CardHeader>
-            <CardContent>
-              <div className="dashtail-legend">
-                <BranchesReport
-                  orders={orders}
-                  selectedStatus={selectedStatus}
-                  errororders={errororders}
-                  isLoadingorders={isLoadingorders}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </div>
+
+      {/* الجدول */}
       <div>
-        <Card className="col-span- h-full mt- p-3">
+        <Card className="h-full p-3">
           <TableOrder
             orders={orders}
             selectedStatus={selectedStatus}

@@ -47,7 +47,7 @@ export default function StatCard({
   return (
     <div
       onClick={onClick}
-      className={`flex items-center justify-between p-2 rounded-xl shadow hover:opacity-90 transition  ${bg} cursor-pointer  ${
+      className={`flex items-center justify-between p-5 rounded-xl shadow hover:opacity-90 transition  ${bg} cursor-pointer  ${
         selectedStatus === "Total" ? "w-full" : "w-[180px]"
       } `}
     >

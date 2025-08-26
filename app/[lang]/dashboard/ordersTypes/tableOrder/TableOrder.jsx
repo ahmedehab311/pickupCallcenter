@@ -81,7 +81,7 @@ export function BasicDataTable({
     const filteredOrders =
       selectedStatus === "Total"
         ? baseOrders
-        : baseOrders.filter((order) => order?.status === selectedStatus);
+        : baseOrders.filter((order) => order?.status.toLowerCase() === selectedStatus.toLowerCase());
 
          const sortedOrders = filteredOrders.sort((a, b) => {
     return new Date(b.created_at) - new Date(a.created_at);

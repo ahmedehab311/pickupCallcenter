@@ -50,6 +50,13 @@ const BasicTable = ({ OrderDetails, OrderDetailsItem }) => {
         </TableBody>
       </Table> */}
       <div className="max-h-[px] overflow-auto  border rounded-md">
+          <div className="flex justify-between items-center w-1/2">
+                  <div className="flex gap-2">
+                    <h3>Check: {OrderDetails?.check_id } </h3>
+                    <p>Source: {OrderDetails?.source}</p>
+                  </div>
+                  <p>Status: {OrderDetails?.status}</p>
+                </div>
         <Table>
           <TableHeader>
             <TableRow>
