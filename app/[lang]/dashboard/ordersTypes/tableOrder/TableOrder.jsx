@@ -60,6 +60,7 @@ export function BasicDataTable({
     pageIndex: 0,
     pageSize: 20,
   });
+  
   const daysNumberOptions = [
     { value: 1, label: "1 Day" },
     { value: 7, label: "7 Days" },
@@ -149,7 +150,7 @@ export function BasicDataTable({
       },
       {
         accessorKey: "Date",
-        header: "Date",
+        header: "Date-time / type",
         cell: (info) => {
           const row = info.row.original;
           return (
@@ -282,6 +283,7 @@ export function BasicDataTable({
   const handleClearSearch = () => {
     setOrderIdOrPhone("");
     setHasSearched(false);
+
   };
 
   const handleEditOrderClick = (orderId) => {
@@ -362,7 +364,7 @@ export function BasicDataTable({
             value={daysNumberOptions.find(
               (option) => option.value === selectedDayNumber
             )}
-            isDisabled={searchUser}
+            isDisabled={hasSearched}
           />
         </div>
       </div>
