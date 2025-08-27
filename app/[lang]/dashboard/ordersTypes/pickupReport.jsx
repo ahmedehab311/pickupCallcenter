@@ -34,78 +34,6 @@ const UserDeviceReport = ({
   const sourceLabels = ["Delivery", "Pickup"];
   const series = [deliveryCount, pickupCount];
 
-  // const options = {
-  //      chart: { 
-  //     toolbar: { show: false },
-  //     height: height - 40, // تقليل ارتفاع الشارت نفسه
-  //   },
-  //   labels: sourceLabels,
-  //   dataLabels: { enabled: false },
-  //   colors: [
-  //     `hsl(${theme?.cssVars[mode === "dark" ? "dark" : "light"].primary})`,
-  //     "#FF9E69",
-  //     "#FFD1A7",
-  //     "#6C5DD3",
-  //     "#00C9A7",
-  //     "#FFC700",
-  //   ],
-  //   tooltip: {
-  //     theme: mode === "dark" ? "dark" : "light",
-  //   },
-  //   stroke: { width: 0 },
-  //   plotOptions: {
-  //     pie: {
-  //       donut: {
-  //         labels: {
-  //           show: true,
-  //           name: {
-  //             show: true,
-  //             fontSize: "24px",
-  //             fontWeight: 500,
-  //             color: `hsl(${
-  //               theme?.cssVars[mode === "dark" ? "dark" : "light"].chartLabel
-  //             })`,
-  //           },
-  //           value: {
-  //             show: true,
-  //             fontSize: "18px",
-  //             fontWeight: 600,
-  //             color: `hsl(${
-  //               theme?.cssVars[mode === "dark" ? "dark" : "light"].chartLabel
-  //             })`,
-  //             offsetY: -1,
-  //           },
-  //           total: {
-  //             show: true,
-  //             label: "Total",
-  //             fontSize: "16px",
-  //             fontWeight: 600,
-  //             color: `hsl(${
-  //               theme?.cssVars[mode === "dark" ? "dark" : "light"].chartLabel
-  //             })`,
-  //             offsetY: -10,
-  //           },
-  //         },
-  //       },
-  //     },
-  //   },
-  //   legend: {
-  //     position: "bottom",
-  //     offsetY: -15,
-  //     labels: {
-  //       colors: `hsl(${
-  //         theme?.cssVars[mode === "dark" ? "dark" : "light"].chartLabel
-  //       })`,
-  //     },
-  //     itemMargin: { horizontal: 5, vertical: 12 },
-  //     markers: {
-  //       width: 10,
-  //       height: 10,
-  //       radius: 10,
-  //       offsetX: isRtl ? 5 : -5,
-  //     },
-  //   },
-  // };
  const options = {
     chart: {
       toolbar: { show: false },
@@ -185,6 +113,11 @@ const UserDeviceReport = ({
   }
     },
   };
+    const hasNoResult =
+    !orders ||
+    !orders.sources ||
+    sourceLabels.length === 0 ||
+    series.reduce((a, b) => a + b, 0) === 0;
   if (isLoadingorders) {
     return (
       <div className="flex justify-center items-center h-[250px] animate-pulse text-[#fff] text-lg">
@@ -197,6 +130,13 @@ const UserDeviceReport = ({
     return (
       <div className="flex justify-center items-center h-[250px] text-red-500 text-lg">
         Error loading chart
+      </div>
+    );
+  }
+  if (hasNoResult) {
+    return (
+      <div className="flex justify-center items-center h-[180px] text-[#000] dark:text-[#fff] text-lg">
+        No results.
       </div>
     );
   }

@@ -9,6 +9,7 @@ export default function StatCard({
   label,
   onClick,
   color, 
+  orders,
   borderColor,
   isLoadingorders,
   selectedStatus,
@@ -16,7 +17,7 @@ export default function StatCard({
 }) {
   const [displayNumber, setDisplayNumber] = useState(0);
   const [isReal, setIsReal] = useState(false);
-
+ 
   useEffect(() => {
     if (number !== "—" && number !== undefined) {
       setIsReal(true);

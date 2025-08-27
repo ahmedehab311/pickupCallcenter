@@ -2348,8 +2348,8 @@ function CreateOrder({ params }) {
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-4 ">
-        <div className=" order-2 lg:order-1 lg:col-span p-4 shadow- rounded-lg mt-0  ">
+      <div className="grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-4 mt-4">
+        <div className=" order-2 lg:order-1 lg:col-span p-4 shadow- rounded-lg m  ">
           {/*  مربع البحث */}
           <div className="space-y-4 ">
             {/*  مربع البحث */}
@@ -3517,7 +3517,7 @@ function CreateOrder({ params }) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 mt-[15px] order-1 lg:order-2  ">
+        <div className="flex flex-col gap-4 order-1 lg:order-2  ">
           {restaurantsSelect?.length > 1 && (
             <Select
               placeholder="Select Restaurant"

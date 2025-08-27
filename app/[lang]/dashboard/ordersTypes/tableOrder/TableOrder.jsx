@@ -291,7 +291,7 @@ export function BasicDataTable({
   const latestSearchRef = useRef("");
   return (
     <>
-      <div className="flex items-center flex-wrap gap-2 px-4 justify-between">
+      <div className="flex items-center flex-wrap gap-2 px-2 pt-4  justify-between">
         <div className="relative max-w-sm min-w-[200px]">
           <Input
             placeholder="Search by order id or phone"
@@ -368,7 +368,7 @@ export function BasicDataTable({
       </div>
 
       <div>
-        <Table>
+        <Table >
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -395,7 +395,7 @@ export function BasicDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  <span className="animate-pulse text-[#000] dark:text-[#fff] flex justify-center items-center">
+                  <span className="animate-pulse text-[#000] dark:text-[#fff] flex justify-center items-center text-lg">
                     Loading...
                   </span>
                 </TableCell>
@@ -406,7 +406,7 @@ export function BasicDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  <span className=" text-[#000] dark:text-[#fff] flex justify-center items-center">
+                  <span className=" text-[#000] dark:text-[#fff] flex justify-center items-center text-lg">
                     Error loading data.
                   </span>
                 </TableCell>
@@ -417,7 +417,7 @@ export function BasicDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  <span className=" text-[#000] dark:text-[#fff] flex justify-center items-center">
+                  <span className=" text-[#000] dark:text-[#fff] flex justify-center items-center text-lg">
                     No search results found.
                   </span>
                 </TableCell>
@@ -448,7 +448,7 @@ export function BasicDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  <span className=" text-[#000] dark:text-[#fff] flex justify-center items-center">
+                  <span className=" text-[#000] dark:text-[#fff] flex justify-center items-center text-lg">
                     No results.
                   </span>
                 </TableCell>

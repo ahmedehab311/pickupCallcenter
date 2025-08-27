@@ -101,16 +101,21 @@ const BranchesReport = ({
         radius: 8,
         offsetX: isRtl ? 4 : -4,
       },
-      fontSize: "12px", 
-     formatter: function(seriesName, opts) {
-    const value = opts.w.globals.series[opts.seriesIndex];
-    const total = opts.w.globals.series.reduce((a, b) => a + b, 0);
-    const percentage = ((value / total) * 100).toFixed(2);
-    return `${seriesName}: (${percentage}%)`;
-  }
+      fontSize: "12px",
+      formatter: function (seriesName, opts) {
+        const value = opts.w.globals.series[opts.seriesIndex];
+        const total = opts.w.globals.series.reduce((a, b) => a + b, 0);
+        const percentage = ((value / total) * 100).toFixed(2);
+        return `${seriesName}: (${percentage}%)`;
+      }
     },
-    
+
   };
+  const hasNoResult =
+    !orders ||
+    !orders.sources ||
+    branchLabels.length === 0 ||
+    branchSeries.reduce((a, b) => a + b, 0) === 0;
   if (isLoadingorders) {
     return (
       <div className="flex justify-center items-center h-[250px] animate-pulse text-[#fff] text-lg">
@@ -126,7 +131,13 @@ const BranchesReport = ({
       </div>
     );
   }
-
+  if (hasNoResult) {
+    return (
+      <div className="flex justify-center items-center h-[180px] text-[#000] dark:text-[#fff] text-lg">
+        No results.
+      </div>
+    );
+  }
   return (
     <div className="custom-chart flex flex-col justify-between items-between h-full">
       <Chart
@@ -134,11 +145,11 @@ const BranchesReport = ({
           ...options,
           labels: branchLabels,
           chart: {
-          ...options.chart,
-          width: "100%", // التأكد من أن العرض 100%
-        },
+            ...options.chart,
+            width: "100%",
+          },
         }}
-        
+
         series={branchSeries}
         type="donut"
         height={height}
