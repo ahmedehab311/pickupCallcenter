@@ -8,10 +8,11 @@ export default function StatCard({
   number,
   label,
   onClick,
-  bg,
+  color, 
+  borderColor,
   isLoadingorders,
   selectedStatus,
-  errororders,
+  errororders, statusKey
 }) {
   const [displayNumber, setDisplayNumber] = useState(0);
   const [isReal, setIsReal] = useState(false);
@@ -47,17 +48,16 @@ export default function StatCard({
   return (
     <div
       onClick={onClick}
-      className={`flex items-center justify-between p-5 rounded-xl shadow hover:opacity-90 transition  ${bg} cursor-pointer  ${
-        selectedStatus === "Total" ? "w-full" : "w-[180px]"
-      } `}
+      className={`flex items-center justify-between  flex-1  ${selectedStatus === "Total" ? "p-6" : "p-3"}  rounded-xl shadow hover:opacity-90 transition  bg-card cursor-pointer
+  ${selectedStatus === "Total" ? "w-full" : ""}  
+    ${selectedStatus === statusKey ? `border-2  ${borderColor}` : ""}  `}
+
     >
       <div className="flex flex-col text-left">
         <span
-          className={` ${
-            selectedStatus === "Total" ? "text-xl" : "text-[13px]"
-          }  ${
-            selectedStatus === "Total" ? "font-bold" : "font-medium"
-          }  text-[#000] flex items-center gap-2`}
+          className={` ${selectedStatus === "Total" ? "text-xl" : "text-[13px]"
+            }  ${selectedStatus === "Total" ? "font-bold" : "font-medium"
+            }  text-[#000] flex items-center gap-2`}
         >
           {isLoadingorders ? (
             <>
@@ -86,9 +86,9 @@ export default function StatCard({
           )}
         </span>
 
-        <span className="text-xs text-[#000]">{label}</span>
+        <span className="text-xs text-[#000] mt-1">{label}</span>
       </div>
-      <div className="text-blue-500">
+      <div className={`${color} `}>
         <Icon size={selectedStatus === "Total" ? 32 : 16} />
       </div>
     </div>

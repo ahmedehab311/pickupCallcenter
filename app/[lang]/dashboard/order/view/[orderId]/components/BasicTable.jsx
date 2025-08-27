@@ -50,13 +50,20 @@ const BasicTable = ({ OrderDetails, OrderDetailsItem }) => {
         </TableBody>
       </Table> */}
       <div className="max-h-[px] overflow-auto  border rounded-md">
+        <div className="flex justify-between  m-[10px]">
           <div className="flex justify-between items-center w-1/2">
-                  <div className="flex gap-2">
-                    <h3>Check: {OrderDetails?.check_id } </h3>
-                    <p>Source: {OrderDetails?.source}</p>
-                  </div>
-                  <p>Status: {OrderDetails?.status}</p>
-                </div>
+            <div className="flex gap-2">
+              {
+                OrderDetails?.check_id && (
+
+                  <h3>Check: {OrderDetails?.check_id}</h3>
+                )
+              }
+              <p>Source: {OrderDetails?.source}</p>
+            </div>
+            <p>Status: {OrderDetails?.status}</p>
+          </div>
+        </div>
         <Table>
           <TableHeader>
             <TableRow>
@@ -135,7 +142,7 @@ const BasicTable = ({ OrderDetails, OrderDetailsItem }) => {
         </div>
         <div className="flex gap-1">
           <span className="font-semibold">Tax fees:</span>
-          <span>{OrderDetails?.tax_fees}</span> 
+          <span>{OrderDetails?.tax_fees}</span>
         </div>
       </div>
 
@@ -149,18 +156,18 @@ const BasicTable = ({ OrderDetails, OrderDetailsItem }) => {
           <span className="font-semibold">
             Sub Total :
             {/* (Before Discount and Taxes) */}
-            
+
           </span>
           <span>{OrderDetails?.sub_total?.toFixed(2)}</span>
         </div>
-      
+
         <div className="flex gap-1">
           <span className="font-semibold">Total Amount :</span>
           <span>
             {OrderDetails?.total
               ? parseFloat(
-                  OrderDetails.total.replace(/\s/g, "").replace(",", ".")
-                ).toFixed(2)
+                OrderDetails.total.replace(/\s/g, "").replace(",", ".")
+              ).toFixed(2)
               : "0.00"}
           </span>
         </div>

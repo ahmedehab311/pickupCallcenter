@@ -438,9 +438,9 @@ export const updateUserData = async (userData) => {
 
   try {
     const response = await axios.post(url);
-    console.log("apiBaseUrl updateUserData", `${basePath}/callcenter/user`);
+    // console.log("apiBaseUrl updateUserData", `${basePath}/callcenter/user`);
 
-    console.log("User updated:", response);
+    // console.log("User updated:", response);
     return response.data;
   } catch (error) {
     console.error("Error updating user:", error);
@@ -463,7 +463,7 @@ export const deleteAddress = async (id, token, apiBaseUrl) => {
     //   if (messages.length > 0) {
     //     toast.success(messages[0]);
     //   }
-    console.log("apiBaseUrl deleteAddress", apiBaseUrl);
+    // console.log("apiBaseUrl deleteAddress", apiBaseUrl);
 
     return response.data;
   } catch (error) {

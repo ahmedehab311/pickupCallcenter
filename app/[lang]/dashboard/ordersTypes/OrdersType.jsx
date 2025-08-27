@@ -9,6 +9,7 @@ import {
   CheckCheck,
   Ban,
   XCircle,
+  ThumbsDown,
 } from "lucide-react";
 import { useSubdomin } from "@/provider/SubdomainContext";
 import { useQuery } from "@tanstack/react-query";
@@ -88,57 +89,65 @@ function OrdersType() {
       number: orders?.total?.count ?? "—",
       label: "Total Orders",
       statusKey: "Total",
-      bg: "bg-blue-100",
+      color: "text-[#231f20]",
+      borderColor: "border-[#231f20]",
     },
     {
       icon: PlusSquare,
       number: orders?.countByStatus?.new?.count ?? "—",
       label: "New",
       statusKey: "New",
-      bg: "bg-green-100",
+      color: "text-[#f39c12]",
+      borderColor: "border-[#f39c12]",
     },
     {
       icon: Hourglass,
       number: orders?.countByStatus?.pending?.count ?? "—",
       label: "Pending",
       statusKey: "Pending",
-      bg: "bg-yellow-100",
+      borderColor: "border-[#8e44ad]",
+      color: "text-[#8e44ad]",
     },
     {
       icon: Settings,
       number: orders?.countByStatus?.processing?.count ?? "—",
       label: "Processing",
       statusKey: "Processing",
-      bg: "bg-purple-100",
+      color: "text-[#2980b9]",
+      borderColor: "border-[#2980b9]",
     },
     {
       icon: Truck,
       number: orders?.countByStatus?.inWay?.count ?? "—",
-      label: "In way Orders",
+      label: "In way",
       statusKey: "Processing",
       statusKey: "In-way",
-      bg: "bg-orange-100",
+      borderColor: "border-[#B53471]",
+      color: "text-[#B53471]",
     },
     {
       icon: CheckCheck,
       number: orders?.countByStatus?.delivered?.count ?? "—",
       label: "Delivered",
       statusKey: "Delivered",
-      bg: "bg-emerald-100",
+      borderColor: "border-[#2ecc71]",
+      color: "text-[#2ecc71]",
     },
     {
       icon: XCircle,
       number: orders?.countByStatus?.canceled?.count ?? "—",
       label: "Cancelled",
       statusKey: "canceled",
-      bg: "bg-emerald-100",
+      borderColor: "border-[#df1f27]",
+      color: "text-[#df1f27]",
     },
     {
-      icon: Ban,
+      icon: ThumbsDown,
       number: orders?.countByStatus?.rejected?.count ?? "—",
       label: "Rejected",
       statusKey: "rejected",
-      bg: "bg-emerald-100",
+      color: "text-[#df1f27]",
+      borderColor: "border-[#df1f27]",
     },
 
   ];
@@ -147,8 +156,8 @@ function OrdersType() {
     <>
 
       {selectedStatus === "Total" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full p-2 mb-1">
-          <Card className="">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full pt-2 mb-1">
+          <Card >
             <CardHeader className="border-none p-4 pb-1 text-primary font-semibold">Order Source</CardHeader>
             <CardContent className="p-2 pt-0">
               <div className="dashtail-legend ">
@@ -161,7 +170,7 @@ function OrdersType() {
             </CardContent>
           </Card>
 
-          <Card className="">
+          <Card >
             <CardHeader className="border-none p-4 pb-1 text-primary font-semibold">Delivery Types</CardHeader>
             <CardContent className="p-2 pt-0">
               <div className="dashtail-legend">
@@ -176,7 +185,7 @@ function OrdersType() {
             </CardContent>
           </Card>
 
-          <Card className="">
+          <Card >
             <CardHeader className="border-none p-4 pb-1 text-primary font-semibold">Branches</CardHeader>
             <CardContent className="p-2 pt-0">
               <div className="dashtail-legend">
@@ -191,88 +200,27 @@ function OrdersType() {
           </Card>
         </div>
       )}
-      {/* {selectedStatus === "Total" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full p-2 mb-1">
-          <Card >
-            <CardHeader className="border-none p-4 pb-1">User Devices</CardHeader>
-            <CardContent className="p-2 pt-0">
-              <div className="dashtail-legend h-[50px]">
-                <UserDeviceReport
-                  orders={orders}
-                  errororders={errororders}
-                  isLoadingorders={isLoadingorders}
-                />
-              </div>
-            </CardContent>
-          </Card>
 
-          <Card >
-            <CardHeader className="border-none p-4 pb-1"></CardHeader>
-            <CardContent>
-              <div className="dashtail-legend">
-                <PickupReport
-                  orders={orders}
-                  selectedStatus={selectedStatus}
-                  errororders={errororders}
-                  isLoadingorders={isLoadingorders}
-                  error={error}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card >
-            <CardHeader className="border-none p-4 pb-1"></CardHeader>
-            <CardContent>
-              <div className="dashtail-legend">
-                <BranchesReport
-                  orders={orders}
-                  selectedStatus={selectedStatus}
-                  errororders={errororders}
-                  isLoadingorders={isLoadingorders}
-                />
-              </div>
-            </CardContent>
-          </Card>
+      <div className="w-full  my-7">
+        <div className={selectedStatus === "Total" ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" : "flex flex-wrap gap-4"}>
+          {stats.map((stat, index) => (
+            <StatCard
+              key={index}
+              icon={stat.icon}
+              number={stat.number}
+              label={stat.label}
+              onClick={() => setSelectedStatus(stat.statusKey)}
+              color={stat.color}
+              borderColor={stat.borderColor}
+              language={language}
+              errororders={errororders}
+              isLoadingorders={isLoadingorders}
+              selectedStatus={selectedStatus}
+              statusKey={stat.statusKey}
+            />
+          ))}
         </div>
-      )} */}
 
-      <div className="w-full p-2 mb-4">
-        {selectedStatus === "Total" ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {stats.map((stat, index) => (
-              <StatCard
-                key={index}
-                icon={stat.icon}
-                number={stat.number}
-                label={stat.label}
-                onClick={() => setSelectedStatus(stat.statusKey)}
-                bg={stat.bg}
-                language={language}
-                errororders={errororders}
-                isLoadingorders={isLoadingorders}
-                selectedStatus={selectedStatus}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-wrap gap-4">
-            {stats.map((stat, index) => (
-              <StatCard
-                key={index}
-                icon={stat.icon}
-                number={stat.number}
-                label={stat.label}
-                onClick={() => setSelectedStatus(stat.statusKey)}
-                bg={stat.bg}
-                language={language}
-                errororders={errororders}
-                isLoadingorders={isLoadingorders}
-                selectedStatus={selectedStatus}
-              />
-            ))}
-          </div>
-        )}
       </div>
 
       {/* الجدول */}

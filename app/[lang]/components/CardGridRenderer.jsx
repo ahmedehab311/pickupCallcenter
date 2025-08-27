@@ -20,7 +20,7 @@ function CardGridRenderer({
   isSettingLoading,
   subdomain,
   handleViewEdit,
-  handleDelete,handleDeleteTest,
+  handleDelete,
   handleEnter,
   handlechangeStatus,
   labelLoading,
@@ -148,7 +148,6 @@ function CardGridRenderer({
                   sectionName={section?.name}
                   onViewEdit={() => handleViewEdit(section.id)}
                   onDelete={() => handleDelete(section.id)}
-                  onDeleteTest={() => handleDeleteTest(section.id)}
                   onRestore={() => handleRestore(section.id)}
                   onEnter={() => handleEnter(section.id)}
                   // checked={getStatusDefault(section)}

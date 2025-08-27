@@ -261,54 +261,12 @@ export default function OrderViewPage({ params }) {
   }
   return (
     <>
-      {/* <div className="flex">
- <div>
-   <div className="flex justify-between items-center w-[60%]">
-        <h3>Order id: {OrderDetails?.check_id}</h3>
+    
 
-        <p>Status: {OrderDetails?.status}</p>
-      </div>
-      <Card title="Basic Table " className="w-[60%]">
-        <BasicTable
-          OrderDetailsItem={OrderDetailsItem}
-          OrderDetails={OrderDetails}
-        />
-      </Card>
-   </div>
-      <Card title="Basic Table" className="w-[60%] p-4">
-      <div className="flex gap-3">
-       <p>Order date: {OrderDetails?.created_at}</p>
-        <p>Order id: {OrderDetails?.order_id}</p>
-
-       </div>
-        <Select
-          placeholder="Select branch" 
-          className="react-select w-[40%] my-2"
-          classNamePrefix="select"
-          // options={daysNumberOptions}
-          // onChange={handledaysNumberChange}
-          isClearable={true}
-          styles={selectStyles(theme, color)}
-          // value={daysNumberOptions.find(
-          //   (option) => option.value === selectedDayNumber
-          // )}
-        />
-     
-      </Card>
- </div> */}
-      <div className="flex justify-between">
-     {/* <div className="flex gap-4">
-        <div className="flex justify-between items-center w-1/2">
-          <div className="flex gap-2">
-            <h3>Check: {OrderDetails?.check_id}</h3>
-            <p>Source: {OrderDetails?.source}</p>
-          </div>
-          <p>Status: {OrderDetails?.status}</p>
-        </div>
-      </div> */}
+     <div className="flex gap-4">
+  {/* الجدول على الشمال */}
   <div className="w-1/2">
     <Card title="Order Info">
-     
       <BasicTable
         OrderDetailsItem={OrderDetailsItem}
         OrderDetails={OrderDetails}
@@ -444,16 +402,7 @@ export default function OrderViewPage({ params }) {
   </div>
 </div>
 
-    
 
-      {/* <Card className="col-span- h-full mt-0 w-[60%] p-5">
-        <p>Customer Name: {OrderDetails?.user?.name}</p>
-      </Card> */}
-
-      {/* <Card className="col-span- h-full mt-0 w-[60%] p-5">
-        <p>Status: {OrderDetails?.status}</p>
-        <p>Customer Name: {OrderDetails?.user?.name}</p>
-      </Card> */}
     </>
   );
 }

@@ -27,6 +27,7 @@ import { useReorderableList } from "@/hooks/useReorderableList";
 import { useSubdomin } from "@/provider/SubdomainContext";
 import toast from "react-hot-toast";
 import CardGridRenderer from "../../components/CardGridRenderer";
+import TableRenderer from "../../components/TableRenderer";
 import { useToken } from "@/provider/TokenContext";
 import { fetchAllSections, useSections } from "../sections/apisSection";
 // import { TokenProvider } from "@/context/TokenContext";
@@ -37,6 +38,7 @@ const Menu = ({ params: { lang } }) => {
   const { apiBaseUrl, subdomain } = useSubdomin();
   const [filteredMenus, setFilteredMenus] = useState();
   const [pageSize, setPageSize] = useState("10");
+  const [viewMode, setViewMode] = useState("card");
   const {
     data: Menus,
     isLoading,
@@ -164,33 +166,7 @@ const Menu = ({ params: { lang } }) => {
       setIsSettingDefaultLoading(false);
     }
   };
-  const handleDeleteTest = async (id) => {
-    try {
-      setIsSettingDefaultLoading(true);
-      const res = await deleteItemTest(apiBaseUrl, token, id, "menu");
-      if (res.messages?.[0]?.includes("so you can't delete")) {
-        toast.error(res.messages[0]);
-        return;
-      }
-      if (res.messages?.[0]?.includes("is deleted")) {
-        toast.error(res.messages[0]);
-        return;
-      }
-      if (
-        res?.responseStatus &&
-        Array.isArray(res.messages) &&
-        res.messages.length > 0
-      ) {
-        refetch();
-        toast.success(res.messages[0]);
-      }
-    } catch (error) {
-      toast.error("An error occurred while deleting the menu.");
-      console.error("Error default menu:", error);
-    } finally {
-      setIsSettingDefaultLoading(false);
-    }
-  };
+
   const handleRestore = async (id) => {
     try {
       setIsSettingDefaultLoading(true);
@@ -324,6 +300,25 @@ const Menu = ({ params: { lang } }) => {
           itemsCount={itemsCount}
           isSettingLoading={isSettingLoading}
         />
+        {/* <div className="flex justify-end gap-2 mb-4">
+  <button
+    onClick={() => setViewMode("card")}
+    className={`px-3 py-1 rounded ${
+      viewMode === "card" ? "bg-blue-500 text-white" : "bg-gray-200"
+    }`}
+  >
+    Cards
+  </button>
+  <button
+    onClick={() => setViewMode("table")}
+    className={`px-3 py-1 rounded ${
+      viewMode === "table" ? "bg-blue-500 text-white" : "bg-gray-200"
+    }`}
+  >
+    Table
+  </button>
+</div> */}
+
       </div>
       <CardGridRenderer
         labelLoading="menus"
@@ -340,7 +335,7 @@ const Menu = ({ params: { lang } }) => {
         handleEnter={handleEnter}
         handleViewEdit={handleViewEdit}
         handleDelete={handleDelete}
-        handleDeleteTest={handleDeleteTest}
+
         handlechangeStatus={handlechangeStatus}
         isSettingLoading={isSettingLoading}
         subdomain={subdomain}
@@ -349,6 +344,47 @@ const Menu = ({ params: { lang } }) => {
         filteredSections={filteredMenus}
         setFilteredSections={setFilteredMenus}
       />
+{/* {viewMode === "card" ? (
+  <CardGridRenderer
+    labelLoading="menus"
+    currentItems={currentItems}
+    isLoading={isLoading}
+    error={error}
+    localStatuses={localStatuses}
+    setLocalStatuses={setLocalStatuses}
+    trans={trans}
+    isDefaultForMenu={true}
+    isLoadingStatus={isLoadingStatus}
+    handleDefault={handleDefault}
+    handleRestore={handleRestore}
+    handleEnter={handleEnter}
+    handleViewEdit={handleViewEdit}
+    handleDelete={handleDelete}
+    handlechangeStatus={handlechangeStatus}
+    isSettingLoading={isSettingLoading}
+    subdomain={subdomain}
+    offset={offset}
+    setDraggedIndex={setDraggedIndex}
+    filteredSections={filteredMenus}
+    setFilteredSections={setFilteredMenus}
+  />
+) : (
+  // <TableRenderer
+  //   labelLoading="menus"
+  //   currentItems={currentItems}
+  //   isLoading={isLoading}
+  //   error={error}
+  //   trans={trans}
+  //   handleDefault={handleDefault}
+  //   handleRestore={handleRestore}
+  //   handleEnter={handleEnter}
+  //   handleViewEdit={handleViewEdit}
+  //   // handleDelete={handleDelete}
+  //   // handlechangeStatus={handlechangeStatus}
+  //   // isLoadingStatus={isLoadingStatus}
+  //   // isSettingLoading={isSettingLoading}
+  // />
+)} */}
 
       {pageCount > 1 && currentItems && !isLoading && (
         <Pagination>

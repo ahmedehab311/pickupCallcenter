@@ -44,7 +44,7 @@ export function BasicDataTable({
   refetchSearchUser,
 }) {
   // console.log("orders",orders);
-  
+
   const language =
     typeof window !== "undefined" ? localStorage.getItem("language") : null;
   const [hasSearched, setHasSearched] = useState(false);
@@ -83,9 +83,9 @@ export function BasicDataTable({
         ? baseOrders
         : baseOrders.filter((order) => order?.status.toLowerCase() === selectedStatus.toLowerCase());
 
-         const sortedOrders = filteredOrders.sort((a, b) => {
-    return new Date(b.created_at) - new Date(a.created_at);
-  });
+    const sortedOrders = filteredOrders.sort((a, b) => {
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
     // console.log("filteredOrders", filteredOrders);
 
     return sortedOrders.map((order) => {
@@ -198,8 +198,8 @@ export function BasicDataTable({
             row["paymentMethod"] === 1
               ? "Cash"
               : row["paymentMethod"] === 2
-              ? "Visa"
-              : "Other";
+                ? "Visa"
+                : "Other";
           return (
             <div className="flex flex-col">
               <span className="whitespace-nowrap">{row["TotalAmount"]}</span>
@@ -378,9 +378,9 @@ export function BasicDataTable({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}
@@ -448,7 +448,7 @@ export function BasicDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  <span className="animate-pulse text-[#fff] flex justify-center items-center">
+                  <span className=" text-[#000] dark:text-[#fff] flex justify-center items-center">
                     No results.
                   </span>
                 </TableCell>

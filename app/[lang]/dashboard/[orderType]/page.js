@@ -127,11 +127,15 @@ const editUserAddressSchema = z.object({
     { value: z.number(), label: z.string() },
     { required_error: "Area is required" }
   ),
-  street: z.string().min(1, "Street name is required"),
+  // street: z.string().min(1, "Street name is required"),
+  street: z.preprocess(
+    (val) => val?.toString(), // أي حاجة تيجي تتحول string
+    z.string().min(1, "Street name is required")
+  ),
   name: z.string().optional(),
-  building: z.string().optional(),
-  floor: z.string().optional().or(z.literal("")),
-  apt: z.string().optional(),
+  building: z.union([z.string(), z.number()]).optional().transform(val => val?.toString() ?? ""),
+  floor: z.union([z.string(), z.number()]).optional().or(z.literal("")),
+  apt: z.union([z.string(), z.number()]).optional(),
   additionalInfo: z.string().optional(),
 });
 
@@ -1180,26 +1184,25 @@ function CreateOrder({ params }) {
   const [showManualLoading, setShowManualLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSearch = () => {
+  const handleSearch = () => {  
     setHasSearched(true);
     if (search) {
       setShowManualLoading(true);
       setPhone(search);
       refetch().finally(() => setShowManualLoading(false));
       if (selectedUser?.address?.length > 0) {
+        setDeliveryMethod("Delivery");
         if (!selectedAddress) {
+          console.log("selectedAddress",selectedAddress);
           setSelectedAddress(selectedUser.address[0]);
-        }
+        } 
       } else {
         setDeliveryMethod("pickup");
         setSelectedAddress(null);
         setSelectedBranch(null);
         // setBranchId(null);
       }
-      // queryClient.removeQueries(["userSearch"], { exact: false });
-      // refetch();
-      // setErrorSearchUser("");
-      // setStaticMassageError("");
+
 
       if (selectedBranch) {
         setSelectedBranchPriceList(selectedBranch.price_list);

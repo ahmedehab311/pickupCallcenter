@@ -166,7 +166,6 @@ const CardFooter = React.forwardRef(
       sectionItems,
       onViewEdit,
       onDelete,
-      onDeleteTest,
       onRestore,
       onEnter,
       className,
@@ -299,14 +298,7 @@ const CardFooter = React.forwardRef(
                   Restore
                 </DropdownMenuItem>
               )}
-              {!deletedAt && (
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={onDeleteTest}
-                >
-                  Delete Test
-                </DropdownMenuItem>
-              )}
+           
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
