@@ -387,18 +387,26 @@ function CreateOrder({ params }) {
     queryFn: () => fetchUserByPhone(search.trim(), token, apiBaseUrl),
     enabled: false,
     onSuccess: (data) => {
-      if (data) {
+      // if (data) {
         setAllUserData(data);
-        setStaticMassageError(""); // داتا موجودة
-      } else {
-        setAllUserData(null);
-        setStaticMassageError("No data for this number"); // داتا فاضية
-      }
-    },
-    onError: (error) => {
-      setErrorSearchUser("Error fetching user data");
-      console.error("Error fetching user:", error);
-    },
+        // if (data?.address?.length > 0) {
+        //   setDeliveryMethod("Delivery");
+        //   if (!selectedAddress) {
+        //     setSelectedAddress(data.address[0]);
+        //   }
+        // }
+        // } else {
+        //   setAllUserData(null);
+        //   setDeliveryMethod("pickup");
+        //   setSelectedAddress(null);
+        // }
+        // console.log("data:",data);
+        
+      },
+      onError: (error) => {
+        setErrorSearchUser("Error fetching user data");
+        console.error("Error fetching user:", error);
+      },
   });
   // api branches
 
@@ -1195,18 +1203,18 @@ function CreateOrder({ params }) {
       setShowManualLoading(true);
       setPhone(search);
       refetch().finally(() => setShowManualLoading(false));
-      if (selectedUser?.address?.length > 0) {
-        setDeliveryMethod("Delivery");
-        if (!selectedAddress) {
-          console.log("selectedAddress", selectedAddress);
-          setSelectedAddress(selectedUser.address[0]);
-        }
-      } else {
-        setDeliveryMethod("pickup");
-        setSelectedAddress(null);
-        setSelectedBranch(null);
-        // setBranchId(null);
-      }
+      // if (selectedUser?.address?.length > 0) {
+      //   setDeliveryMethod("Delivery");
+      //   if (!selectedAddress) {
+      //     console.log("selectedAddress", selectedAddress);
+      //     setSelectedAddress(selectedUser.address[0]);
+      //   }
+      // } else {
+      //   setDeliveryMethod("pickup");
+      //   setSelectedAddress(null);
+      //   setSelectedBranch(null);
+      //   // setBranchId(null);
+      // }
 
 
       if (selectedBranch) {
@@ -1216,7 +1224,24 @@ function CreateOrder({ params }) {
       setErrorSearchUser("Please enter a valid search.");
     }
   };
+  console.log("selectedAddress", selectedAddress);
+useEffect(() => {
+  if (!selectedUser) return;
 
+  if (selectedUser?.address?.length > 0) {
+    setDeliveryMethod("Delivery");
+
+    if (!selectedAddress) {
+      console.log("✅ selectedAddress set:", selectedUser.address[0]);
+      setSelectedAddress(selectedUser.address[0]);
+    }
+  } else {
+    setDeliveryMethod("pickup");
+    setSelectedAddress(null);
+    setSelectedBranch(null);
+    // setBranchId(null);
+  }
+}, [selectedUser]);
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearch();
@@ -1576,26 +1601,50 @@ function CreateOrder({ params }) {
     }
   }, [selectedBranchNew?.id]);
 
-  useEffect(() => {
-    if (
-      prevUserRef?.current !== null &&
-      prevUserRef?.current?.id !== selectedUser?.id
-    ) {
-      // setDeliveryMethod("delivery");
-      setDeliveryMethod(
-        selectedUser?.address?.length > 0 ? "delivery" : "pickup"
-      );
-      prevUserRef.current = selectedUser;
-      if (!isEditMode) {
-        setSelectedBranch(null);
-        setSelectedBranchName("");
-        setSelectedBranchInSelected(null);
-        setSelectedBranchId(null);
-      }
-    }
+  // useEffect(() => {
+  //   if (
+  //     prevUserRef?.current !== null &&
+  //     prevUserRef?.current?.id !== selectedUser?.id
+  //   ) {
+  //     // setDeliveryMethod("delivery");
+  //     // setDeliveryMethod(
+  //     //   selectedUser?.address?.length > 0 ? "delivery" : "pickup"
+  //     // );
+  //     prevUserRef.current = selectedUser;
+  //     if (!isEditMode) {
+  //       setSelectedBranch(null);
+  //       setSelectedBranchName("");
+  //       setSelectedBranchInSelected(null);
+  //       setSelectedBranchId(null);
+  //     }
+  //   }
 
+  //   prevUserRef.current = selectedUser;
+  // }, [selectedUser]);
+  useEffect(() => {
+  if (
+    selectedUser &&
+    prevUserRef?.current !== null &&
+    prevUserRef?.current?.id !== selectedUser?.id
+  ) {
+    if (Array.isArray(selectedUser.address)) {
+      setDeliveryMethod(
+        selectedUser.address.length > 0 ? "delivery" : "pickup"
+      );
+    }
     prevUserRef.current = selectedUser;
-  }, [selectedUser]);
+
+    if (!isEditMode) {
+      setSelectedBranch(null);
+      setSelectedBranchName("");
+      setSelectedBranchInSelected(null);
+      setSelectedBranchId(null);
+    }
+  }
+
+  prevUserRef.current = selectedUser;
+}, [selectedUser]);
+
   useEffect(() => {
     setIsBranchManuallySelected(!!selectedBranchId);
   }, [selectedBranchId]);
@@ -3863,11 +3912,11 @@ function CreateOrder({ params }) {
                           value={selectedBranchInSelected}
                         />
                         {showAlertBranch && (
-                        <ShowAlertBranchAlert  
-                        showAlertBranch={showAlertBranch} 
-                        setShowAlertBranch={setShowAlertBranch} 
-                        handleCancelChange={handleCancelChange} 
-                        handleConfirmChange={handleConfirmChange}/>
+                          <ShowAlertBranchAlert
+                            showAlertBranch={showAlertBranch}
+                            setShowAlertBranch={setShowAlertBranch}
+                            handleCancelChange={handleCancelChange}
+                            handleConfirmChange={handleConfirmChange} />
                         )}
                       </div>
                     )}
@@ -4095,7 +4144,7 @@ function CreateOrder({ params }) {
                                       >
                                         <FiEdit className="mr-3 text-l" />
                                       </button>
-                                  <DeleteItemFromCartAlert handleRemoveItem={handleRemoveItem} item={item}/>
+                                      <DeleteItemFromCartAlert handleRemoveItem={handleRemoveItem} item={item} />
                                     </div>
 
                                     {/* <span>
@@ -4740,9 +4789,9 @@ function CreateOrder({ params }) {
                       </Dialog>
                     )}
 
-                  <CancelOrderAlert 
-                    handleCacelOrder={handleCacelOrder}
-                    setCreateOrderDialogOpen={setCreateOrderDialogOpen}/>
+                    <CancelOrderAlert
+                      handleCacelOrder={handleCacelOrder}
+                      setCreateOrderDialogOpen={setCreateOrderDialogOpen} />
                   </>
                 )}
               </Card>
