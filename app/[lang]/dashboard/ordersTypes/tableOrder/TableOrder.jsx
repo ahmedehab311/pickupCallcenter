@@ -42,6 +42,7 @@ export function BasicDataTable({
   setOrderIdOrPhone,
   isLoadingSearchUser,
   refetchSearchUser,
+  stats,
 }) {
   // console.log("orders",orders);
 
@@ -60,7 +61,7 @@ export function BasicDataTable({
     pageIndex: 0,
     pageSize: 20,
   });
-  
+
   const daysNumberOptions = [
     { value: 1, label: "1 Day" },
     { value: 7, label: "7 Days" },
@@ -120,6 +121,12 @@ export function BasicDataTable({
     });
   }, [orders, searchUser, selectedStatus, hasSearched]);
 
+  // styles for status
+  const statusStyles = stats.reduce((acc, item) => {
+    acc[item.statusKey.toLowerCase()] = item.color;
+    return acc;
+  }, {});
+
   const columns = useMemo(
     () => [
       {
@@ -128,6 +135,8 @@ export function BasicDataTable({
 
         cell: (info) => {
           const row = info.row.original;
+          const status = row["status"]?.toLowerCase();
+          const colorClass = statusStyles[status] || "text-red-400";
           return (
             <div className="flex flex-col">
               {row["check_id"] && (
@@ -136,7 +145,7 @@ export function BasicDataTable({
                 </span>
               )}
               <span>{row["Invoice Id"]}</span>
-              <span className="text-sm text-muted-foreground">
+              <span className={`text-sm ${colorClass} font-se`}>
                 {row["status"]}
               </span>
             </div>

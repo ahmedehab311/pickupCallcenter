@@ -86,6 +86,11 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import placeholderImg from "./fsr-placeholder.webp"
 import InfiniteScroll from "react-infinite-scroll-component";
 import { CardItem } from "./CardItem";
+import RestaurantChangeAlert from "../../components/aletrs/RestaurantChangeAlert";
+import DeleteAddressAlert from "../../components/aletrs/address/DeleteAddressAlert";
+import ShowAlertBranchAlert from "../../components/aletrs/ShowAlertBranchAlert";
+import DeleteItemFromCartAlert from "../../components/aletrs/DeleteItemFromCartAlert";
+import CancelOrderAlert from "../../components/aletrs/CancelOrderAlert";
 const editUserDataSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters long"),
   phone: z.string().regex(/^\d{3,15}$/, "Invalid phone number"),
@@ -1184,7 +1189,7 @@ function CreateOrder({ params }) {
   const [showManualLoading, setShowManualLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSearch = () => {  
+  const handleSearch = () => {
     setHasSearched(true);
     if (search) {
       setShowManualLoading(true);
@@ -1193,9 +1198,9 @@ function CreateOrder({ params }) {
       if (selectedUser?.address?.length > 0) {
         setDeliveryMethod("Delivery");
         if (!selectedAddress) {
-          console.log("selectedAddress",selectedAddress);
+          console.log("selectedAddress", selectedAddress);
           setSelectedAddress(selectedUser.address[0]);
-        } 
+        }
       } else {
         setDeliveryMethod("pickup");
         setSelectedAddress(null);
@@ -2317,102 +2322,75 @@ function CreateOrder({ params }) {
   if (errorBranchs) return <p>Error loading branches: {error.message}</p>;
   return (
     <div className="flex flex-col gap-4">
-      <AlertDialog
-        open={showRestaurantChangeAlert}
-        onOpenChange={setShowRestaurantChangeAlert}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Changing the restaurant will clear your cart. Do you want to
-              proceed?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              type="button"
-              variant="outline"
-              color="info"
-              onClick={() => setShowRestaurantChangeAlert(false)}
-            >
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/80"
-              onClick={confirmRestaurantChange}
-            >
-              Ok
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-4 mt-4">
-        <div className=" order-2 lg:order-1 lg:col-span p-4 shadow- rounded-lg m  ">
+      <RestaurantChangeAlert
+        showRestaurantChangeAlert={showRestaurantChangeAlert}
+        setShowRestaurantChangeAlert={setShowRestaurantChangeAlert}
+        confirmRestaurantChange={confirmRestaurantChange}
+      />
+      <div className="grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-4 mt-2">
+        <div className=" order-2 lg:order-1 lg:col-span lg:-4 shadow- rounded-lg m  ">
           {/*  مربع البحث */}
-          <div className="space-y-4 ">
-            {/*  مربع البحث */}
-            <Card className="p-4 shadow-md rounded-lg mt-[-15px] -ml-[15px]  ">
-              <div className="relative min-w-[240px] mb-2">
-                <span className="absolute top-1/2 -translate-y-1/2 left-2">
-                  <Search className="w-4 h-4 text-gray-500" />
-                </span>
-                <Input
-                  type="text"
-                  placeholder="Search"
-                  className="pl-7 w-full text-[#000] dark:text-[#fff] "
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+          <Card className="p-4 shadow-md rounded-lg  -ml-[]  ">
+            <div className="relative min-w-[240px] mb-2">
+              <span className="absolute top-1/2 -translate-y-1/2 left-2">
+                <Search className="w-4 h-4 text-gray-500" />
+              </span>
+              <Input
+                type="text"
+                placeholder="Search"
+                className="pl-7 w-full text-[#000] dark:text-[#fff] "
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
 
-                {searchQuery && (
-                  <button
-                    onClick={handleClearSearch}
-                    className="absolute top-1/2 right-2 -translate-y-1/2 text-[#000] dark:text-[#fff] text-xs font-bold"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
+              {searchQuery && (
+                <button
+                  onClick={handleClearSearch}
+                  className="absolute top-1/2 right-2 -translate-y-1/2 text-[#000] dark:text-[#fff] text-xs font-bold"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
 
-              {/*  التابات */}
-              <div className="flex gap-4 flex-wrap border-b pb-2 mt-3">
-                {filteredSections.map((section) => (
-                  <button
-                    key={section.id}
-                    className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300
+            {/*  التابات */}
+            <div className="flex gap-4 flex-wrap border-b pb-2 mt-3">
+              {filteredSections.map((section) => (
+                <button
+                  key={section.id}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300
         ${activeSection === section.id
-                        ? "bg-black text-white"
-                        : "bg-gray-200 text-gray-600"
-                      }
+                      ? "bg-black text-white"
+                      : "bg-gray-200 text-gray-600"
+                    }
       `}
-                    onClick={() => setActiveSection(section.id)}
-                  >
-                    {language === "en" ? section.name_en : section.name_ar}
-                  </button>
+                  onClick={() => setActiveSection(section.id)}
+                >
+                  {language === "en" ? section.name_en : section.name_ar}
+                </button>
+              ))}
+            </div>
+            <InfiniteScroll
+              dataLength={visibleItems}
+              next={fetchMoreData}
+              hasMore={visibleItems < displayedItems.length}
+              loader={<h4 className="text-center p-4">Loading...</h4>}
+            >
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                {displayedItems.slice(0, visibleItems).map((item) => (
+                  <CardItem
+                    key={item.id}
+                    item={item}
+                    language={language}
+                    handleItemClick={handleItemClick}
+                    placeholderImg={placeholderImg}
+                  />
                 ))}
               </div>
-              <InfiniteScroll
-                dataLength={visibleItems}
-                next={fetchMoreData}
-                hasMore={visibleItems < displayedItems.length}
-                loader={<h4 className="text-center p-4">Loading...</h4>}
-              >
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                  {displayedItems.slice(0, visibleItems).map((item) => (
-                    <CardItem
-                      key={item.id}
-                      item={item}
-                      language={language}
-                      handleItemClick={handleItemClick}
-                      placeholderImg={placeholderImg}
-                    />
-                  ))}
-                </div>
-              </InfiniteScroll>
+            </InfiniteScroll>
 
-              {/* <DialogItemForMenu
+            {/* <DialogItemForMenu
                     isItemDialogOpen={isItemDialogOpen}
                     setIsItemDialogOpen={setIsItemDialogOpen}
                     selectedItem={selectedItem}
@@ -2433,549 +2411,345 @@ function CreateOrder({ params }) {
                     handleAddToCart={handleAddToCart}
                     massegeInvaildToken={massegeInvaildToken}
                   /> */}
-              {isItemDialogOpen && (
-                <Dialog
-                  open={isItemDialogOpen}
-                  onOpenChange={setIsItemDialogOpen}
-                >
-                  <DialogContent size="3xl" hiddenCloseIcon={true}>
-                    <div className=" flex justify-between items-center space-y-4">
-                      <p className="text-xl">{selectedItem?.name}</p>
+            {isItemDialogOpen && (
+              <Dialog
+                open={isItemDialogOpen}
+                onOpenChange={setIsItemDialogOpen}
+              >
+                <DialogContent size="3xl" hiddenCloseIcon={true}>
+                  <div className=" flex justify-between items-center space-y-4">
+                    <p className="text-xl">{selectedItem?.name}</p>
 
-                      <div className="flex items-center space-">
-                        {/* السعر الإجمالي */}
-                        <p className="text-sm font-semibold text-gray-">
-                          {(selectedItem?.price * counter).toFixed(2)} EGP
-                        </p>
+                    <div className="flex items-center space-">
+                      {/* السعر الإجمالي */}
+                      <p className="text-sm font-semibold text-gray-">
+                        {(selectedItem?.price * counter).toFixed(2)} EGP
+                      </p>
 
-                        <button
-                          onClick={() =>
-                            setCounter((prev) => (prev > 1 ? prev - 1 : 1))
+                      <button
+                        onClick={() =>
+                          setCounter((prev) => (prev > 1 ? prev - 1 : 1))
+                        }
+                        className="px-2 py-1 bg-red-500 text-white rounded-[6px] hover:bg-red-600 transition-colors mr-1 ml-4"
+                      >
+                        <FaMinus />
+                      </button>
+
+                      <input
+                        type="number"
+                        step="0.001"
+                        value={counter}
+                        onInput={(e) => {
+                          if (e.target.value.length > 4) {
+                            e.target.value = e.target.value.slice(0, 4); // اقتصاص القيمة إلى 4 أرق
                           }
-                          className="px-2 py-1 bg-red-500 text-white rounded-[6px] hover:bg-red-600 transition-colors mr-1 ml-4"
+                        }}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value);
+                          if (!isNaN(value) && value >= 0.1) {
+                            // السماح بالأرقام العشرية وعدم السماح بالقيم السالبة
+                            setCounter(value);
+                          }
+                        }}
+                        className="w-12 text-center border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:-blue-500 focus:border-transparent "
+                      />
+                      <button
+                        onClick={() => setCounter((prev) => prev + 1)}
+                        className="px-2 py-1 bg-green-500 text-white rounded-[6px] hover:bg-green-600 transition-colors ml5 mr-2 ml-1"
+                      >
+                        <FaPlus />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="items-center">
+                    <h3 className="font-medium ">
+                      {selectedItem?.description}
+                      {language === "en"
+                        ? selectedItem?.description_en
+                        : selectedItem?.description_ar}
+                    </h3>
+                  </div>
+                  <hr className="my-2" />
+                  <div className="mt-4">
+                    <div className="flex flex-c gap-5">
+                      {selectedItem?.info?.map((size, index) => (
+                        <label
+                          key={index}
+                          className="flex items-center space-x-2"
                         >
-                          <FaMinus />
-                        </button>
-
-                        <input
-                          type="number"
-                          step="0.001"
-                          value={counter}
-                          onInput={(e) => {
-                            if (e.target.value.length > 4) {
-                              e.target.value = e.target.value.slice(0, 4); // اقتصاص القيمة إلى 4 أرق
+                          <input
+                            type="radio"
+                            name="size"
+                            value={size?.size_en}
+                            checked={
+                              selectedItem?.selectedInfo === size?.size_en
                             }
-                          }}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value);
-                            if (!isNaN(value) && value >= 0.1) {
-                              // السماح بالأرقام العشرية وعدم السماح بالقيم السالبة
-                              setCounter(value);
-                            }
-                          }}
-                          className="w-12 text-center border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:-blue-500 focus:border-transparent "
-                        />
-                        <button
-                          onClick={() => setCounter((prev) => prev + 1)}
-                          className="px-2 py-1 bg-green-500 text-white rounded-[6px] hover:bg-green-600 transition-colors ml5 mr-2 ml-1"
-                        >
-                          <FaPlus />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="items-center">
-                      <h3 className="font-medium ">
-                        {selectedItem?.description}
-                        {language === "en"
-                          ? selectedItem?.description_en
-                          : selectedItem?.description_ar}
-                      </h3>
-                    </div>
-                    <hr className="my-2" />
-                    <div className="mt-4">
-                      <div className="flex flex-c gap-5">
-                        {selectedItem?.info?.map((size, index) => (
-                          <label
-                            key={index}
-                            className="flex items-center space-x-2"
-                          >
-                            <input
-                              type="radio"
-                              name="size"
-                              value={size?.size_en}
-                              checked={
-                                selectedItem?.selectedInfo === size?.size_en
-                              }
-                              onChange={() => {
-                                setIsOpenMainOption(true);
-                                setIsOpen(true);
-                                setIsOpenMainExtra(true);
-                                const newItemExtras =
-                                  size?.size_condiments || [];
+                            onChange={() => {
+                              setIsOpenMainOption(true);
+                              setIsOpen(true);
+                              setIsOpenMainExtra(true);
+                              const newItemExtras =
+                                size?.size_condiments || [];
 
-                                const newExtraGroup = newItemExtras.find(
-                                  (g) => g?.type === "extra"
-                                );
-                                const newOptionGroup = newItemExtras.find(
-                                  (g) => g?.type === "option"
-                                );
-                                const newGroupRules = newExtraGroup
-                                  ? {
-                                    min: newExtraGroup?.min ?? 0,
-                                    max: newExtraGroup?.max ?? 0,
-                                  }
-                                  : { min: 0, max: 0 };
-                                return setSelectedItem((prev) => ({
-                                  ...prev,
-                                  selectedInfo: size?.size_en,
-                                  selectedIdSize: size?.id,
-                                  price: size?.price?.price,
-                                  availability:
-                                    size?.availability?.availability,
-                                  itemExtras: newItemExtras,
-                                  extrasData: newExtraGroup?.condiments || [],
-                                  optionSize:
-                                    newOptionGroup?.condiments || [],
-                                  groupNameSizes:
-                                    newOptionGroup?.group_name || "",
-
-                                  groupNameExtrasData:
-                                    newExtraGroup?.group_name || "",
-                                  // selectedoption:newOptionGroup?.condiments?.length > 0 ? [newOptionGroup[0]] : [],
-                                  // selectedoptionId:newOptionGroup?.condiments?.length > 0 ? [newOptionGroup[0]?.id] : [],
-
-                                  selectedoption:
-                                    newOptionGroup?.condiments?.length > 0
-                                      ? [newOptionGroup.condiments[0]]
-                                      : [],
-                                  selectedoptionId:
-                                    newOptionGroup?.condiments?.length > 0
-                                      ? [newOptionGroup.condiments[0].id]
-                                      : [],
-
-                                  selectedItemExtras: [],
-                                  selectedExtras: [],
-                                  selectedExtrasIds: [],
-                                  groupExtrasRules: newGroupRules,
-                                }));
-                              }}
-                            />
-                            <span>
-                              {size?.size_en} ({selectedItem?.availability})
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    {selectedItem?.optionSize?.length > 0 && (
-                      <div className="border rounded-lg overflow-hidden shadow-md">
-                        <div
-                          className="p-3 bg-gray- cursor-pointer flex gap-4 items-center"
-                          onClick={toggleOption}
-                        >
-                          <h3 className="font-bold text-[16px]">
-                            {selectedItem?.groupNameSizes}
-                          </h3>
-                          <h3 className=" text-[16px]">
-                            (Choose up to 1 Items)
-                          </h3>
-
-                          <span className="text-gray-600">
-                            {isOpenMainOption ? "▲" : "▼"}
-                          </span>
-                        </div>
-
-                        {/* العناصر المختارة */}
-                        {selectedItem?.selectedoption?.length > 0 && (
-                          <div className="p-3 bg-gray- border-t">
-                            <span className="text-gray-500 font-medium">
-                              {selectedItem.selectedoption
-                                .map((extra) => extra.name)
-                                .join(", ")}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* الاختيارات */}
-                        <div
-                          className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpenMainOption ? "max-h-96" : "max-h-0"
-                            }`}
-                        >
-                          <div className="p-3 flex flex- flex-wrap gap-2">
-                            {selectedItem?.optionSize?.map((extra, index) => (
-                              <label
-                                key={index}
-                                className="flex items-center space-x-2"
-                              >
-                                <input
-                                  type="radio"
-                                  value={extra.name_en}
-                                  checked={selectedItem.selectedoption.some(
-                                    (ex) => ex.id === extra.id
-                                  )}
-                                  onChange={() => {
-                                    setIsOpenMainOption(false);
-                                    setSelectedItem((prev) => ({
-                                      ...prev,
-                                      selectedoption: [extra], // اختيار واحد فقط
-                                      selectedoptionId: [extra.id],
-                                    }));
-                                  }}
-                                />
-                                <span className="text-[#000] dark:text-[#fff]">
-                                  {extra.name}
-                                </span>
-                                <span className="text-[#000] dark:text-[#fff]">
-                                  {Number(extra.price) > 0 &&
-                                    `(${Number(extra.price).toFixed(
-                                      2
-                                    )} EGP)`}{" "}
-                                </span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    {selectedItem?.extrasData?.length > 0 && (
-                      <div className="border rounded-lg overflow-hidden shadow-md">
-                        <div className="flex  items-center justify-between">
-                          <div
-                            className="p-3 bg-gray- cursor-pointer flex gap-4 items-center"
-                            onClick={toggleExtras}
-                          >
-                            <h3
-                              className={`font-bold text-[16px] ${extrasError
-                                ? "text-red-500"
-                                : "text-black dark:text-white"
-                                }`}
-                            >
-                              {selectedItem?.groupNameExtrasData}
-                            </h3>
-                            <h3 className="text-[16px]">
-                              (Choose up to{" "}
-                              {selectedItem?.groupExtrasRules?.max === 0
-                                ? selectedItem?.mainExtras?.length
-                                : selectedItem?.groupExtrasRules?.max}{" "}
-                              Items)
-                            </h3>
-
-                            <span className="text-gray-600">
-                              {isOpen ? "▲" : "▼"}
-                            </span>
-                          </div>
-                          {extrasError && (
-                            <p className="text-red-500 text-sm px-3 py-1">
-                              {extrasError}
-                            </p>
-                          )}
-                        </div>
-                        {/* العناصر المختارة */}
-                        {selectedItem?.selectedExtras?.length > 0 && (
-                          <div className="p-3 bg-gray- border-t">
-                            <span className="text-gray-500 font-medium">
-                              {selectedItem.selectedExtras
-                                .map(
-                                  (extra) =>
-                                    `${extra.name} x${extra.quantity || 1}`
-                                )
-                                .join(", ")}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* الاختيارات */}
-                        <div
-                          className="transition-all duration-300 ease-in-out overflow-hidden"
-                          style={{ height }}
-                        >
-                          <div
-                            ref={contentRef}
-                            className="p-3 flex flex-wrap gap-2"
-                          >
-                            {selectedItem?.extrasData?.map((extra, index) => {
-                              const selected =
-                                selectedItem.selectedExtras.find(
-                                  (ex) => ex.id === extra.id
-                                );
-                              const quantity = selected?.quantity || 0;
-                              const totalSelectedCount =
-                                selectedItem.selectedExtras.reduce(
-                                  (sum, ex) => sum + (ex.quantity || 0),
-                                  0
-                                );
-
-                              return (
-                                <div
-                                  key={index}
-                                  onClick={() => {
-                                    if (selected) {
-                                      // لو العنصر متعلم، إحذفه
-                                      setSelectedItem((prev) => {
-                                        const updatedExtras =
-                                          prev.selectedExtras.filter(
-                                            (ex) => ex.id !== extra.id
-                                          );
-                                        return {
-                                          ...prev,
-                                          selectedExtras: updatedExtras,
-                                          selectedExtrasIds:
-                                            updatedExtras.map((ex) => ex.id),
-                                        };
-                                      });
-                                    } else {
-                                      // لو مش متعلم، ضيفه لكن بعد التأكد إنه مش مكرر
-                                      setSelectedItem((prev) => {
-                                        const totalSelectedCount =
-                                          prev.selectedExtras.reduce(
-                                            (sum, ex) =>
-                                              sum + (ex.quantity || 0),
-                                            0
-                                          );
-
-                                        if (
-                                          groupMax > 0 &&
-                                          totalSelectedCount >= groupMax
-                                        ) {
-                                          return prev;
-                                        }
-
-                                        const alreadyExists =
-                                          prev.selectedExtras.some(
-                                            (ex) => ex.id === extra.id
-                                          );
-                                        if (alreadyExists) return prev;
-
-                                        const updatedExtras = [
-                                          ...prev.selectedExtras,
-                                          {
-                                            id: extra.id,
-                                            name: extra.name,
-                                            price: extra.price,
-                                            quantity: 1,
-                                          },
-                                        ];
-
-                                        return {
-                                          ...prev,
-                                          selectedExtras: updatedExtras,
-                                          selectedExtrasIds:
-                                            updatedExtras.map((ex) => ex.id),
-                                        };
-                                      });
-                                    }
-                                  }}
-                                  className="flex items-center gap-2 border p-2 rounded cursor-pointer"
-                                >
-                                  <input
-                                    type="checkbox"
-                                    checked={!!selected}
-                                    readOnly
-                                  />
-                                  <span className="text-[#000] dark:text-[#fff]">
-                                    {extra.name}
-                                  </span>
-                                  <span className="text-[#000] dark:text-[#fff]">
-                                    {Number(extra.price) > 0 &&
-                                      `(${Number(extra.price).toFixed(
-                                        2
-                                      )} EGP)`}{" "}
-                                  </span>
-
-                                  {extra.max !== 1 && (
-                                    <div className="flex items-center gap-1">
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          if (!selected) return;
-
-                                          setSelectedItem((prev) => {
-                                            const existing =
-                                              prev.selectedExtras.find(
-                                                (ex) => ex.id === extra.id
-                                              );
-                                            let updatedExtras;
-
-                                            if (existing.quantity === 1) {
-                                              // احذف العنصر لو الكمية = 1
-                                              updatedExtras =
-                                                prev.selectedExtras.filter(
-                                                  (ex) => ex.id !== extra.id
-                                                );
-                                            } else {
-                                              // قلل الكمية
-                                              updatedExtras =
-                                                prev.selectedExtras.map(
-                                                  (ex) =>
-                                                    ex.id === extra.id
-                                                      ? {
-                                                        ...ex,
-                                                        quantity:
-                                                          ex.quantity - 1,
-                                                      }
-                                                      : ex
-                                                );
-                                            }
-
-                                            return {
-                                              ...prev,
-                                              selectedExtras: updatedExtras,
-                                              selectedExtrasIds:
-                                                updatedExtras.map(
-                                                  (ex) => ex.id
-                                                ),
-                                            };
-                                          });
-                                        }}
-                                        className={`px-2 text-sm border rounded ${!selected
-                                          ? "opacity-50 pointer-events-none"
-                                          : ""
-                                          }`}
-                                      >
-                                        -
-                                      </button>
-
-                                      <span className="w-4 text-center">
-                                        {quantity}
-                                      </span>
-
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          if (
-                                            !selected ||
-                                            (extra.max > 0 &&
-                                              quantity >= extra.max)
-                                          )
-                                            return;
-
-                                          setSelectedItem((prev) => {
-                                            const updatedExtras =
-                                              prev.selectedExtras.map((ex) =>
-                                                ex.id === extra.id
-                                                  ? {
-                                                    ...ex,
-                                                    quantity:
-                                                      ex.quantity + 1,
-                                                  }
-                                                  : ex
-                                              );
-
-                                            return {
-                                              ...prev,
-                                              selectedExtras: updatedExtras,
-                                            };
-                                          });
-                                        }}
-                                        disabled={
-                                          !selected ||
-                                          (groupMax > 0 &&
-                                            totalSelectedCount >= groupMax)
-                                        }
-                                        className={`px-2 text-sm border rounded ${!selected ||
-                                          (extra.max > 0 &&
-                                            quantity >= extra.max)
-                                          ? "opacity-50 pointer-events-none"
-                                          : ""
-                                          }`}
-                                      >
-                                        +
-                                      </button>
-                                    </div>
-                                  )}
-                                </div>
+                              const newExtraGroup = newItemExtras.find(
+                                (g) => g?.type === "extra"
                               );
-                            })}
-                          </div>
+                              const newOptionGroup = newItemExtras.find(
+                                (g) => g?.type === "option"
+                              );
+                              const newGroupRules = newExtraGroup
+                                ? {
+                                  min: newExtraGroup?.min ?? 0,
+                                  max: newExtraGroup?.max ?? 0,
+                                }
+                                : { min: 0, max: 0 };
+                              return setSelectedItem((prev) => ({
+                                ...prev,
+                                selectedInfo: size?.size_en,
+                                selectedIdSize: size?.id,
+                                price: size?.price?.price,
+                                availability:
+                                  size?.availability?.availability,
+                                itemExtras: newItemExtras,
+                                extrasData: newExtraGroup?.condiments || [],
+                                optionSize:
+                                  newOptionGroup?.condiments || [],
+                                groupNameSizes:
+                                  newOptionGroup?.group_name || "",
+
+                                groupNameExtrasData:
+                                  newExtraGroup?.group_name || "",
+                                // selectedoption:newOptionGroup?.condiments?.length > 0 ? [newOptionGroup[0]] : [],
+                                // selectedoptionId:newOptionGroup?.condiments?.length > 0 ? [newOptionGroup[0]?.id] : [],
+
+                                selectedoption:
+                                  newOptionGroup?.condiments?.length > 0
+                                    ? [newOptionGroup.condiments[0]]
+                                    : [],
+                                selectedoptionId:
+                                  newOptionGroup?.condiments?.length > 0
+                                    ? [newOptionGroup.condiments[0].id]
+                                    : [],
+
+                                selectedItemExtras: [],
+                                selectedExtras: [],
+                                selectedExtrasIds: [],
+                                groupExtrasRules: newGroupRules,
+                              }));
+                            }}
+                          />
+                          <span>
+                            {size?.size_en} ({selectedItem?.availability})
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {selectedItem?.optionSize?.length > 0 && (
+                    <div className="border rounded-lg overflow-hidden shadow-md">
+                      <div
+                        className="p-3 bg-gray- cursor-pointer flex gap-4 items-center"
+                        onClick={toggleOption}
+                      >
+                        <h3 className="font-bold text-[16px]">
+                          {selectedItem?.groupNameSizes}
+                        </h3>
+                        <h3 className=" text-[16px]">
+                          (Choose up to 1 Items)
+                        </h3>
+
+                        <span className="text-gray-600">
+                          {isOpenMainOption ? "▲" : "▼"}
+                        </span>
+                      </div>
+
+                      {/* العناصر المختارة */}
+                      {selectedItem?.selectedoption?.length > 0 && (
+                        <div className="p-3 bg-gray- border-t">
+                          <span className="text-gray-500 font-medium">
+                            {selectedItem.selectedoption
+                              .map((extra) => extra.name)
+                              .join(", ")}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* الاختيارات */}
+                      <div
+                        className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpenMainOption ? "max-h-96" : "max-h-0"
+                          }`}
+                      >
+                        <div className="p-3 flex flex- flex-wrap gap-2">
+                          {selectedItem?.optionSize?.map((extra, index) => (
+                            <label
+                              key={index}
+                              className="flex items-center space-x-2"
+                            >
+                              <input
+                                type="radio"
+                                value={extra.name_en}
+                                checked={selectedItem.selectedoption.some(
+                                  (ex) => ex.id === extra.id
+                                )}
+                                onChange={() => {
+                                  setIsOpenMainOption(false);
+                                  setSelectedItem((prev) => ({
+                                    ...prev,
+                                    selectedoption: [extra], // اختيار واحد فقط
+                                    selectedoptionId: [extra.id],
+                                  }));
+                                }}
+                              />
+                              <span className="text-[#000] dark:text-[#fff]">
+                                {extra.name}
+                              </span>
+                              <span className="text-[#000] dark:text-[#fff]">
+                                {Number(extra.price) > 0 &&
+                                  `(${Number(extra.price).toFixed(
+                                    2
+                                  )} EGP)`}{" "}
+                              </span>
+                            </label>
+                          ))}
                         </div>
                       </div>
-                    )}
-                    {selectedItem?.mainExtras?.length > 0 && (
-                      <div className="border rounded-lg overflow-hidden shadow-md">
+                    </div>
+                  )}
+                  {selectedItem?.extrasData?.length > 0 && (
+                    <div className="border rounded-lg overflow-hidden shadow-md">
+                      <div className="flex  items-center justify-between">
                         <div
                           className="p-3 bg-gray- cursor-pointer flex gap-4 items-center"
-                          onClick={toggleExtrasMainExtra}
+                          onClick={toggleExtras}
                         >
-                          <h3 className="font-bold text-[16px] ">
-                            {selectedItem?.groupNameMainExtras}
+                          <h3
+                            className={`font-bold text-[16px] ${extrasError
+                              ? "text-red-500"
+                              : "text-black dark:text-white"
+                              }`}
+                          >
+                            {selectedItem?.groupNameExtrasData}
                           </h3>
-                          <h3 className=" text-[16px] ">
-                            {selectedItem?.mainExtras?.category_ar} (Choose up
-                            to {selectedItem?.mainExtras?.length} Items)
+                          <h3 className="text-[16px]">
+                            (Choose up to{" "}
+                            {selectedItem?.groupExtrasRules?.max === 0
+                              ? selectedItem?.mainExtras?.length
+                              : selectedItem?.groupExtrasRules?.max}{" "}
+                            Items)
                           </h3>
 
                           <span className="text-gray-600">
-                            {isOpenMainExtra ? "▲" : "▼"}
+                            {isOpen ? "▲" : "▼"}
                           </span>
                         </div>
-
-                        {/* العناصر المختارة */}
-                        {selectedItem?.selectedMainExtras?.length > 0 && (
-                          <div className="p-3 bg-gray- border-t">
-                            <span className="text-gray-500 font-medium">
-                              {selectedItem.selectedMainExtras
-                                .map((extra) => extra.name)
-                                .join(", ")}
-                            </span>
-                          </div>
+                        {extrasError && (
+                          <p className="text-red-500 text-sm px-3 py-1">
+                            {extrasError}
+                          </p>
                         )}
+                      </div>
+                      {/* العناصر المختارة */}
+                      {selectedItem?.selectedExtras?.length > 0 && (
+                        <div className="p-3 bg-gray- border-t">
+                          <span className="text-gray-500 font-medium">
+                            {selectedItem.selectedExtras
+                              .map(
+                                (extra) =>
+                                  `${extra.name} x${extra.quantity || 1}`
+                              )
+                              .join(", ")}
+                          </span>
+                        </div>
+                      )}
 
-                        {/* الاختيارات */}
+                      {/* الاختيارات */}
+                      <div
+                        className="transition-all duration-300 ease-in-out overflow-hidden"
+                        style={{ height }}
+                      >
                         <div
-                          className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpenMainExtra ? "max-h-96" : "max-h-0"
-                            }`}
+                          ref={contentRef}
+                          className="p-3 flex flex-wrap gap-2"
                         >
-                          <div className="p-3 flex flex- flex-wrap gap-2">
-                            {selectedItem?.mainExtras?.map((extra, index) => (
-                              <label
+                          {selectedItem?.extrasData?.map((extra, index) => {
+                            const selected =
+                              selectedItem.selectedExtras.find(
+                                (ex) => ex.id === extra.id
+                              );
+                            const quantity = selected?.quantity || 0;
+                            const totalSelectedCount =
+                              selectedItem.selectedExtras.reduce(
+                                (sum, ex) => sum + (ex.quantity || 0),
+                                0
+                              );
+
+                            return (
+                              <div
                                 key={index}
-                                className="flex items-center space-x-2"
-                              >
-                                <input
-                                  type="checkbox"
-                                  value={extra.name_en}
-                                  checked={selectedItem.selectedMainExtras.some(
-                                    (ex) => ex.id === extra.id
-                                  )}
-                                  onChange={(e) => {
-                                    const checked = e.target.checked;
+                                onClick={() => {
+                                  if (selected) {
+                                    // لو العنصر متعلم، إحذفه
                                     setSelectedItem((prev) => {
-                                      let updatedExtras = checked
-                                        ? [...prev.selectedMainExtras, extra]
-                                        : prev.selectedMainExtras.filter(
+                                      const updatedExtras =
+                                        prev.selectedExtras.filter(
                                           (ex) => ex.id !== extra.id
                                         );
-
-                                      let updatedExtrasIds =
-                                        updatedExtras.map((ex) => ex.id); // تخزين الـ ID فقط
-
-                                      // حساب السعر الإجمالي الجديد
-                                      const newTotalPrice =
-                                        updatedExtras.reduce(
-                                          (acc, curr) =>
-                                            acc +
-                                            parseFloat(curr.price || "0"), // تحويل السعر إلى رقم مع معالجة القيم الفارغة
+                                      return {
+                                        ...prev,
+                                        selectedExtras: updatedExtras,
+                                        selectedExtrasIds:
+                                          updatedExtras.map((ex) => ex.id),
+                                      };
+                                    });
+                                  } else {
+                                    // لو مش متعلم، ضيفه لكن بعد التأكد إنه مش مكرر
+                                    setSelectedItem((prev) => {
+                                      const totalSelectedCount =
+                                        prev.selectedExtras.reduce(
+                                          (sum, ex) =>
+                                            sum + (ex.quantity || 0),
                                           0
                                         );
 
-                                      // console.log(
-                                      //   "Selected Extras:",
-                                      //   updatedExtras
-                                      // );
-                                      // console.log(
-                                      //   "Total Price:",
-                                      //   newTotalPrice
-                                      // );
-                                      setTotalExtrasPrice(newTotalPrice);
+                                      if (
+                                        groupMax > 0 &&
+                                        totalSelectedCount >= groupMax
+                                      ) {
+                                        return prev;
+                                      }
+
+                                      const alreadyExists =
+                                        prev.selectedExtras.some(
+                                          (ex) => ex.id === extra.id
+                                        );
+                                      if (alreadyExists) return prev;
+
+                                      const updatedExtras = [
+                                        ...prev.selectedExtras,
+                                        {
+                                          id: extra.id,
+                                          name: extra.name,
+                                          price: extra.price,
+                                          quantity: 1,
+                                        },
+                                      ];
+
                                       return {
                                         ...prev,
-                                        selectedMainExtras: updatedExtras,
-                                        selectedMainExtrasIds:
-                                          updatedExtrasIds, // تحديث قائمة الـ IDs
+                                        selectedExtras: updatedExtras,
+                                        selectedExtrasIds:
+                                          updatedExtras.map((ex) => ex.id),
                                       };
                                     });
-                                  }}
+                                  }
+                                }}
+                                className="flex items-center gap-2 border p-2 rounded cursor-pointer"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={!!selected}
+                                  readOnly
                                 />
                                 <span className="text-[#000] dark:text-[#fff]">
                                   {extra.name}
@@ -2986,137 +2760,341 @@ function CreateOrder({ params }) {
                                       2
                                     )} EGP)`}{" "}
                                 </span>
-                              </label>
-                            ))}
-                          </div>
+
+                                {extra.max !== 1 && (
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (!selected) return;
+
+                                        setSelectedItem((prev) => {
+                                          const existing =
+                                            prev.selectedExtras.find(
+                                              (ex) => ex.id === extra.id
+                                            );
+                                          let updatedExtras;
+
+                                          if (existing.quantity === 1) {
+                                            // احذف العنصر لو الكمية = 1
+                                            updatedExtras =
+                                              prev.selectedExtras.filter(
+                                                (ex) => ex.id !== extra.id
+                                              );
+                                          } else {
+                                            // قلل الكمية
+                                            updatedExtras =
+                                              prev.selectedExtras.map(
+                                                (ex) =>
+                                                  ex.id === extra.id
+                                                    ? {
+                                                      ...ex,
+                                                      quantity:
+                                                        ex.quantity - 1,
+                                                    }
+                                                    : ex
+                                              );
+                                          }
+
+                                          return {
+                                            ...prev,
+                                            selectedExtras: updatedExtras,
+                                            selectedExtrasIds:
+                                              updatedExtras.map(
+                                                (ex) => ex.id
+                                              ),
+                                          };
+                                        });
+                                      }}
+                                      className={`px-2 text-sm border rounded ${!selected
+                                        ? "opacity-50 pointer-events-none"
+                                        : ""
+                                        }`}
+                                    >
+                                      -
+                                    </button>
+
+                                    <span className="w-4 text-center">
+                                      {quantity}
+                                    </span>
+
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (
+                                          !selected ||
+                                          (extra.max > 0 &&
+                                            quantity >= extra.max)
+                                        )
+                                          return;
+
+                                        setSelectedItem((prev) => {
+                                          const updatedExtras =
+                                            prev.selectedExtras.map((ex) =>
+                                              ex.id === extra.id
+                                                ? {
+                                                  ...ex,
+                                                  quantity:
+                                                    ex.quantity + 1,
+                                                }
+                                                : ex
+                                            );
+
+                                          return {
+                                            ...prev,
+                                            selectedExtras: updatedExtras,
+                                          };
+                                        });
+                                      }}
+                                      disabled={
+                                        !selected ||
+                                        (groupMax > 0 &&
+                                          totalSelectedCount >= groupMax)
+                                      }
+                                      className={`px-2 text-sm border rounded ${!selected ||
+                                        (extra.max > 0 &&
+                                          quantity >= extra.max)
+                                        ? "opacity-50 pointer-events-none"
+                                        : ""
+                                        }`}
+                                    >
+                                      +
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
-                    )}
-
-                    <div className="sticky  flex flex-col lg:flex-row lg:items-center gap-2 my-4">
-                      <Label className="lg:min-w-[100px]">Note:</Label>
-                      <Input
-                        value={note}
-                        onChange={(e) => setNote(e.target.value)}
-                        type="text"
-                        placeholder="Note"
-                        className="w-full text-[#000] dark:text-[#fff]"
-                      />
                     </div>
-                    <div className="sticky bottom-[-23px] bg-white dark:bg-black p-4 border-t border-gray-300 dark:border-gray-700 shadow-md z-50 mt-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          {selectedItem?.selectedInfo && (
-                            <p className="font-semibold">
-                              {counter > 1 ? `${counter}x` : ""}{" "}
-                              {selectedItem?.selectedInfo || ""}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex justify-end">
-                          <p className="text-sm font-semibold mr-1">
-                            Subtoal:{" "}
-                          </p>
-                          <p className="text-sm font-semibold mr-1">
-                            {(
-                              (selectedItem?.price + totalExtrasPrices +
-                                totalOptionPrices +
-                                totalMainExtrasPrices) * counter
+                  )}
+                  {selectedItem?.mainExtras?.length > 0 && (
+                    <div className="border rounded-lg overflow-hidden shadow-md">
+                      <div
+                        className="p-3 bg-gray- cursor-pointer flex gap-4 items-center"
+                        onClick={toggleExtrasMainExtra}
+                      >
+                        <h3 className="font-bold text-[16px] ">
+                          {selectedItem?.groupNameMainExtras}
+                        </h3>
+                        <h3 className=" text-[16px] ">
+                          {selectedItem?.mainExtras?.category_ar} (Choose up
+                          to {selectedItem?.mainExtras?.length} Items)
+                        </h3>
 
-                            ).toFixed(2)}
-                          </p>
-                          <p className="text-sm font-semibold ">EGP</p>
+                        <span className="text-gray-600">
+                          {isOpenMainExtra ? "▲" : "▼"}
+                        </span>
+                      </div>
+
+                      {/* العناصر المختارة */}
+                      {selectedItem?.selectedMainExtras?.length > 0 && (
+                        <div className="p-3 bg-gray- border-t">
+                          <span className="text-gray-500 font-medium">
+                            {selectedItem.selectedMainExtras
+                              .map((extra) => extra.name)
+                              .join(", ")}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* الاختيارات */}
+                      <div
+                        className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpenMainExtra ? "max-h-96" : "max-h-0"
+                          }`}
+                      >
+                        <div className="p-3 flex flex- flex-wrap gap-2">
+                          {selectedItem?.mainExtras?.map((extra, index) => (
+                            <label
+                              key={index}
+                              className="flex items-center space-x-2"
+                            >
+                              <input
+                                type="checkbox"
+                                value={extra.name_en}
+                                checked={selectedItem.selectedMainExtras.some(
+                                  (ex) => ex.id === extra.id
+                                )}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  setSelectedItem((prev) => {
+                                    let updatedExtras = checked
+                                      ? [...prev.selectedMainExtras, extra]
+                                      : prev.selectedMainExtras.filter(
+                                        (ex) => ex.id !== extra.id
+                                      );
+
+                                    let updatedExtrasIds =
+                                      updatedExtras.map((ex) => ex.id); // تخزين الـ ID فقط
+
+                                    // حساب السعر الإجمالي الجديد
+                                    const newTotalPrice =
+                                      updatedExtras.reduce(
+                                        (acc, curr) =>
+                                          acc +
+                                          parseFloat(curr.price || "0"), // تحويل السعر إلى رقم مع معالجة القيم الفارغة
+                                        0
+                                      );
+
+                                    // console.log(
+                                    //   "Selected Extras:",
+                                    //   updatedExtras
+                                    // );
+                                    // console.log(
+                                    //   "Total Price:",
+                                    //   newTotalPrice
+                                    // );
+                                    setTotalExtrasPrice(newTotalPrice);
+                                    return {
+                                      ...prev,
+                                      selectedMainExtras: updatedExtras,
+                                      selectedMainExtrasIds:
+                                        updatedExtrasIds, // تحديث قائمة الـ IDs
+                                    };
+                                  });
+                                }}
+                              />
+                              <span className="text-[#000] dark:text-[#fff]">
+                                {extra.name}
+                              </span>
+                              <span className="text-[#000] dark:text-[#fff]">
+                                {Number(extra.price) > 0 &&
+                                  `(${Number(extra.price).toFixed(
+                                    2
+                                  )} EGP)`}{" "}
+                              </span>
+                            </label>
+                          ))}
                         </div>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <div className="text-sm font-semibold flex flex-wrap max-w-[500px]">
-                          <p className="text-gray-500 ml-3">
-                            {(selectedItem?.selectedoption || [])
-                              .map((option) => option.name)
-                              .join(", ")}
+                    </div>
+                  )}
 
-                            {/* فاصل لو في option و extras */}
-                            {selectedItem?.selectedoption?.length > 0 &&
-                              selectedItem?.selectedExtras?.length > 0 &&
-                              ", "}
-
-                            {/* الإكسترا مع الكمية */}
-                            {(selectedItem?.selectedExtras || [])
-                              .map((extra) =>
-                                extra.quantity > 1
-                                  ? `${extra.name} x${extra.quantity}`
-                                  : `${extra.name}`
-                              )
-                              .join(", ")}
-
-                            {/* فاصل لو في main extras */}
-                            {selectedItem?.selectedMainExtras?.length > 0 &&
-                              (selectedItem?.selectedoption?.length > 0 ||
-                                selectedItem?.selectedExtras?.length > 0) &&
-                              ", "}
-
-                            {/* main extras */}
-                            {(selectedItem?.selectedMainExtras || [])
-                              .map((extra) =>
-                                extra.quantity > 1
-                                  ? `${extra.name} x${extra.quantity}`
-                                  : `${extra.name}`
-                              )
-                              .join(", ")}
+                  <div className="sticky  flex flex-col lg:flex-row lg:items-center gap-2 my-4">
+                    <Label className="lg:min-w-[100px]">Note:</Label>
+                    <Input
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      type="text"
+                      placeholder="Note"
+                      className="w-full text-[#000] dark:text-[#fff]"
+                    />
+                  </div>
+                  <div className="sticky bottom-[-23px] bg-white dark:bg-black p-4 border-t border-gray-300 dark:border-gray-700 shadow-md z-50 mt-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        {selectedItem?.selectedInfo && (
+                          <p className="font-semibold">
+                            {counter > 1 ? `${counter}x` : ""}{" "}
+                            {selectedItem?.selectedInfo || ""}
                           </p>
-                        </div>
+                        )}
+                      </div>
+                      <div className="flex justify-end">
+                        <p className="text-sm font-semibold mr-1">
+                          Subtoal:{" "}
+                        </p>
+                        <p className="text-sm font-semibold mr-1">
+                          {(
+                            (selectedItem?.price + totalExtrasPrices +
+                              totalOptionPrices +
+                              totalMainExtrasPrices) * counter
 
-                        <DialogFooter className="mt-4">
-                          <div className="flex items-center gap-4">
-                            {/* <p className="text-sm font-semibold mr-1 ">
+                          ).toFixed(2)}
+                        </p>
+                        <p className="text-sm font-semibold ">EGP</p>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm font-semibold flex flex-wrap max-w-[500px]">
+                        <p className="text-gray-500 ml-3">
+                          {(selectedItem?.selectedoption || [])
+                            .map((option) => option.name)
+                            .join(", ")}
+
+                          {/* فاصل لو في option و extras */}
+                          {selectedItem?.selectedoption?.length > 0 &&
+                            selectedItem?.selectedExtras?.length > 0 &&
+                            ", "}
+
+                          {/* الإكسترا مع الكمية */}
+                          {(selectedItem?.selectedExtras || [])
+                            .map((extra) =>
+                              extra.quantity > 1
+                                ? `${extra.name} x${extra.quantity}`
+                                : `${extra.name}`
+                            )
+                            .join(", ")}
+
+                          {/* فاصل لو في main extras */}
+                          {selectedItem?.selectedMainExtras?.length > 0 &&
+                            (selectedItem?.selectedoption?.length > 0 ||
+                              selectedItem?.selectedExtras?.length > 0) &&
+                            ", "}
+
+                          {/* main extras */}
+                          {(selectedItem?.selectedMainExtras || [])
+                            .map((extra) =>
+                              extra.quantity > 1
+                                ? `${extra.name} x${extra.quantity}`
+                                : `${extra.name}`
+                            )
+                            .join(", ")}
+                        </p>
+                      </div>
+
+                      <DialogFooter className="mt-4">
+                        <div className="flex items-center gap-4">
+                          {/* <p className="text-sm font-semibold mr-1 ">
                                                 {selectedUser ? massegeNotSerachPhone : ""} 
                                                 </p> */}
-                            {!selectedUser && massegeNotSerachPhone && (
-                              <p className="text-sm font-semibold mr-1">
-                                {massegeNotSerachPhone}
-                              </p>
-                            )}
-
-                            <p className="text-sm font-semibold mr-1 ">
-                              {deliveryMethod === "pickup" &&
-                                !isBranchManuallySelected
-                                ? massegeNotSelectedBranch
-                                : ""}
+                          {!selectedUser && massegeNotSerachPhone && (
+                            <p className="text-sm font-semibold mr-1">
+                              {massegeNotSerachPhone}
                             </p>
-                            {massegeInvaildToken && (
-                              <p className="text-sm font-semibold text-red-500 mr-1">
-                                {massegeInvaildToken}{" "}
-                                <Link
-                                  href={`/${language}/login`}
-                                  className="text-blue-500 underline ml-1"
-                                >
-                                  Login here
-                                </Link>
-                              </p>
-                            )}
+                          )}
 
-                            <Button
-                              type="submit"
-                              color="success"
-                              onClick={handleAddToCart}
-                              disabled={
-                                !selectedUser ||
-                                (deliveryMethod === "pickup" &&
-                                  !isBranchManuallySelected) ||
-                                !selectedItem?.selectedInfo
-                              }
-                            >
-                              Add to Cart
-                            </Button>
-                          </div>
-                        </DialogFooter>
-                      </div>
+                          <p className="text-sm font-semibold mr-1 ">
+                            {deliveryMethod === "pickup" &&
+                              !isBranchManuallySelected
+                              ? massegeNotSelectedBranch
+                              : ""}
+                          </p>
+                          {massegeInvaildToken && (
+                            <p className="text-sm font-semibold text-red-500 mr-1">
+                              {massegeInvaildToken}{" "}
+                              <Link
+                                href={`/${language}/login`}
+                                className="text-blue-500 underline ml-1"
+                              >
+                                Login here
+                              </Link>
+                            </p>
+                          )}
+
+                          <Button
+                            type="submit"
+                            color="success"
+                            onClick={handleAddToCart}
+                            disabled={
+                              !selectedUser ||
+                              (deliveryMethod === "pickup" &&
+                                !isBranchManuallySelected) ||
+                              !selectedItem?.selectedInfo
+                            }
+                          >
+                            Add to Cart
+                          </Button>
+                        </div>
+                      </DialogFooter>
                     </div>
-                  </DialogContent>
-                </Dialog>
-              )}
-              <>
-                {/* <NewUserDialog
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+            <>
+              {/* <NewUserDialog
                       isNewUserDialogOpen={isNewUserDialogOpen}
                       setIsNewUserDialogOpen={setIsNewUserDialogOpen}
                       selectedAddressType={selectedAddressType}
@@ -3127,213 +3105,213 @@ function CreateOrder({ params }) {
                       setLoading={setLoading}
                       token={token}
                     /> */}
-                {isNewUserDialogOpen && (
-                  <Dialog
-                    open={isNewUserDialogOpen}
-                    onOpenChange={setIsNewUserDialogOpen}
-                  >
-                    <DialogContent size="3xl">
-                      <DialogHeader>
-                        <DialogTitle className="text-base font-medium text-default-700">
-                          Create New User
-                        </DialogTitle>
-                      </DialogHeader>
-                      <div className="text-sm text-default-500 space-y-4">
-                        <form
-                          onSubmit={handleSubmitAddNewUser(
-                            onSubmitAddUserData
-                          )}
-                        >
-                          <div className="flex gap-2 items-start mb-4">
-                            {/* Username Input */}
-                            <div className="flex-1 flex flex-col">
-                              <Input
-                                type="text"
-                                placeholder="Username"
-                                {...registerAddNewUser("username")}
-                                className="w-full text-[#000] dark:text-[#fff]"
-                              />
-                              {errorsAddNewUser.username && (
-                                <p className="text-red-500 text-sm h-[20px] mt-2">
-                                  {errorsAddNewUser.username.message}
-                                </p>
-                              )}
-                            </div>
-                            <div className="flex-1 flex flex-col">
-                              <Controller
-                                name="area"
-                                control={control}
-                                rules={{ required: "Area is required" }}
-                                render={({ field }) => (
-                                  <Select
-                                    {...field}
-                                    options={areasOptions || []}
-                                    placeholder="Area"
-                                    className="react-select w-full mb"
-                                    classNamePrefix="select"
-                                    // onChange={handleChangeArea}
-                                    onChange={(selectedOption) => {
-                                      field.onChange(selectedOption);
-                                      handleChangeArea(selectedOption);
-                                    }}
-                                    styles={selectStyles(theme, color)}
-                                  />
-                                )}
-                              />
-                              {errorsAddNewUser.area && (
-                                <p className="text-red-500 text-sm h-[20px]">
-                                  {errorsAddNewUser.area.message}
-                                </p>
-                              )}
-                            </div>
-                            {/* Phone Input */}
+              {isNewUserDialogOpen && (
+                <Dialog
+                  open={isNewUserDialogOpen}
+                  onOpenChange={setIsNewUserDialogOpen}
+                >
+                  <DialogContent size="3xl">
+                    <DialogHeader>
+                      <DialogTitle className="text-base font-medium text-default-700">
+                        Create New User
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="text-sm text-default-500 space-y-4">
+                      <form
+                        onSubmit={handleSubmitAddNewUser(
+                          onSubmitAddUserData
+                        )}
+                      >
+                        <div className="flex gap-2 items-start mb-4">
+                          {/* Username Input */}
+                          <div className="flex-1 flex flex-col">
+                            <Input
+                              type="text"
+                              placeholder="Username"
+                              {...registerAddNewUser("username")}
+                              className="w-full text-[#000] dark:text-[#fff]"
+                            />
+                            {errorsAddNewUser.username && (
+                              <p className="text-red-500 text-sm h-[20px] mt-2">
+                                {errorsAddNewUser.username.message}
+                              </p>
+                            )}
                           </div>
-                          <div className="flex gap-2 items-start mb-4">
-                            <div className="flex-1 flex flex-col">
-                              <Input
-                                type="number"
-                                placeholder="Phone"
-                                {...registerAddNewUser("phone")}
-                                className="w-full  text-[#000] dark:text-[#fff]"
-                              />
-                              {errorsAddNewUser.phone && (
-                                <p className="text-red-500 text-sm h-[20px] mt-2">
-                                  {errorsAddNewUser.phone.message}
-                                </p>
+                          <div className="flex-1 flex flex-col">
+                            <Controller
+                              name="area"
+                              control={control}
+                              rules={{ required: "Area is required" }}
+                              render={({ field }) => (
+                                <Select
+                                  {...field}
+                                  options={areasOptions || []}
+                                  placeholder="Area"
+                                  className="react-select w-full mb"
+                                  classNamePrefix="select"
+                                  // onChange={handleChangeArea}
+                                  onChange={(selectedOption) => {
+                                    field.onChange(selectedOption);
+                                    handleChangeArea(selectedOption);
+                                  }}
+                                  styles={selectStyles(theme, color)}
+                                />
                               )}
-                            </div>
-                            <div className="flex-1 flex flex-col">
-                              <Input
-                                type="number"
-                                placeholder="Phone 2"
-                                {...registerAddNewUser("phone2")}
-                                className="w-full text-[#000] dark:text-[#fff]"
-                              />
-                              {/* {errorsAddNewUser.phone2 && (
+                            />
+                            {errorsAddNewUser.area && (
+                              <p className="text-red-500 text-sm h-[20px]">
+                                {errorsAddNewUser.area.message}
+                              </p>
+                            )}
+                          </div>
+                          {/* Phone Input */}
+                        </div>
+                        <div className="flex gap-2 items-start mb-4">
+                          <div className="flex-1 flex flex-col">
+                            <Input
+                              type="number"
+                              placeholder="Phone"
+                              {...registerAddNewUser("phone")}
+                              className="w-full  text-[#000] dark:text-[#fff]"
+                            />
+                            {errorsAddNewUser.phone && (
+                              <p className="text-red-500 text-sm h-[20px] mt-2">
+                                {errorsAddNewUser.phone.message}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex-1 flex flex-col">
+                            <Input
+                              type="number"
+                              placeholder="Phone 2"
+                              {...registerAddNewUser("phone2")}
+                              className="w-full text-[#000] dark:text-[#fff]"
+                            />
+                            {/* {errorsAddNewUser.phone2 && (
                                       <p className="text-red-500 text-sm h-[20px] mt-2">
                                         {errorsAddNewUser.phone2.message}
                                       </p>
                                     )} */}
-                            </div>
                           </div>
+                        </div>
 
-                          <div className="flex gap-2 items-center my-3 mb-4">
-                            {/* Street Input */}
-                            <div className="flex-1">
-                              <Input
-                                type="text"
-                                placeholder="Street"
-                                {...registerAddNewUser("street")}
-                                className="w-full text-[#000] dark:text-[#fff]"
-                              />
-                              <p
-                                className={`text-red-500 text-sm mt-1 transition-all duration-200 ${errorsAddNewUser.street
-                                  ? "h-auto opacity-100"
-                                  : "h-0 opacity-0"
-                                  }`}
-                              >
-                                {errorsAddNewUser.street?.message}
-                              </p>
-                            </div>
-
-                            {/* Building Input */}
-                            <div className="flex-1">
-                              <Input
-                                type="text"
-                                placeholder="Building"
-                                {...registerAddNewUser("building")}
-                                className="w-full text-[#000] dark:text-[#fff]"
-                              />
-                              {errorsAddNewUser.street && (
-                                <div className="h-[20px]"></div>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="flex gap-2 items- my-3 mb-4">
+                        <div className="flex gap-2 items-center my-3 mb-4">
+                          {/* Street Input */}
+                          <div className="flex-1">
                             <Input
                               type="text"
-                              placeholder="Floor"
-                              {...registerAddNewUser("floor")}
-                              className=" text-[#000] dark:text-[#fff]"
+                              placeholder="Street"
+                              {...registerAddNewUser("street")}
+                              className="w-full text-[#000] dark:text-[#fff]"
                             />
+                            <p
+                              className={`text-red-500 text-sm mt-1 transition-all duration-200 ${errorsAddNewUser.street
+                                ? "h-auto opacity-100"
+                                : "h-0 opacity-0"
+                                }`}
+                            >
+                              {errorsAddNewUser.street?.message}
+                            </p>
+                          </div>
 
+                          {/* Building Input */}
+                          <div className="flex-1">
                             <Input
                               type="text"
-                              placeholder="Apt"
-                              {...registerAddNewUser("apt")}
-                              className="mb-1 text-[#000] dark:text-[#fff]"
+                              placeholder="Building"
+                              {...registerAddNewUser("building")}
+                              className="w-full text-[#000] dark:text-[#fff]"
                             />
+                            {errorsAddNewUser.street && (
+                              <div className="h-[20px]"></div>
+                            )}
                           </div>
+                        </div>
+
+                        <div className="flex gap-2 items- my-3 mb-4">
                           <Input
                             type="text"
-                            placeholder="Land mark"
-                            {...registerAddNewUser("additionalInfo")}
-                            className="mb-4 text-[#000] dark:text-[#fff]"
+                            placeholder="Floor"
+                            {...registerAddNewUser("floor")}
+                            className=" text-[#000] dark:text-[#fff]"
                           />
 
-                          <div className="space-y-1">
-                            {/* Checkboxes */}
-                            <div className="flex gap-4 items-center">
-                              {["home", "work", "other"].map((type) => (
-                                <label
-                                  key={type}
-                                  className="flex items-center gap-2 "
-                                >
-                                  <Input
-                                    type="checkbox"
-                                    name="addressType"
-                                    className="mt-1"
-                                    value={type}
-                                    checked={selectedAddressType === type}
-                                    onChange={() =>
-                                      handleAddressTypeChange(type)
-                                    }
-                                  />
-                                  {type.charAt(0).toUpperCase() +
-                                    type.slice(1)}{" "}
-                                </label>
-                              ))}
-                            </div>
+                          <Input
+                            type="text"
+                            placeholder="Apt"
+                            {...registerAddNewUser("apt")}
+                            className="mb-1 text-[#000] dark:text-[#fff]"
+                          />
+                        </div>
+                        <Input
+                          type="text"
+                          placeholder="Land mark"
+                          {...registerAddNewUser("additionalInfo")}
+                          className="mb-4 text-[#000] dark:text-[#fff]"
+                        />
 
-                            {selectedAddressType === "other" && (
-                              <Input
-                                type="text"
-                                placeholder="Enter address name"
-                                {...registerAddNewUser("name")}
-                                className="text-[#000] dark:text-[#fff]"
-                              />
-                            )}
+                        <div className="space-y-1">
+                          {/* Checkboxes */}
+                          <div className="flex gap-4 items-center">
+                            {["home", "work", "other"].map((type) => (
+                              <label
+                                key={type}
+                                className="flex items-center gap-2 "
+                              >
+                                <Input
+                                  type="checkbox"
+                                  name="addressType"
+                                  className="mt-1"
+                                  value={type}
+                                  checked={selectedAddressType === type}
+                                  onChange={() =>
+                                    handleAddressTypeChange(type)
+                                  }
+                                />
+                                {type.charAt(0).toUpperCase() +
+                                  type.slice(1)}{" "}
+                              </label>
+                            ))}
                           </div>
-                          <DialogFooter className="mt-8">
-                            <DialogClose asChild>
-                              <Button
-                                variant="outline"
-                                onClick={() => setIsNewUserDialogOpen(false)}
-                              >
-                                Close
-                              </Button>
-                            </DialogClose>
-                            {lodaingCreateUserData ? (
-                              <Button
-                                type="submit"
-                                disabled
-                                className="w-[150px] flex items-center justify-center"
-                              >
-                                <FaSpinner className="animate-spin mr-2" />
 
-                              </Button>
-                            ) : (
-                              <Button type="submit">Create User</Button>
-                            )}
+                          {selectedAddressType === "other" && (
+                            <Input
+                              type="text"
+                              placeholder="Enter address name"
+                              {...registerAddNewUser("name")}
+                              className="text-[#000] dark:text-[#fff]"
+                            />
+                          )}
+                        </div>
+                        <DialogFooter className="mt-8">
+                          <DialogClose asChild>
+                            <Button
+                              variant="outline"
+                              onClick={() => setIsNewUserDialogOpen(false)}
+                            >
+                              Close
+                            </Button>
+                          </DialogClose>
+                          {lodaingCreateUserData ? (
+                            <Button
+                              type="submit"
+                              disabled
+                              className="w-[150px] flex items-center justify-center"
+                            >
+                              <FaSpinner className="animate-spin mr-2" />
 
-                          </DialogFooter>
-                        </form>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                )}
-                {/* <NewAddressDialog
+                            </Button>
+                          ) : (
+                            <Button type="submit">Create User</Button>
+                          )}
+
+                        </DialogFooter>
+                      </form>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
+              {/* <NewAddressDialog
                       isNewAddressDialogOpen={isNewAddressDialogOpen}
                       setIsNewAddressDialogOpen={setIsNewAddressDialogOpen}
                       setIsNewUserDialogOpen={setIsNewUserDialogOpen}
@@ -3350,178 +3328,177 @@ function CreateOrder({ params }) {
                       QueryClient={queryClient}
                       selectedAddressType={selectedAddressType}
                     /> */}
-                {isNewAddressDialogOpen && (
-                  <Dialog
-                    open={isNewAddressDialogOpen}
-                    onOpenChange={setIsNewAddressDialogOpen}
-                  >
-                    <DialogContent size="3xl">
-                      <DialogHeader>
-                        <DialogTitle className="text-base font-medium text-default-700">
-                          Create New Address
-                        </DialogTitle>
-                      </DialogHeader>
-                      <div className="text-sm text-default-500 space-y-4">
-                        <form
-                          onSubmit={handleSubmitAddNewAddress(
-                            onSubmitAddAddress
+              {isNewAddressDialogOpen && (
+                <Dialog
+                  open={isNewAddressDialogOpen}
+                  onOpenChange={setIsNewAddressDialogOpen}
+                >
+                  <DialogContent size="3xl">
+                    <DialogHeader>
+                      <DialogTitle className="text-base font-medium text-default-700">
+                        Create New Address
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="text-sm text-default-500 space-y-4">
+                      <form
+                        onSubmit={handleSubmitAddNewAddress(
+                          onSubmitAddAddress
+                        )}
+                      >
+                        <Controller
+                          name="area"
+                          control={controlAddress}
+                          rules={{ required: "Area is required" }}
+                          render={({ field }) => (
+                            <Select
+                              {...field}
+                              options={areasOptions || []}
+                              placeholder="Area"
+                              className="react-select w-full my-3 mb-4"
+                              classNamePrefix="select"
+                              // onChange={handleChangeArea}
+                              onChange={(selectedOption) => {
+                                field.onChange(selectedOption);
+                                handleChangeArea(selectedOption);
+                              }}
+                              styles={selectStyles(theme, color)}
+                            />
                           )}
-                        >
-                          <Controller
-                            name="area"
-                            control={controlAddress}
-                            rules={{ required: "Area is required" }}
-                            render={({ field }) => (
-                              <Select
-                                {...field}
-                                options={areasOptions || []}
-                                placeholder="Area"
-                                className="react-select w-full my-3 mb-4"
-                                classNamePrefix="select"
-                                // onChange={handleChangeArea}
-                                onChange={(selectedOption) => {
-                                  field.onChange(selectedOption);
-                                  handleChangeArea(selectedOption);
-                                }}
-                                styles={selectStyles(theme, color)}
-                              />
-                            )}
-                          />
-                          {errorsAddNewAddress.area && (
-                            <p className="text-red-500 text-sm">
-                              {errorsAddNewAddress.area.message}
+                        />
+                        {errorsAddNewAddress.area && (
+                          <p className="text-red-500 text-sm">
+                            {errorsAddNewAddress.area.message}
+                          </p>
+                        )}
+
+                        <div className="flex gap-2 items-center my-3 mb-4">
+                          <div className="flex-1">
+                            <Input
+                              type="text"
+                              placeholder="Street"
+                              {...registerAddNewAddress("street")}
+                              className="w-full text-[#000] dark:text-[#fff] "
+                            />
+                            <p
+                              className={`text-red-500 text-sm mt-1 transition-all duration-200 ${errorsAddNewAddress.street
+                                ? "h-auto opacity-100"
+                                : "h-0 opacity-0"
+                                }`}
+                            >
+                              {errorsAddNewAddress.street?.message}
                             </p>
-                          )}
-
-                          <div className="flex gap-2 items-center my-3 mb-4">
-                            <div className="flex-1">
-                              <Input
-                                type="text"
-                                placeholder="Street"
-                                {...registerAddNewAddress("street")}
-                                className="w-full text-[#000] dark:text-[#fff] "
-                              />
-                              <p
-                                className={`text-red-500 text-sm mt-1 transition-all duration-200 ${errorsAddNewAddress.street
-                                  ? "h-auto opacity-100"
-                                  : "h-0 opacity-0"
-                                  }`}
-                              >
-                                {errorsAddNewAddress.street?.message}
-                              </p>
-                            </div>
-
-                            <div className="flex-1">
-                              <Input
-                                type="text"
-                                placeholder="Building"
-                                {...registerAddNewAddress("building")}
-                                className="w-full  text-[#000] dark:text-[#fff]"
-                              />
-                              {errorsAddNewAddress.street && (
-                                <div className="h-[20px]"></div>
-                              )}
-                            </div>
                           </div>
 
-                          <div className="flex gap-2 items- my- mb-4">
+                          <div className="flex-1">
                             <Input
                               type="text"
-                              placeholder="Floor"
-                              {...registerAddNewAddress("floor")}
-                              // className="mb-4"
-                              // className={`${
-                              //   registerAddNewAddress.floor ? "mb-1" : "mb-4"
-                              // }`}
-                              className=" text-[#000] dark:text-[#fff]"
+                              placeholder="Building"
+                              {...registerAddNewAddress("building")}
+                              className="w-full  text-[#000] dark:text-[#fff]"
                             />
-
-                            <Input
-                              type="text"
-                              placeholder="Apt"
-                              {...registerAddNewAddress("apt")}
-                              className="mb-  text-[#000] dark:text-[#fff]"
-                            />
+                            {errorsAddNewAddress.street && (
+                              <div className="h-[20px]"></div>
+                            )}
                           </div>
+                        </div>
+
+                        <div className="flex gap-2 items- my- mb-4">
                           <Input
                             type="text"
-                            placeholder="Land mark"
-                            {...registerAddNewAddress("additionalInfo")}
-                            className="mb-  text-[#000] dark:text-[#fff]"
+                            placeholder="Floor"
+                            {...registerAddNewAddress("floor")}
+                            // className="mb-4"
+                            // className={`${
+                            //   registerAddNewAddress.floor ? "mb-1" : "mb-4"
+                            // }`}
+                            className=" text-[#000] dark:text-[#fff]"
                           />
 
-                          <div className="space-y-1">
-                            <div className="flex gap-4 items-center">
-                              {["home", "work", "other"].map((type) => (
-                                <label
-                                  key={type}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Input
-                                    type="checkbox"
-                                    name="addressType"
-                                    className="mt-1"
-                                    value={type}
-                                    checked={addAddressType === type}
-                                    onChange={() =>
-                                      handleAddressTypeAdd(type)
-                                    }
-                                  />
-                                  {type.charAt(0).toUpperCase() +
-                                    type.slice(1)}{" "}
-                                </label>
-                              ))}
-                            </div>
+                          <Input
+                            type="text"
+                            placeholder="Apt"
+                            {...registerAddNewAddress("apt")}
+                            className="mb-  text-[#000] dark:text-[#fff]"
+                          />
+                        </div>
+                        <Input
+                          type="text"
+                          placeholder="Land mark"
+                          {...registerAddNewAddress("additionalInfo")}
+                          className="mb-  text-[#000] dark:text-[#fff]"
+                        />
 
-                            {addAddressType === "other" && (
-                              <Input
-                                type="text"
-                                placeholder="Enter address name"
-                                {...registerAddNewAddress("name")}
-                                className="text-[#000] dark:text-[#fff]"
-                              />
-                            )}
+                        <div className="space-y-1">
+                          <div className="flex gap-4 items-center">
+                            {["home", "work", "other"].map((type) => (
+                              <label
+                                key={type}
+                                className="flex items-center gap-2"
+                              >
+                                <Input
+                                  type="checkbox"
+                                  name="addressType"
+                                  className="mt-1"
+                                  value={type}
+                                  checked={addAddressType === type}
+                                  onChange={() =>
+                                    handleAddressTypeAdd(type)
+                                  }
+                                />
+                                {type.charAt(0).toUpperCase() +
+                                  type.slice(1)}{" "}
+                              </label>
+                            ))}
                           </div>
-                          <DialogFooter className="mt-8">
-                            <DialogClose asChild>
-                              <Button
-                                variant="outline"
-                                onClick={() => setIsNewUserDialogOpen(false)}
-                              >
-                                Close
-                              </Button>
-                            </DialogClose>
-                            {lodaingCreateAddressData ? (
-                              <Button
-                                type="submit"
-                                disabled
-                                className="w-[150px] flex items-center justify-center"
-                              >
-                                <FaSpinner className="animate-spin mr-2" />
 
-                              </Button>
-                            ) : (
-                              <Button type="submit">Add address</Button>
-                            )}
+                          {addAddressType === "other" && (
+                            <Input
+                              type="text"
+                              placeholder="Enter address name"
+                              {...registerAddNewAddress("name")}
+                              className="text-[#000] dark:text-[#fff]"
+                            />
+                          )}
+                        </div>
+                        <DialogFooter className="mt-8">
+                          <DialogClose asChild>
+                            <Button
+                              variant="outline"
+                              onClick={() => setIsNewUserDialogOpen(false)}
+                            >
+                              Close
+                            </Button>
+                          </DialogClose>
+                          {lodaingCreateAddressData ? (
+                            <Button
+                              type="submit"
+                              disabled
+                              className="w-[150px] flex items-center justify-center"
+                            >
+                              <FaSpinner className="animate-spin mr-2" />
+
+                            </Button>
+                          ) : (
+                            <Button type="submit">Add address</Button>
+                          )}
 
 
-                          </DialogFooter>
-                        </form>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                )}
-              </>
-              {/* </div> */}
-            </Card>
-          </div>
+                        </DialogFooter>
+                      </form>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </>
+            {/* </div> */}
+          </Card>
         </div>
 
         <div className="flex flex-col gap-4 order-1 lg:order-2  ">
           {restaurantsSelect?.length > 1 && (
             <Select
               placeholder="Select Restaurant"
-              className="react-select w-[3] mb-0"
+              className="react-select  mb-0"
               classNamePrefix="select"
               options={restaurantsSelect}
               value={restaurantsSelect.find(
@@ -3531,7 +3508,7 @@ function CreateOrder({ params }) {
               styles={selectStyles(theme, color)}
             />
           )}
-          <Card className="p-4 shadow-m rounded-lg w-full mt-0 ">
+          <Card className="p-4 shadow-m rounded-lg w-full mt0 ">
             <div className="flex gap-1 items-center justify-between mb-3">
               <div className="relative flex-grow">
                 <span className="absolute top-1/2 left-2 -translate-y-1/2">
@@ -3866,50 +3843,8 @@ function CreateOrder({ params }) {
                               >
                                 <FiEdit className="mr-1 text-xs" />
                               </button>
-
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <button className="flex items-center text-red-500 gap-[2px]">
-                                    <FiTrash2 className="text-xs" />
-                                  </button>
-                                </AlertDialogTrigger>
-
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                      Are you absolutely sure?
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      This action cannot be undone. This will
-                                      permanently delete this address.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel
-                                      type="button"
-                                      variant="outline"
-                                      color="info"
-                                    >
-                                      Cancel
-                                    </AlertDialogCancel>
-
-                                    <AlertDialogAction
-                                      className="bg-destructive hover:bg-destructive/80"
-                                      onClick={() => handleDeleteAddress(address.id)}
-                                      disabled={lodaingEditDeletedAddress}
-                                    >
-                                      {lodaingEditDeletedAddress ? (
-                                        <span className="flex items-center justify-center">
-                                          <FaSpinner className="animate-spin mr-2" />
-                                        </span>
-                                      ) : (
-                                        "Ok"
-                                      )}
-                                    </AlertDialogAction>
-
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
+                              <DeleteAddressAlert handleDeleteAddress={handleDeleteAddress}
+                                lodaingEditDeletedAddress={lodaingEditDeletedAddress} />
                             </div>
                           </div>
                         ))}
@@ -3928,32 +3863,11 @@ function CreateOrder({ params }) {
                           value={selectedBranchInSelected}
                         />
                         {showAlertBranch && (
-                          <AlertDialog
-                            open={showAlertBranch}
-                            onOpenChange={setShowAlertBranch}
-                          >
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Are you sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Changing the branch will clear your cart. Do
-                                  you want to proceed?
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel onClick={handleCancelChange}>
-                                  Cancel
-                                </AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={handleConfirmChange}
-                                >
-                                  Ok
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                        <ShowAlertBranchAlert  
+                        showAlertBranch={showAlertBranch} 
+                        setShowAlertBranch={setShowAlertBranch} 
+                        handleCancelChange={handleCancelChange} 
+                        handleConfirmChange={handleConfirmChange}/>
                         )}
                       </div>
                     )}
@@ -4181,42 +4095,7 @@ function CreateOrder({ params }) {
                                       >
                                         <FiEdit className="mr-3 text-l" />
                                       </button>
-                                      <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                          <button className="flex items-center text-red-500 hover:text-red-400 gap-[2px]">
-                                            <FiTrash2 className="text-l" />
-                                          </button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-                                          <AlertDialogHeader>
-                                            <AlertDialogTitle className="text-gray-800 dark:text-gray-200">
-                                              Are you absolutely sure?
-                                            </AlertDialogTitle>
-                                            <AlertDialogDescription className="text-gray-600 dark:text-gray-400">
-                                              This action cannot be undone. This
-                                              will permanently delete this item
-                                              from your saved items.
-                                            </AlertDialogDescription>
-                                          </AlertDialogHeader>
-                                          <AlertDialogFooter>
-                                            <AlertDialogCancel
-                                              type="button"
-                                              variant="outline"
-                                              className="text-gray-800 dark:text-gray-200 border-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700"
-                                            >
-                                              Cancel
-                                            </AlertDialogCancel>
-                                            <AlertDialogAction
-                                              className="bg-red-600 hover:bg-red-500 text-white"
-                                              onClick={() =>
-                                                handleRemoveItem(item.cartId)
-                                              }
-                                            >
-                                              Ok
-                                            </AlertDialogAction>
-                                          </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                      </AlertDialog>
+                                  <DeleteItemFromCartAlert handleRemoveItem={handleRemoveItem} item={item}/>
                                     </div>
 
                                     {/* <span>
@@ -4861,50 +4740,9 @@ function CreateOrder({ params }) {
                       </Dialog>
                     )}
 
-                    <div className="flex items-center justify-between gap-5 my-5">
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button className="w-1/2" color="destructive">
-                            Cancel
-                          </Button>
-                        </AlertDialogTrigger>
-
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Are you absolutely sure?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action will reset everything and start the
-                              process from the beginning.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel
-                              type="button"
-                              variant="outline"
-                              color="info"
-                            >
-                              Cancel
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              className="bg-destructive hover:bg-destructive/80"
-                              onClick={handleCacelOrder}
-                            >
-                              Ok
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                      <Button
-                        className="w-1/2"
-                        color="success"
-                        onClick={() => setCreateOrderDialogOpen(true)}
-                      >
-                        Checkout
-                        {/* {isEditMode ? "Edit" : "CheckOut"} */}
-                      </Button>
-                    </div>
+                  <CancelOrderAlert 
+                    handleCacelOrder={handleCacelOrder}
+                    setCreateOrderDialogOpen={setCreateOrderDialogOpen}/>
                   </>
                 )}
               </Card>

@@ -82,7 +82,7 @@ function OrdersType() {
   const language =
     typeof window !== "undefined" ? localStorage.getItem("language") : null;
 
-  const stats = [
+  const stats = [ 
     {
       icon: Package,
       // number: `${orders?.total?.count}`,
@@ -119,8 +119,7 @@ function OrdersType() {
     {
       icon: Truck,
       number: orders?.countByStatus?.inWay?.count ?? "—",
-      label: "In way",
-      statusKey: "Processing",
+      label: "In way",  
       statusKey: "In-way",
       borderColor: "border-[#B53471]",
       color: "text-[#B53471]",
@@ -206,6 +205,7 @@ function OrdersType() {
           {stats.map((stat, index) => (
             <StatCard
               key={index}
+             
               icon={stat.icon}
               number={stat.number}
               label={stat.label}
@@ -228,6 +228,7 @@ function OrdersType() {
         <Card className="h-full p-3">
           <TableOrder
             orders={orders}
+             stats={stats}
             selectedStatus={selectedStatus}
             selectedDayNumber={selectedDayNumber}
             setSelectedDayNumber={setSelectedDayNumber}
