@@ -1746,8 +1746,6 @@ function CreateOrder({ params }) {
     }
   }, [selectedUser, selectedAddress, setValueEdit]);
 
-
-
   const [totalExtrasPrice, setTotalExtrasPrice] = useState(0);
   // console.log("selectedEditAddress", selectedEditAddress);
   const [lodaingCreateOrder, setLodaingCreateOrder] = useState(false);
@@ -1814,7 +1812,6 @@ function CreateOrder({ params }) {
   const fetchMoreData = () => {
     setVisibleItems((prev) => prev + 12); // كل مرة يزود 12
   };
-
 
   const [orderId, setOrderId] = useState(null);
   const [orderCheck, setOrderCheck] = useState(null);
