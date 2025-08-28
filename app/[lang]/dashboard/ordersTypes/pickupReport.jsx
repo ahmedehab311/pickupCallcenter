@@ -144,9 +144,13 @@ const UserDeviceReport = ({
   return (
       <div className="custom-chart flex flex-col justify-between items-between h-full">
       <Chart
-        options={{
+         options={{
           ...options,
-          labels: sourceLabels,
+           labels: sourceLabels,
+          chart: {
+            ...options.chart,
+            width: "100%",
+          },
         }}
         series={series}
         type="donut"

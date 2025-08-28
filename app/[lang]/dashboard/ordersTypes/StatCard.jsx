@@ -84,11 +84,11 @@ export default function StatCard({
               </svg>
             </>
           ) : (
-            <CountUp end={number} duration={1.5} />
+            <CountUp end={number} duration={1.5} className="text-black dark:text-white" />
           )}
         </span>
 
-        <span className="text-xs text-[#000] mt-1">{label}</span>
+        <span className="text-xs text-[#000] dark:text-white mt-1" >{label}</span>
       </div>
       <div className={`${color} `}>
         <Icon size={selectedStatus === "Total" ? 32 : 16} />

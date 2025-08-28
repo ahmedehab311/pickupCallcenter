@@ -31,7 +31,8 @@ const BranchesReport = ({
   const branchLabels = Object.keys(branchOrdersCount);
   const branchSeries = Object.values(branchOrdersCount);
 
-  const options = {
+
+ const options = {
     chart: {
       toolbar: { show: false },
       height: height - 40, // تقليل ارتفاع الشارت نفسه
@@ -87,31 +88,30 @@ const BranchesReport = ({
     },
     legend: {
       position: "right",
-      offsetY: 30, // تقليل الإزاحة
+        offsetY: 30, // تقليل الإزاحة
       horizontalAlign: "center",
       labels: {
         colors: `hsl(${theme?.cssVars[mode === "dark" ? "dark" : "light"].chartLabel
           })`,
         useSeriesColors: false,
       },
-      itemMargin: { horizontal: 1, vertical: 4 }, // تقليل المسافة بين العناصر
+      itemMargin: { horizontal: 8, vertical: 4 }, // تقليل المسافة بين العناصر
       markers: {
         width: 8, // تصغير حجم الماركر
         height: 8,
         radius: 8,
         offsetX: isRtl ? 4 : -4,
       },
-      fontSize: "12px",
-      formatter: function (seriesName, opts) {
-        const value = opts.w.globals.series[opts.seriesIndex];
-        const total = opts.w.globals.series.reduce((a, b) => a + b, 0);
-        const percentage = ((value / total) * 100).toFixed(2);
-        return `${seriesName}: (${percentage}%)`;
-      }
+      fontSize: "12px", 
+     formatter: function(seriesName, opts) {
+    const value = opts.w.globals.series[opts.seriesIndex];
+    const total = opts.w.globals.series.reduce((a, b) => a + b, 0);
+    const percentage = ((value / total) * 100).toFixed(2);
+    return `${seriesName}: (${percentage}%)`;
+  }
     },
-
   };
-  const hasNoResult =
+    const hasNoResult =
     !orders ||
     !orders.sources ||
     branchLabels.length === 0 ||

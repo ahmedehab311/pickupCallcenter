@@ -1,5 +1,5 @@
 "use client";
-import { toast } from "react-hot-toast";
+import { useEffect, useState } from "react";
 import Select from "react-select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,42 +11,27 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { z } from "zod";
+import { toast } from "react-hot-toast";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createAddress, createUser } from "../apICallCenter/apisUser";
 import { selectStyles } from "@/lib/utils";
 import { useSubdomin } from "@/provider/SubdomainContext";
-import { useEffect } from "react";
-const addUserSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters long"),
-  phone: z.string().regex(/^\d{3,15}$/, "Invalid phone number"),
-  phone2: z.string().optional(),
-  area: z.object(
-    { value: z.number(), label: z.string() },
-    { required_error: "Area is required" }
-  ),
-  street: z.string().min(1, "Street is required"),
-  name: z.string().optional(),
-
-  building: z.string().min(1, "Building number is required").or(z.literal("")),
-  floor: z.string().optional(),
-  apt: z.string().optional(),
-  additionalInfo: z.string().optional(),
-});
-
+import { addUserSchema } from "./shcemas/addUserSchema";
+import { FaSpinner } from "react-icons/fa";
 function NewUserDialog({
   isNewUserDialogOpen,
   setIsNewUserDialogOpen,
   selectedAddressType,
+  setValueEditAddressUser, editAddressType, setCustomAddressName,
   areasOptions,
   handleChangeArea,
   color,
   theme,
   setLoading,
   token,
+  apiBaseUrl
 }) {
-  const { apiBaseUrl } = useSubdomin();
   const {
     control,
     register: registerAddNewUser,
@@ -56,6 +41,8 @@ function NewUserDialog({
     trigger,
     formState: { errors: errorsAddNewUser },
   } = useForm({ resolver: zodResolver(addUserSchema), mode: "onSubmit" });
+  const [lodaingCreateUserData, setLodaingCreateUserData] = useState(false);
+
   useEffect(() => {
     if (selectedAddressType !== "other") {
       setValueAddNewUser("name", selectedAddressType);
@@ -76,7 +63,7 @@ function NewUserDialog({
   };
   const onSubmitAddUserData = async (data) => {
     // console.log("data", data);
-    setLoading(true);
+    setLodaingCreateUserData(true);
     try {
       const userId = await createUser(
         data.username,
@@ -115,7 +102,16 @@ function NewUserDialog({
       console.error(error);
       // toast.error(errorMessage);
     } finally {
-      setLoading(false);
+      setLodaingCreateUserData(false);
+    }
+    // seEditAddressType(type);
+
+    if (editAddressType === "other") {
+      setCustomAddressName("");
+      setValueEditAddressUser("name", "");
+    } else {
+      setCustomAddressName("");
+      // setValueEditAddressUser("name", type);
     }
   };
   return (
@@ -211,11 +207,10 @@ function NewUserDialog({
                   className="w-full text-[#000] dark:text-[#fff]"
                 />
                 <p
-                  className={`text-red-500 text-sm mt-1 transition-all duration-200 ${
-                    errorsAddNewUser.street
-                      ? "h-auto opacity-100"
-                      : "h-0 opacity-0"
-                  }`}
+                  className={`text-red-500 text-sm mt-1 transition-all duration-200 ${errorsAddNewUser.street
+                    ? "h-auto opacity-100"
+                    : "h-0 opacity-0"
+                    }`}
                 >
                   {errorsAddNewUser.street?.message}
                 </p>
@@ -291,7 +286,20 @@ function NewUserDialog({
                   Close
                 </Button>
               </DialogClose>
-              <Button type="submit">Create User</Button>
+              {lodaingCreateUserData ? (
+                <Button
+                  type="submit"
+                  disabled
+                  className="w-[150px] flex items-center justify-center"
+                >
+                  <FaSpinner className="animate-spin mr-2" />
+
+                </Button>
+              ) : (
+                <Button type="submit">Create User</Button>
+              )}
+
+
             </DialogFooter>
           </form>
         </div>

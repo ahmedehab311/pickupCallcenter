@@ -205,7 +205,6 @@ function OrdersType() {
           {stats.map((stat, index) => (
             <StatCard
               key={index}
-             
               icon={stat.icon}
               number={stat.number}
               label={stat.label}

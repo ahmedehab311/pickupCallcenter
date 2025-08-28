@@ -75,9 +75,9 @@ import { useSidebar } from "@/store/index";
 import { useSubdomin } from "@/provider/SubdomainContext";
 import Link from "next/link";
 import DialogItemForMenu from "./components/DialogItemForMenu";
-// import NewAddressDialog from "./components/NewAddressDialog";
+import NewAddressDialog from "./components/NewAddressDialog";
 // import NewUserDialog from "./components/NewUserDialog";
-// import EditAddressDiaolg from "./components/EditAddressDiaolg";
+import EditAddressDiaolg from "./components/EditAddressDiaolg";
 // import DeleteAddressFotUser from "./components/DeleteAddressFotUser";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
@@ -91,6 +91,7 @@ import DeleteAddressAlert from "../../components/aletrs/address/DeleteAddressAle
 import ShowAlertBranchAlert from "../../components/aletrs/ShowAlertBranchAlert";
 import DeleteItemFromCartAlert from "../../components/aletrs/DeleteItemFromCartAlert";
 import CancelOrderAlert from "../../components/aletrs/CancelOrderAlert";
+import NewUserDialog from "./components/NewUserDialog";
 const editUserDataSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters long"),
   phone: z.string().regex(/^\d{3,15}$/, "Invalid phone number"),
@@ -108,41 +109,7 @@ const editUserDataSchema = z.object({
       message: "Invalid email address",
     }),
 });
-// const editUserAddressSchema = z.object({
-//   area: z.object(
-//     { value: z.number(), label: z.string() },
-//     { required_error: "Area is required" }
-//   ),
-//   street: z.string().min(1, "Street name is required"),
-//   name: z.string().optional(),
-//   building: z.string().min(1, "Building number is required").or(z.literal("")),
-//   building: z.string().min(1, "Building number is required").or(z.literal("")),
-//   floor: z
-//     .union([z.string(), z.number()])
-//     .optional()
-//     .transform((val) => val || ""),
-//   apt: z
-//     .union([z.string(), z.number()])
-//     .optional()
-//     .transform((val) => val || ""),
-//   additionalInfo: z.string().optional(),
-// });
-const editUserAddressSchema = z.object({
-  area: z.object(
-    { value: z.number(), label: z.string() },
-    { required_error: "Area is required" }
-  ),
-  // street: z.string().min(1, "Street name is required"),
-  street: z.preprocess(
-    (val) => val?.toString(), // أي حاجة تيجي تتحول string
-    z.string().min(1, "Street name is required")
-  ),
-  name: z.string().optional(),
-  building: z.union([z.string(), z.number()]).optional().transform(val => val?.toString() ?? ""),
-  floor: z.union([z.string(), z.number()]).optional().or(z.literal("")),
-  apt: z.union([z.string(), z.number()]).optional(),
-  additionalInfo: z.string().optional(),
-});
+
 
 const createOrderSchema = z.object({
   ordertype: z.number({ required_error: "Order type is required" }),
@@ -158,47 +125,11 @@ const createOrderSchema = z.object({
   discountPercentage: z.number().optional(),
   notes: z.string().optional(),
 });
-const addUserSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters long"),
-  phone: z.string().regex(/^\d{3,15}$/, "Invalid phone number"),
-  phone2: z.string().optional(),
-  area: z.object(
-    { value: z.number(), label: z.string() },
-    { required_error: "Area is required" }
-  ),
-  street: z.string().min(1, "Street is required"),
-  name: z.string().optional(),
 
-  building: z.string().min(1, "Building number is required").or(z.literal("")),
-  floor: z.string().optional(),
-  apt: z.string().optional(),
-  additionalInfo: z.string().optional(),
-});
-const addAddressSchema = z.object({
-  area: z.object(
-    { value: z.number(), label: z.string() },
-    { required_error: "Area is required" }
-  ),
-  street: z.string().min(1, "Street name is required"),
-  name: z.string().optional(),
 
-  building: z.string().min(1, "Building number is required").or(z.literal("")),
-  floor: z.string().optional(),
-  apt: z.string().optional(),
-  additionalInfo: z.string().optional(),
-});
 function CreateOrder({ params }) {
   const { orderType } = params;
-  const {
-    control: controlEditAddress,
-    register: registerEditAddressUser,
-    handleSubmit: handleEditAddressUser,
-    setValue: setValueEditAddressUser,
-    formState: { errors: errorsEditAddressUser },
-  } = useForm({
-    resolver: zodResolver(editUserAddressSchema),
-    mode: "onSubmit",
-  });
+
 
   const {
     register: registerEdit,
@@ -206,15 +137,6 @@ function CreateOrder({ params }) {
     setValue: setValueEdit,
     formState: { errors: errorsEdit },
   } = useForm({ resolver: zodResolver(editUserDataSchema), mode: "onSubmit" });
-  const {
-    control: controlAddress,
-    register: registerAddNewAddress,
-    handleSubmit: handleSubmitAddNewAddress,
-    setValue: setValueAddNewAddress,
-    reset: resetAddNewAddress,
-    trigger,
-    formState: { errors: errorsAddNewAddress },
-  } = useForm({ resolver: zodResolver(addAddressSchema), mode: "onSubmit" });
   const {
     control: controlCreateOrder,
     register: registerCreateOrder,
@@ -232,16 +154,6 @@ function CreateOrder({ params }) {
       notes: "",
     },
   });
-  const {
-    control,
-    register: registerAddNewUser,
-    handleSubmit: handleSubmitAddNewUser,
-    setValue: setValueAddNewUser,
-    reset: resetAddNewUser,
-    // trigger,
-    formState: { errors: errorsAddNewUser },
-  } = useForm({ resolver: zodResolver(addUserSchema), mode: "onSubmit" });
-  // console.log("errorsCreateOrder", errorsCreateOrder);
   const language = localStorage.getItem("language") || "en";
   // console.log("language order", language);
   const { apiBaseUrl, subdomain } = useSubdomin();
@@ -388,25 +300,25 @@ function CreateOrder({ params }) {
     enabled: false,
     onSuccess: (data) => {
       // if (data) {
-        setAllUserData(data);
-        // if (data?.address?.length > 0) {
-        //   setDeliveryMethod("Delivery");
-        //   if (!selectedAddress) {
-        //     setSelectedAddress(data.address[0]);
-        //   }
-        // }
-        // } else {
-        //   setAllUserData(null);
-        //   setDeliveryMethod("pickup");
-        //   setSelectedAddress(null);
-        // }
-        // console.log("data:",data);
-        
-      },
-      onError: (error) => {
-        setErrorSearchUser("Error fetching user data");
-        console.error("Error fetching user:", error);
-      },
+      setAllUserData(data);
+      // if (data?.address?.length > 0) {
+      //   setDeliveryMethod("Delivery");
+      //   if (!selectedAddress) {
+      //     setSelectedAddress(data.address[0]);
+      //   }
+      // }
+      // } else {
+      //   setAllUserData(null);
+      //   setDeliveryMethod("pickup");
+      //   setSelectedAddress(null);
+      // }
+      // console.log("data:",data);
+
+    },
+    onError: (error) => {
+      setErrorSearchUser("Error fetching user data");
+      console.error("Error fetching user:", error);
+    },
   });
   // api branches
 
@@ -1225,23 +1137,23 @@ function CreateOrder({ params }) {
     }
   };
   console.log("selectedAddress", selectedAddress);
-useEffect(() => {
-  if (!selectedUser) return;
+  useEffect(() => {
+    if (!selectedUser) return;
 
-  if (selectedUser?.address?.length > 0) {
-    setDeliveryMethod("Delivery");
+    if (selectedUser?.address?.length > 0) {
+      setDeliveryMethod("Delivery");
 
-    if (!selectedAddress) {
-      console.log("✅ selectedAddress set:", selectedUser.address[0]);
-      setSelectedAddress(selectedUser.address[0]);
+      if (!selectedAddress) {
+        console.log("✅ selectedAddress set:", selectedUser.address[0]);
+        setSelectedAddress(selectedUser.address[0]);
+      }
+    } else {
+      setDeliveryMethod("pickup");
+      setSelectedAddress(null);
+      setSelectedBranch(null);
+      // setBranchId(null);
     }
-  } else {
-    setDeliveryMethod("pickup");
-    setSelectedAddress(null);
-    setSelectedBranch(null);
-    // setBranchId(null);
-  }
-}, [selectedUser]);
+  }, [selectedUser]);
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearch();
@@ -1622,28 +1534,28 @@ useEffect(() => {
   //   prevUserRef.current = selectedUser;
   // }, [selectedUser]);
   useEffect(() => {
-  if (
-    selectedUser &&
-    prevUserRef?.current !== null &&
-    prevUserRef?.current?.id !== selectedUser?.id
-  ) {
-    if (Array.isArray(selectedUser.address)) {
-      setDeliveryMethod(
-        selectedUser.address.length > 0 ? "delivery" : "pickup"
-      );
+    if (
+      selectedUser &&
+      prevUserRef?.current !== null &&
+      prevUserRef?.current?.id !== selectedUser?.id
+    ) {
+      if (Array.isArray(selectedUser.address)) {
+        setDeliveryMethod(
+          selectedUser.address.length > 0 ? "delivery" : "pickup"
+        );
+      }
+      prevUserRef.current = selectedUser;
+
+      if (!isEditMode) {
+        setSelectedBranch(null);
+        setSelectedBranchName("");
+        setSelectedBranchInSelected(null);
+        setSelectedBranchId(null);
+      }
     }
+
     prevUserRef.current = selectedUser;
-
-    if (!isEditMode) {
-      setSelectedBranch(null);
-      setSelectedBranchName("");
-      setSelectedBranchInSelected(null);
-      setSelectedBranchId(null);
-    }
-  }
-
-  prevUserRef.current = selectedUser;
-}, [selectedUser]);
+  }, [selectedUser]);
 
   useEffect(() => {
     setIsBranchManuallySelected(!!selectedBranchId);
@@ -1835,43 +1747,12 @@ useEffect(() => {
   }, [selectedUser, selectedAddress, setValueEdit]);
 
 
-  useEffect(() => {
-    if (selectedEditAddress) {
-      // تأكد من أن القيمة موجودة أولاً قبل تعيينها
-      const selectedAreaOption = areasOptions?.find(
-        (option) => option.value === selectedEditAddress.area
-      );
 
-      if (selectedAreaOption) {
-        setValueEditAddressUser("area", selectedAreaOption);
-      }
-
-      // تحقق من وجود القيم قبل تعيينها
-      if (["home", "work"].includes(selectedEditAddress.address_name)) {
-        seEditAddressType(selectedEditAddress.address_name);
-        setCustomAddressName("");
-      } else {
-        seEditAddressType("other");
-        setCustomAddressName(selectedEditAddress.address_name || "");
-      }
-
-      setValueEditAddressUser("street", selectedEditAddress.street || "");
-      setValueEditAddressUser("building", selectedEditAddress.building || "");
-      setValueEditAddressUser("floor", selectedEditAddress.floor || "");
-      setValueEditAddressUser("apt", selectedEditAddress.apartment || "");
-      setValueEditAddressUser(
-        "additionalInfo",
-        selectedEditAddress.additional || ""
-      );
-    }
-  }, [selectedEditAddress, setValueEditAddressUser]);
   const [totalExtrasPrice, setTotalExtrasPrice] = useState(0);
   // console.log("selectedEditAddress", selectedEditAddress);
   const [lodaingCreateOrder, setLodaingCreateOrder] = useState(false);
   const [lodaingCreateUserData, setLodaingCreateUserData] = useState(false);
   const [lodaingEditUserData, setLodaingEditUserData] = useState(false);
-  const [lodaingCreateAddressData, setLodaingCreateAddressData] = useState(false);
-  const [lodaingEditAddressData, setLodaingEditAddressData] = useState(false);
   const [lodaingEditDeletedAddress, setLodaingDeletedAddress] = useState(false);
   const onSubmitEditUserData = async (data) => {
     setLodaingEditUserData(true);
@@ -1933,110 +1814,8 @@ useEffect(() => {
   const fetchMoreData = () => {
     setVisibleItems((prev) => prev + 12); // كل مرة يزود 12
   };
-  const onSubmitEditUserAddress = async (data) => {
-    // console.log("apiBaseUrl onSubmitEditUserAddress", data);
-    setLodaingEditAddressData(true);
-    const nameValue =
-      typeof data.name === "string" && data.name.trim() !== ""
-        ? data.name
-        : "home";
-    try {
-      // console.log("token onSubmitEditUserAddress:", token);
-      // const response = await updateUserAddress(formattedData);
-      const response = await updateUserAddress({
-        id: selectedEditAddress.id,
-        area: data.area.value,
-        street: data.street || "",
-        building: data.building || "",
-        floor: data.floor || "",
-        apt: data.apt || "",
-        additional: data.additionalInfo || "",
-        address_name: nameValue,
-        token,
-        apiBaseUrl,
-      });
 
-      if (response) {
-        setOpenEditAddressDialog(false);
-        toast.success("Address updated successfully");
-        await queryClient.invalidateQueries(["userSearch"]);
-        refetch();
-      } else {
-        toast.error("Something went wrong");
-      }
 
-      // console.log("Response onSubmit:", response);
-    } catch (error) {
-      console.error("Error updating user address:", error);
-      toast.error("Failed to update address. Please try again.");
-    } finally {
-      setLodaingEditAddressData(false);
-
-    }
-  };
-
-  useEffect(() => {
-    if (selectedAddressType !== "other") {
-      setValueAddNewAddress("name", selectedAddressType);
-    } else {
-      setValueAddNewAddress("name", "");
-    }
-    trigger("name");
-  }, [selectedAddressType]);
-  useEffect(() => {
-    if (selectedAddressType !== "other") {
-      setValueAddNewUser("name", selectedAddressType);
-    } else {
-      setValueAddNewUser("name", "");
-    }
-    trigger("name");
-  }, [selectedAddressType]);
-  const handleAddressTypeAdd = (type) => {
-    setaddAddressType(type);
-    if (type !== "other") {
-      setValueAddNewAddress("name", type);
-    } else {
-      setValueAddNewAddress("name", "");
-    }
-    trigger("name");
-  };
-
-  const onSubmitAddAddress = async (data) => {
-    setLodaingCreateAddressData(true)
-    const userId = selectedUser?.id;
-    try {
-      const nameValue =
-        typeof data.name === "string" && data.name.trim() !== ""
-          ? data.name
-          : "home";
-      await createAddress(
-        userId,
-        data.area.value,
-        data.street,
-        data.building,
-        data.floor,
-        data.apt,
-        data.additionalInfo,
-        // data.name
-        nameValue,
-        token,
-        apiBaseUrl
-      );
-
-      await queryClient.invalidateQueries(["userSearch"]);
-      await refetch();
-      setIsNewAddressDialogOpen(false);
-      toast.success("Address added successfully");
-      resetAddNewAddress();
-      setaddAddressType("home");
-    } catch (error) {
-      const errorMessage = error.message || "Unexpected error";
-      console.error(error);
-      // toast.error(errorMessage);
-    } finally {
-      setLodaingCreateAddressData(false);
-    }
-  };
   const [orderId, setOrderId] = useState(null);
   const [orderCheck, setOrderCheck] = useState(null);
   // console.log("savedBranch", savedBranch);
@@ -2119,81 +1898,6 @@ useEffect(() => {
     }
   };
   // console.log("isEditMode", isEditMode);
-
-  const handleAddressTypeChange = (type) => {
-    setSelectedAddressType(type);
-    if (type !== "other") {
-      setValueAddNewUser("name", type);
-    } else {
-      setValueAddNewUser("name", "");
-    }
-    trigger("name");
-  };
-  const onSubmitAddUserData = async (data) => {
-    // console.log("data", data);
-    setLodaingCreateUserData(true);
-    try {
-      const userId = await createUser(
-        data.username,
-        data.phone,
-        data.phone2,
-        token,
-        apiBaseUrl
-      );
-
-      if (!userId) throw new Error("User ID not received");
-      // console.log("userId from onSubmitAddUserData ", userId);
-      // const nameValue = data?.name?.trim() === "" ? "home" : data?.name;
-      const nameValue =
-        typeof data.name === "string" && data.name.trim() !== ""
-          ? data.name
-          : "home";
-
-      await createAddress(
-        userId,
-        data.area.value,
-        data.street,
-        data.building,
-        data.floor,
-        data.apt,
-        data.additionalInfo,
-        // data.name
-        nameValue,
-        token,
-        apiBaseUrl
-      );
-      setIsNewUserDialogOpen(false);
-      resetAddNewUser();
-      toast.success("User added successfully");
-    } catch (error) {
-      const errorMessage = error.message || "Unexpected error";
-      console.error(error);
-      // toast.error(errorMessage);
-    } finally {
-      setLodaingCreateUserData(false);
-    }
-    // seEditAddressType(type);
-
-    if (editAddressType === "other") {
-      setCustomAddressName("");
-      setValueEditAddressUser("name", "");
-    } else {
-      setCustomAddressName("");
-      // setValueEditAddressUser("name", type);
-    }
-  };
-
-  const handleEditAddressTypeChange = (type) => {
-    seEditAddressType(type);
-
-    if (type === "other") {
-      setCustomAddressName("");
-      setValueEditAddressUser("name", "");
-    } else {
-      setCustomAddressName("");
-      setValueEditAddressUser("name", type);
-    }
-  };
 
   const grandTotal = cartItems.reduce((sum, item) => {
     const basePrice = parseFloat(item.price) || 0;
@@ -3143,401 +2847,42 @@ useEffect(() => {
               </Dialog>
             )}
             <>
-              {/* <NewUserDialog
-                      isNewUserDialogOpen={isNewUserDialogOpen}
-                      setIsNewUserDialogOpen={setIsNewUserDialogOpen}
-                      selectedAddressType={selectedAddressType}
-                      areasOptions={areasOptions}
-                      handleChangeArea={handleChangeArea}
-                      theme={theme}
-                      color={color}
-                      setLoading={setLoading}
-                      token={token}
-                    /> */}
-              {isNewUserDialogOpen && (
-                <Dialog
-                  open={isNewUserDialogOpen}
-                  onOpenChange={setIsNewUserDialogOpen}
-                >
-                  <DialogContent size="3xl">
-                    <DialogHeader>
-                      <DialogTitle className="text-base font-medium text-default-700">
-                        Create New User
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="text-sm text-default-500 space-y-4">
-                      <form
-                        onSubmit={handleSubmitAddNewUser(
-                          onSubmitAddUserData
-                        )}
-                      >
-                        <div className="flex gap-2 items-start mb-4">
-                          {/* Username Input */}
-                          <div className="flex-1 flex flex-col">
-                            <Input
-                              type="text"
-                              placeholder="Username"
-                              {...registerAddNewUser("username")}
-                              className="w-full text-[#000] dark:text-[#fff]"
-                            />
-                            {errorsAddNewUser.username && (
-                              <p className="text-red-500 text-sm h-[20px] mt-2">
-                                {errorsAddNewUser.username.message}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex-1 flex flex-col">
-                            <Controller
-                              name="area"
-                              control={control}
-                              rules={{ required: "Area is required" }}
-                              render={({ field }) => (
-                                <Select
-                                  {...field}
-                                  options={areasOptions || []}
-                                  placeholder="Area"
-                                  className="react-select w-full mb"
-                                  classNamePrefix="select"
-                                  // onChange={handleChangeArea}
-                                  onChange={(selectedOption) => {
-                                    field.onChange(selectedOption);
-                                    handleChangeArea(selectedOption);
-                                  }}
-                                  styles={selectStyles(theme, color)}
-                                />
-                              )}
-                            />
-                            {errorsAddNewUser.area && (
-                              <p className="text-red-500 text-sm h-[20px]">
-                                {errorsAddNewUser.area.message}
-                              </p>
-                            )}
-                          </div>
-                          {/* Phone Input */}
-                        </div>
-                        <div className="flex gap-2 items-start mb-4">
-                          <div className="flex-1 flex flex-col">
-                            <Input
-                              type="number"
-                              placeholder="Phone"
-                              {...registerAddNewUser("phone")}
-                              className="w-full  text-[#000] dark:text-[#fff]"
-                            />
-                            {errorsAddNewUser.phone && (
-                              <p className="text-red-500 text-sm h-[20px] mt-2">
-                                {errorsAddNewUser.phone.message}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex-1 flex flex-col">
-                            <Input
-                              type="number"
-                              placeholder="Phone 2"
-                              {...registerAddNewUser("phone2")}
-                              className="w-full text-[#000] dark:text-[#fff]"
-                            />
-                            {/* {errorsAddNewUser.phone2 && (
-                                      <p className="text-red-500 text-sm h-[20px] mt-2">
-                                        {errorsAddNewUser.phone2.message}
-                                      </p>
-                                    )} */}
-                          </div>
-                        </div>
+              <NewUserDialog
+                isNewUserDialogOpen={isNewUserDialogOpen}
+                setIsNewUserDialogOpen={setIsNewUserDialogOpen}
+                selectedAddressType={selectedAddressType}
+                areasOptions={areasOptions}
+                handleChangeArea={handleChangeArea}
+                theme={theme}
+                color={color}
+                setLoading={setLoading}
+                token={token}
+                apiBaseUrl={apiBaseUrl}
+                editAddressType={editAddressType}
+                setCustomAddressName={setCustomAddressName}
+              />
 
-                        <div className="flex gap-2 items-center my-3 mb-4">
-                          {/* Street Input */}
-                          <div className="flex-1">
-                            <Input
-                              type="text"
-                              placeholder="Street"
-                              {...registerAddNewUser("street")}
-                              className="w-full text-[#000] dark:text-[#fff]"
-                            />
-                            <p
-                              className={`text-red-500 text-sm mt-1 transition-all duration-200 ${errorsAddNewUser.street
-                                ? "h-auto opacity-100"
-                                : "h-0 opacity-0"
-                                }`}
-                            >
-                              {errorsAddNewUser.street?.message}
-                            </p>
-                          </div>
-
-                          {/* Building Input */}
-                          <div className="flex-1">
-                            <Input
-                              type="text"
-                              placeholder="Building"
-                              {...registerAddNewUser("building")}
-                              className="w-full text-[#000] dark:text-[#fff]"
-                            />
-                            {errorsAddNewUser.street && (
-                              <div className="h-[20px]"></div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2 items- my-3 mb-4">
-                          <Input
-                            type="text"
-                            placeholder="Floor"
-                            {...registerAddNewUser("floor")}
-                            className=" text-[#000] dark:text-[#fff]"
-                          />
-
-                          <Input
-                            type="text"
-                            placeholder="Apt"
-                            {...registerAddNewUser("apt")}
-                            className="mb-1 text-[#000] dark:text-[#fff]"
-                          />
-                        </div>
-                        <Input
-                          type="text"
-                          placeholder="Land mark"
-                          {...registerAddNewUser("additionalInfo")}
-                          className="mb-4 text-[#000] dark:text-[#fff]"
-                        />
-
-                        <div className="space-y-1">
-                          {/* Checkboxes */}
-                          <div className="flex gap-4 items-center">
-                            {["home", "work", "other"].map((type) => (
-                              <label
-                                key={type}
-                                className="flex items-center gap-2 "
-                              >
-                                <Input
-                                  type="checkbox"
-                                  name="addressType"
-                                  className="mt-1"
-                                  value={type}
-                                  checked={selectedAddressType === type}
-                                  onChange={() =>
-                                    handleAddressTypeChange(type)
-                                  }
-                                />
-                                {type.charAt(0).toUpperCase() +
-                                  type.slice(1)}{" "}
-                              </label>
-                            ))}
-                          </div>
-
-                          {selectedAddressType === "other" && (
-                            <Input
-                              type="text"
-                              placeholder="Enter address name"
-                              {...registerAddNewUser("name")}
-                              className="text-[#000] dark:text-[#fff]"
-                            />
-                          )}
-                        </div>
-                        <DialogFooter className="mt-8">
-                          <DialogClose asChild>
-                            <Button
-                              variant="outline"
-                              onClick={() => setIsNewUserDialogOpen(false)}
-                            >
-                              Close
-                            </Button>
-                          </DialogClose>
-                          {lodaingCreateUserData ? (
-                            <Button
-                              type="submit"
-                              disabled
-                              className="w-[150px] flex items-center justify-center"
-                            >
-                              <FaSpinner className="animate-spin mr-2" />
-
-                            </Button>
-                          ) : (
-                            <Button type="submit">Create User</Button>
-                          )}
-
-                        </DialogFooter>
-                      </form>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              )}
-              {/* <NewAddressDialog
-                      isNewAddressDialogOpen={isNewAddressDialogOpen}
-                      setIsNewAddressDialogOpen={setIsNewAddressDialogOpen}
-                      setIsNewUserDialogOpen={setIsNewUserDialogOpen}
-                      addAddressType={addAddressType}
-                      areasOptions={areasOptions}
-                      handleChangeArea={handleChangeArea}
-                      theme={theme}
-                      color={color}
-                      setLoading={setLoading}
-                      selectedUser={selectedUser}
-                      token={token}
-                      phone={phone}
-                      setaddAddressType={setaddAddressType}
-                      QueryClient={queryClient}
-                      selectedAddressType={selectedAddressType}
-                    /> */}
-              {isNewAddressDialogOpen && (
-                <Dialog
-                  open={isNewAddressDialogOpen}
-                  onOpenChange={setIsNewAddressDialogOpen}
-                >
-                  <DialogContent size="3xl">
-                    <DialogHeader>
-                      <DialogTitle className="text-base font-medium text-default-700">
-                        Create New Address
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="text-sm text-default-500 space-y-4">
-                      <form
-                        onSubmit={handleSubmitAddNewAddress(
-                          onSubmitAddAddress
-                        )}
-                      >
-                        <Controller
-                          name="area"
-                          control={controlAddress}
-                          rules={{ required: "Area is required" }}
-                          render={({ field }) => (
-                            <Select
-                              {...field}
-                              options={areasOptions || []}
-                              placeholder="Area"
-                              className="react-select w-full my-3 mb-4"
-                              classNamePrefix="select"
-                              // onChange={handleChangeArea}
-                              onChange={(selectedOption) => {
-                                field.onChange(selectedOption);
-                                handleChangeArea(selectedOption);
-                              }}
-                              styles={selectStyles(theme, color)}
-                            />
-                          )}
-                        />
-                        {errorsAddNewAddress.area && (
-                          <p className="text-red-500 text-sm">
-                            {errorsAddNewAddress.area.message}
-                          </p>
-                        )}
-
-                        <div className="flex gap-2 items-center my-3 mb-4">
-                          <div className="flex-1">
-                            <Input
-                              type="text"
-                              placeholder="Street"
-                              {...registerAddNewAddress("street")}
-                              className="w-full text-[#000] dark:text-[#fff] "
-                            />
-                            <p
-                              className={`text-red-500 text-sm mt-1 transition-all duration-200 ${errorsAddNewAddress.street
-                                ? "h-auto opacity-100"
-                                : "h-0 opacity-0"
-                                }`}
-                            >
-                              {errorsAddNewAddress.street?.message}
-                            </p>
-                          </div>
-
-                          <div className="flex-1">
-                            <Input
-                              type="text"
-                              placeholder="Building"
-                              {...registerAddNewAddress("building")}
-                              className="w-full  text-[#000] dark:text-[#fff]"
-                            />
-                            {errorsAddNewAddress.street && (
-                              <div className="h-[20px]"></div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2 items- my- mb-4">
-                          <Input
-                            type="text"
-                            placeholder="Floor"
-                            {...registerAddNewAddress("floor")}
-                            // className="mb-4"
-                            // className={`${
-                            //   registerAddNewAddress.floor ? "mb-1" : "mb-4"
-                            // }`}
-                            className=" text-[#000] dark:text-[#fff]"
-                          />
-
-                          <Input
-                            type="text"
-                            placeholder="Apt"
-                            {...registerAddNewAddress("apt")}
-                            className="mb-  text-[#000] dark:text-[#fff]"
-                          />
-                        </div>
-                        <Input
-                          type="text"
-                          placeholder="Land mark"
-                          {...registerAddNewAddress("additionalInfo")}
-                          className="mb-  text-[#000] dark:text-[#fff]"
-                        />
-
-                        <div className="space-y-1">
-                          <div className="flex gap-4 items-center">
-                            {["home", "work", "other"].map((type) => (
-                              <label
-                                key={type}
-                                className="flex items-center gap-2"
-                              >
-                                <Input
-                                  type="checkbox"
-                                  name="addressType"
-                                  className="mt-1"
-                                  value={type}
-                                  checked={addAddressType === type}
-                                  onChange={() =>
-                                    handleAddressTypeAdd(type)
-                                  }
-                                />
-                                {type.charAt(0).toUpperCase() +
-                                  type.slice(1)}{" "}
-                              </label>
-                            ))}
-                          </div>
-
-                          {addAddressType === "other" && (
-                            <Input
-                              type="text"
-                              placeholder="Enter address name"
-                              {...registerAddNewAddress("name")}
-                              className="text-[#000] dark:text-[#fff]"
-                            />
-                          )}
-                        </div>
-                        <DialogFooter className="mt-8">
-                          <DialogClose asChild>
-                            <Button
-                              variant="outline"
-                              onClick={() => setIsNewUserDialogOpen(false)}
-                            >
-                              Close
-                            </Button>
-                          </DialogClose>
-                          {lodaingCreateAddressData ? (
-                            <Button
-                              type="submit"
-                              disabled
-                              className="w-[150px] flex items-center justify-center"
-                            >
-                              <FaSpinner className="animate-spin mr-2" />
-
-                            </Button>
-                          ) : (
-                            <Button type="submit">Add address</Button>
-                          )}
+              <NewAddressDialog
+                isNewAddressDialogOpen={isNewAddressDialogOpen}
+                setIsNewAddressDialogOpen={setIsNewAddressDialogOpen}
+                setIsNewUserDialogOpen={setIsNewUserDialogOpen}
+                addAddressType={addAddressType}
+                areasOptions={areasOptions}
+                handleChangeArea={handleChangeArea}
+                theme={theme}
+                color={color}
+                setLoading={setLoading}
+                selectedUser={selectedUser}
+                token={token}
+                phone={phone}
+                setaddAddressType={setaddAddressType}
+                QueryClient={queryClient}
+                selectedAddressType={selectedAddressType}
+                apiBaseUrl={apiBaseUrl}
+                refetch={refetch}
+              />
 
 
-                        </DialogFooter>
-                      </form>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              )}
             </>
             {/* </div> */}
           </Card>
@@ -3893,7 +3238,7 @@ useEffect(() => {
                                 <FiEdit className="mr-1 text-xs" />
                               </button>
                               <DeleteAddressAlert handleDeleteAddress={handleDeleteAddress}
-                                lodaingEditDeletedAddress={lodaingEditDeletedAddress} />
+                                lodaingEditDeletedAddress={lodaingEditDeletedAddress} address={address} />
                             </div>
                           </div>
                         ))}
@@ -4924,177 +4269,25 @@ useEffect(() => {
               </DialogContent>
             </Dialog>
           )}
-          {/* <EditAddressDiaolg
-              open={openEditAddressDialog}
-              setOpen={setOpenEditAddressDialog}
-              color={color}
-              theme={theme}
-              areasOptions={areasOptions}
-              handleChangeArea={handleChangeArea}
-              token={token}
-              phone={phone}
-              queryClient={queryClient}
-              setCustomAddressName={setCustomAddressName}
-              seEditAddressType={seEditAddressType}
-              selectedEditAddress={selectedEditAddress}
-              editAddressType={editAddressType}
-              customAddressName={customAddressName}
-              apiBaseUrl={apiBaseUrl}
-            /> */}
-          {openEditAddressDialog && selectedEditAddress && (
-            <Dialog
-              open={openEditAddressDialog}
-              onOpenChange={setOpenEditAddressDialog}
-            >
-              <DialogContent size="3xl">
-                <DialogHeader>
-                  <DialogTitle>Edit User Address</DialogTitle>
-                </DialogHeader>
+          <EditAddressDiaolg
+            openEditAddressDialog={openEditAddressDialog}
+            setOpenEditAddressDialog={setOpenEditAddressDialog}
+            color={color}
+            theme={theme}
+            areasOptions={areasOptions}
+            handleChangeArea={handleChangeArea}
+            token={token}
+            phone={phone}
+            queryClient={queryClient}
+            setCustomAddressName={setCustomAddressName}
+            seEditAddressType={seEditAddressType}
+            selectedEditAddress={selectedEditAddress}
+            editAddressType={editAddressType}
+            customAddressName={customAddressName}
+            apiBaseUrl={apiBaseUrl}
+            refetch={refetch}
+          />
 
-                <form
-                  onSubmit={handleEditAddressUser(onSubmitEditUserAddress)}
-                  className="space-y-4"
-                >
-                  {/* Select Field */}
-                  <div>
-                    <label className="block mb-1">Area</label>
-                    <Controller
-                      name="area"
-                      control={controlEditAddress}
-                      rules={{ required: "Area is required" }}
-                      render={({ field }) => (
-                        <Select
-                          {...field}
-                          options={areasOptions || []}
-                          placeholder="Area"
-                          className="react-select w-full"
-                          classNamePrefix="select"
-                          value={
-                            areasOptions?.find(
-                              (option) => option.value === field.value?.value
-                            ) || null
-                          }
-                          onChange={(selectedOption) => {
-                            field.onChange(selectedOption);
-                            handleChangeArea(selectedOption);
-                          }}
-                          styles={selectStyles(theme, color)}
-                        />
-                      )}
-                    />
-                  </div>
-                  {errorsEditAddressUser.area && (
-                    <p className="text-red-500 text-sm">
-                      {errorsEditAddressUser.area.message}
-                    </p>
-                  )}
-
-                  {/* Input Fields */}
-                  <div className="flex gap-2 items-center my-3">
-                    <div className="flex-1">
-                      <label className="block mb-1">Street</label>
-                      <Input
-                        type="text"
-                        {...registerEditAddressUser("street")}
-                        className="w-full text-[#000] dark:text-[#fff]"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <label className="block mb-1">Building</label>
-                      <Input
-                        type="text"
-                        {...registerEditAddressUser("building")}
-                        className="w-full text-[#000] dark:text-[#fff]"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 items-center my-3">
-                    <div className="flex-1">
-                      <label className="block mb-1">Floor</label>
-                      <Input
-                        type="text"
-                        {...registerEditAddressUser("floor")}
-                        className="w-full text-[#000] dark:text-[#fff]"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <label className="block mb-1">Apt</label>
-                      <Input
-                        type="text"
-                        {...registerEditAddressUser("apt")}
-                        className="w-full text-[#000] dark:text-[#fff]"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block mb-1">Landmark</label>
-                    <Input
-                      type="text"
-                      {...registerEditAddressUser("additionalInfo")}
-                      className="w-full text-[#000] dark:text-[#fff]"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="flex gap-4 items-center">
-                      {["home", "work", "other"].map((type) => (
-                        <label key={type} className="flex items-center gap-2">
-                          <Input
-                            type="checkbox"
-                            name="addressType"
-                            className="mt-1"
-                            value={type}
-                            checked={editAddressType === type}
-                            onChange={() => handleEditAddressTypeChange(type)}
-                          />
-                          {type.charAt(0).toUpperCase() + type.slice(1)}
-                        </label>
-                      ))}
-                    </div>
-
-                    {editAddressType === "other" && (
-                      <Input
-                        type="text"
-                        placeholder="Enter address name"
-                        value={customAddressName}
-                        onChange={(e) => {
-                          setCustomAddressName(e.target.value);
-                          setValueEditAddressUser("name", e.target.value);
-                        }}
-                        className="text-[#000] dark:text-[#fff]"
-                      />
-                    )}
-                  </div>
-
-                  <DialogFooter className="flex justify-end gap-4">
-                    <DialogClose asChild>
-                      <Button
-                        variant="outline"
-                        onClick={() => setOpenEditAddressDialog(false)}
-                      >
-                        Close
-                      </Button>
-                    </DialogClose>
-                    {lodaingEditAddressData ? (
-                      <Button
-                        type="submit"
-                        disabled
-                        className="w-[150px] flex items-center justify-center"
-                      >
-                        <FaSpinner className="animate-spin mr-2" />
-
-                      </Button>
-                    ) : (
-                      <Button type="submit">Save Changes</Button>
-                    )}
-
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
-          )}
         </>
       </div>
     </div>

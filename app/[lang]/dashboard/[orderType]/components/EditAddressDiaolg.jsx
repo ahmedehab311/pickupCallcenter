@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import Select from "react-select";
 import { Input } from "@/components/ui/input";
@@ -18,28 +18,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { selectStyles } from "@/lib/utils";
 import { useSubdomin } from "@/provider/SubdomainContext";
 import { updateUserAddress } from "../apICallCenter/apisUser";
-const editUserAddressSchema = z.object({
-  area: z.object(
-    { value: z.number(), label: z.string() },
-    { required_error: "Area is required" }
-  ),
-  street: z.string().min(1, "Street name is required"),
-  name: z.string().optional(),
-  building: z.string().min(1, "Building number is required").or(z.literal("")),
-  building: z.string().min(1, "Building number is required").or(z.literal("")),
-  floor: z
-    .union([z.string(), z.number()])
-    .optional()
-    .transform((val) => val || ""),
-  apt: z
-    .union([z.string(), z.number()])
-    .optional()
-    .transform((val) => val || ""),
-  additionalInfo: z.string().optional(),
-});
+import { FaSpinner } from "react-icons/fa";
+import { editUserAddressSchema } from "./shcemas/editUserAddressSchema";
 function EditAddressDiaolg({
-  open,
-  setOpen,
   color,
   theme,
   areasOptions,
@@ -53,6 +34,7 @@ function EditAddressDiaolg({
   editAddressType,
   customAddressName,
   apiBaseUrl,
+  openEditAddressDialog, setOpenEditAddressDialog, refetch
 }) {
   const {
     control: controlEditAddress,
@@ -64,33 +46,39 @@ function EditAddressDiaolg({
     resolver: zodResolver(editUserAddressSchema),
     mode: "onSubmit",
   });
+  const [lodaingEditAddressData, setLodaingEditAddressData] = useState(false);
 
   useEffect(() => {
     if (selectedEditAddress) {
+      // تأكد من أن القيمة موجودة أولاً قبل تعيينها
       const selectedAreaOption = areasOptions?.find(
         (option) => option.value === selectedEditAddress.area
       );
 
-      setValueEditAddressUser("area", selectedAreaOption);
+      if (selectedAreaOption) {
+        setValueEditAddressUser("area", selectedAreaOption);
+      }
 
+      // تحقق من وجود القيم قبل تعيينها
       if (["home", "work"].includes(selectedEditAddress.address_name)) {
         seEditAddressType(selectedEditAddress.address_name);
         setCustomAddressName("");
       } else {
         seEditAddressType("other");
-        setCustomAddressName(selectedEditAddress.address_name);
+        setCustomAddressName(selectedEditAddress.address_name || "");
       }
 
-      setValueEditAddressUser("street", selectedEditAddress.street);
+      setValueEditAddressUser("street", selectedEditAddress.street || "");
       setValueEditAddressUser("building", selectedEditAddress.building || "");
       setValueEditAddressUser("floor", selectedEditAddress.floor || "");
-      setValueEditAddressUser("apt", selectedEditAddress.apt || "");
+      setValueEditAddressUser("apt", selectedEditAddress.apartment || "");
       setValueEditAddressUser(
         "additionalInfo",
-        selectedEditAddress.additionalInfo || ""
+        selectedEditAddress.additional || ""
       );
     }
   }, [selectedEditAddress, setValueEditAddressUser]);
+
   const handleEditAddressTypeChange = (type) => {
     seEditAddressType(type);
 
@@ -103,33 +91,33 @@ function EditAddressDiaolg({
     }
   };
   const onSubmitEditUserAddress = async (data) => {
+    // console.log("apiBaseUrl onSubmitEditUserAddress", data);
+    setLodaingEditAddressData(true);
     const nameValue =
       typeof data.name === "string" && data.name.trim() !== ""
         ? data.name
         : "home";
-    const formattedData = {
-      id: selectedEditAddress.id, // تأكيد إرسال ID صحيح
-      area: data.area.value,
-      street: data.street || "", // تأكيد إرسال قيمة فارغة   `undefined`
-      building: data.building || "",
-      floor: data.floor || "",
-      apt: data.apt || "",
-      additional_info: data.additionalInfo || "",
-      address_name: nameValue,
-      token: token,
-      apiBaseUrl,
-    };
-
-    // console.log("Formatted Data to Send:", formattedData); // تحقق من البيانات
-
     try {
-      const response = await updateUserAddress(formattedData);
+      // console.log("token onSubmitEditUserAddress:", token);
+      // const response = await updateUserAddress(formattedData);
+      const response = await updateUserAddress({
+        id: selectedEditAddress.id,
+        area: data.area.value,
+        street: data.street || "",
+        building: data.building || "",
+        floor: data.floor || "",
+        apt: data.apt || "",
+        additional: data.additionalInfo || "",
+        address_name: nameValue,
+        token,
+        apiBaseUrl,
+      });
 
       if (response) {
+        setOpenEditAddressDialog(false);
         toast.success("Address updated successfully");
-
-        queryClient.invalidateQueries(["userSearch", phone]);
-        setOpen(false);
+        await queryClient.invalidateQueries(["userSearch"]);
+        refetch();
       } else {
         toast.error("Something went wrong");
       }
@@ -138,10 +126,16 @@ function EditAddressDiaolg({
     } catch (error) {
       console.error("Error updating user address:", error);
       toast.error("Failed to update address. Please try again.");
+    } finally {
+      setLodaingEditAddressData(false);
+
     }
   };
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={openEditAddressDialog}
+      onOpenChange={setOpenEditAddressDialog}
+    >
       <DialogContent size="3xl">
         <DialogHeader>
           <DialogTitle>Edit User Address</DialogTitle>
@@ -264,14 +258,28 @@ function EditAddressDiaolg({
             )}
           </div>
 
-          {/* Buttons */}
           <DialogFooter className="flex justify-end gap-4">
             <DialogClose asChild>
-              <Button variant="outline" onClick={() => setOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setOpenEditAddressDialog(false)}
+              >
                 Close
               </Button>
             </DialogClose>
-            <Button type="submit">Save Changes</Button>
+            {lodaingEditAddressData ? (
+              <Button
+                type="submit"
+                disabled
+                className="w-[150px] flex items-center justify-center"
+              >
+                <FaSpinner className="animate-spin mr-2" />
+
+              </Button>
+            ) : (
+              <Button type="submit">Save Changes</Button>
+            )}
+
           </DialogFooter>
         </form>
       </DialogContent>

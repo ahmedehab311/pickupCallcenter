@@ -140,11 +140,11 @@ export function BasicDataTable({
           return (
             <div className="flex flex-col">
               {row["check_id"] && (
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-[#000] dark:text-white">
                   check: {row["check_id"]}
                 </span>
               )}
-              <span>{row["Invoice Id"]}</span>
+              <span className="text-[#000] dark:text-white">{row["Invoice Id"]}</span>
               <span className={`text-sm ${colorClass} font-se`}>
                 {row["status"]}
               </span>
@@ -155,7 +155,15 @@ export function BasicDataTable({
       {
         accessorKey: "Restaurant",
         header: "Restaurant",
-        cell: (info) => info.getValue(),
+        cell: (info) => {
+              const row = info.row.original;
+          return (
+            <div className="flex flex-col">
+              <span className="text-sm text-[#000] dark:text-white">{row["Restaurant"]}</span>
+        
+            </div>
+          )
+        }
       },
       {
         accessorKey: "Date",
@@ -163,9 +171,9 @@ export function BasicDataTable({
         cell: (info) => {
           const row = info.row.original;
           return (
-            <div className="flex flex-col">
+            <div className="flex flex-col text-[#000] dark:text-white">
               <span>{row["Date"]}</span>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-[#000] dark:text-white">
                 {row["source"]}
               </span>
             </div>
@@ -175,7 +183,15 @@ export function BasicDataTable({
       {
         accessorKey: "Branch",
         header: "Branch",
-        cell: (info) => info.getValue(),
+            cell: (info) => {
+                const row = info.row.original;
+            return (
+              <div className="flex flex-col">
+                <span className="text-sm text-[#000] dark:text-white">{row["Branch"]}</span>
+          
+              </div>
+            )
+          }
       },
       {
         accessorKey: "Customer",
@@ -185,7 +201,7 @@ export function BasicDataTable({
           return (
             <div className="flex flex-col">
               <span>{row["Customer"]}</span>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-[#000] dark:text-white">
                 {row["Phone"]}
               </span>
             </div>
@@ -195,7 +211,15 @@ export function BasicDataTable({
       {
         accessorKey: "Address",
         header: "Address",
-        cell: (info) => info.getValue(),
+         cell: (info) => {
+              const row = info.row.original;
+          return (
+            <div className="flex flex-col">
+              <span className="text-sm text-[#000] dark:text-white">{row["Address"]}</span>
+        
+            </div>
+          )
+        }
       },
 
       {
@@ -212,8 +236,8 @@ export function BasicDataTable({
                 : "Other";
           return (
             <div className="flex flex-col">
-              <span className="whitespace-nowrap">{row["TotalAmount"]}</span>
-              <span className="text-sm text-muted-foreground">
+              <span className="whitespace-nowrap text-[#000] dark:text-white">{row["TotalAmount"]}</span>
+              <span className="text-sm text-[#000] dark:text-white">
                 {paymentMethodText}
               </span>
             </div>

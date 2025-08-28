@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import Select from "react-select";
 import { Input } from "@/components/ui/input";
@@ -16,27 +17,11 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createAddress } from "../apICallCenter/apisUser";
 import { selectStyles } from "@/lib/utils";
-import { useSubdomin } from "@/provider/SubdomainContext";
-import { useEffect } from "react";
-
-const addAddressSchema = z.object({
-  area: z.object(
-    { value: z.number(), label: z.string() },
-    { required_error: "Area is required" }
-  ),
-  street: z.string().min(1, "Street name is required"),
-  name: z.string().optional(),
-
-  building: z.string().min(1, "Building number is required").or(z.literal("")),
-  floor: z.string().optional(),
-  apt: z.string().optional(),
-  additionalInfo: z.string().optional(),
-});
-
+import { addAddressSchema } from "./shcemas/addAddressSchema";
+import { FaSpinner } from "react-icons/fa";
 function NewAddressDialog({
   color,
   theme,
-  setLoading,
   isNewAddressDialogOpen,
   setIsNewAddressDialogOpen,
   setIsNewUserDialogOpen,
@@ -49,9 +34,9 @@ function NewAddressDialog({
   token,
   phone,
   QueryClient,
+  refetch,
+  apiBaseUrl
 }) {
-  const { apiBaseUrl } = useSubdomin();
-
   const {
     control: controlAddress,
     register: registerAddNewAddress,
@@ -61,6 +46,7 @@ function NewAddressDialog({
     trigger,
     formState: { errors: errorsAddNewAddress },
   } = useForm({ resolver: zodResolver(addAddressSchema), mode: "onSubmit" });
+  const [lodaingCreateAddressData, setLodaingCreateAddressData] = useState(false);
 
   useEffect(() => {
     if (selectedAddressType !== "other") {
@@ -82,8 +68,7 @@ function NewAddressDialog({
   };
 
   const onSubmitAddAddress = async (data) => {
-    // console.log("data", data);
-    setLoading(true);
+    setLodaingCreateAddressData(true)
     const userId = selectedUser?.id;
     try {
       const nameValue =
@@ -104,7 +89,8 @@ function NewAddressDialog({
         apiBaseUrl
       );
 
-      QueryClient.invalidateQueries(["userSearch", phone]);
+      await QueryClient.invalidateQueries(["userSearch"]);
+      await refetch();
       setIsNewAddressDialogOpen(false);
       toast.success("Address added successfully");
       resetAddNewAddress();
@@ -114,7 +100,7 @@ function NewAddressDialog({
       console.error(error);
       // toast.error(errorMessage);
     } finally {
-      setLoading(false);
+      setLodaingCreateAddressData(false);
     }
   };
   return (
@@ -165,11 +151,10 @@ function NewAddressDialog({
                   className="w-full text-[#000] dark:text-[#fff] "
                 />
                 <p
-                  className={`text-red-500 text-sm mt-1 transition-all duration-200 ${
-                    errorsAddNewAddress.street
-                      ? "h-auto opacity-100"
-                      : "h-0 opacity-0"
-                  }`}
+                  className={`text-red-500 text-sm mt-1 transition-all duration-200 ${errorsAddNewAddress.street
+                    ? "h-auto opacity-100"
+                    : "h-0 opacity-0"
+                    }`}
                 >
                   {errorsAddNewAddress.street?.message}
                 </p>
@@ -247,8 +232,19 @@ function NewAddressDialog({
                   Close
                 </Button>
               </DialogClose>
+              {lodaingCreateAddressData ? (
+                <Button
+                  type="submit"
+                  disabled
+                  className="w-[150px] flex items-center justify-center"
+                >
+                  <FaSpinner className="animate-spin mr-2" />
 
-              <Button type="submit">Add address</Button>
+                </Button>
+              ) : (
+                <Button type="submit">Add address</Button>
+              )}
+
             </DialogFooter>
           </form>
         </div>

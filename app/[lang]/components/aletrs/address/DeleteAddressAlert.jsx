@@ -9,12 +9,13 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { FaSpinner } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
 
 function DeleteAddressAlert({
     handleDeleteAddress,
     lodaingEditDeletedAddress,
-
+    address
 }) {
     return (
 
