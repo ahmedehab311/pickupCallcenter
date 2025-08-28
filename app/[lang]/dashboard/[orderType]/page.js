@@ -1115,20 +1115,6 @@ function CreateOrder({ params }) {
       setShowManualLoading(true);
       setPhone(search);
       refetch().finally(() => setShowManualLoading(false));
-      // if (selectedUser?.address?.length > 0) {
-      //   setDeliveryMethod("Delivery");
-      //   if (!selectedAddress) {
-      //     console.log("selectedAddress", selectedAddress);
-      //     setSelectedAddress(selectedUser.address[0]);
-      //   }
-      // } else {
-      //   setDeliveryMethod("pickup");
-      //   setSelectedAddress(null);
-      //   setSelectedBranch(null);
-      //   // setBranchId(null);
-      // }
-
-
       if (selectedBranch) {
         setSelectedBranchPriceList(selectedBranch.price_list);
       }
@@ -1136,6 +1122,7 @@ function CreateOrder({ params }) {
       setErrorSearchUser("Please enter a valid search.");
     }
   };
+  
   useEffect(() => {
     if (!selectedUser) return;
 
@@ -1171,8 +1158,6 @@ function CreateOrder({ params }) {
     setIsEditMode(false);
     queryClient.removeQueries(["userSearch"], { exact: false });
   };
-
-
 
   const [selectedEditAddress, setSelectedEditAddress] = useState(null);
 
