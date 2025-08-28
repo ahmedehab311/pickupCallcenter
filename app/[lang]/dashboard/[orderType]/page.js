@@ -208,13 +208,13 @@ function CreateOrder({ params }) {
       ),
     enabled: !!selectedRestaurantId && !!token,
   });
-  if (process.env.NODE_ENV === "development") {
-    console.log("branches", branches);
-    console.log("selectedRestaurantId", selectedRestaurantId);
-    console.log("selectedAddress?.area", selectedAddress?.area);
-    // console.log("apiBaseUrl from create order", apiBaseUrl);
-    // console.log("subdomain from create order", subdomain);
-  }
+  // if (process.env.NODE_ENV === "development") {
+  //   console.log("branches", branches);
+  //   console.log("selectedRestaurantId", selectedRestaurantId);
+  //   console.log("selectedAddress?.area", selectedAddress?.area);
+  //   // console.log("apiBaseUrl from create order", apiBaseUrl);
+  //   // console.log("subdomain from create order", subdomain);
+  // }
   const {
     data: areas,
     isLoadingAreas,
@@ -322,11 +322,11 @@ function CreateOrder({ params }) {
   });
   // api branches
 
-  if (process.env.NODE_ENV === "development") {
-    // console.log("branches", branches);
-    console.log("selectedUser", selectedUser);
-    console.log("isLoadingUserDataForSerach", isLoadingUserDataForSerach);
-  }
+  // if (process.env.NODE_ENV === "development") {
+  //   // console.log("branches", branches);
+  //   console.log("selectedUser", selectedUser);
+  //   console.log("isLoadingUserDataForSerach", isLoadingUserDataForSerach);
+  // }
 
   const [activeSection, setActiveSection] = useState("all");
   const [counter, setCounter] = useState(1);
@@ -916,10 +916,10 @@ function CreateOrder({ params }) {
         const matchedBranch = branchOptions.find(
           (branch) => branch.value === Number(branchId)
         );
-        console.log("deliveryType", deliveryType);
-        console.log("branchId", branchId);
-        console.log("branchOptions", branchOptions);
-        console.log("matchedBranch", matchedBranch);
+        // console.log("deliveryType", deliveryType);
+        // console.log("branchId", branchId);
+        // console.log("branchOptions", branchOptions);
+        // console.log("matchedBranch", matchedBranch);
 
         if (
           AdderssOrder &&
@@ -1136,7 +1136,6 @@ function CreateOrder({ params }) {
       setErrorSearchUser("Please enter a valid search.");
     }
   };
-  console.log("selectedAddress", selectedAddress);
   useEffect(() => {
     if (!selectedUser) return;
 
@@ -1144,7 +1143,6 @@ function CreateOrder({ params }) {
       setDeliveryMethod("Delivery");
 
       if (!selectedAddress) {
-        console.log("✅ selectedAddress set:", selectedUser.address[0]);
         setSelectedAddress(selectedUser.address[0]);
       }
     } else {
