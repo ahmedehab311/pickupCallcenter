@@ -51,21 +51,42 @@ export async function PATCH(req) {
       body: JSON.stringify({}) // ← مهم جدًا!
     });
 
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
+    }
 
-    return new Response(JSON.stringify(data), {
-      status: response.status,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    if (!response.ok) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          status: response.status,
+          message: data?.messages?.[0] || "Failed to change status item",
+          data,
+        }),
+        { status: response.status, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        status: response.status,
+        message: data?.messages?.[0] || "Item change status successfully",
+        data,
+      }),
+      { status: response.status, headers: { "Content-Type": "application/json" } }
+    );
   } catch (err) {
-    console.error("Catch Error:", err);
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        status: 500,
+        message: err.message || "Internal server error",
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }

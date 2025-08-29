@@ -143,24 +143,25 @@ const Menu = ({ params: { lang } }) => {
     try {
       setIsSettingDefaultLoading(true);
       const res = await deleteItem(apiBaseUrl, token, id, "menu");
-      if (res.messages?.[0]?.includes("so you can't delete")) {
-        toast.error(res.messages[0]);
+      console.log("res", res);
+
+      if (res.message?.includes("so you can't delete")) {
+        toast.error(res.message);
         return;
       }
-      if (res.messages?.[0]?.includes("is deleted")) {
-        toast.error(res.messages[0]);
+      if (res.message?.includes("is deleted")) {
+        toast.error(res.message);
         return;
       }
-      if (
-        res?.responseStatus &&
-        Array.isArray(res.messages) &&
-        res.messages.length > 0
-      ) {
+      if (res.success) {
+        toast.success(res.message || "Deleted successfully");
         refetch();
-        toast.success(res.messages[0]);
+      } else {
+        toast.error(res.message || "Error deleting menu");
       }
     } catch (error) {
-      toast.error("An error occurred while deleting the menu.");
+      // toast.error("An error occurred while deleting the menu.");
+      toast.error(error.message);
       console.error("Error default menu:", error);
     } finally {
       setIsSettingDefaultLoading(false);
@@ -171,18 +172,15 @@ const Menu = ({ params: { lang } }) => {
     try {
       setIsSettingDefaultLoading(true);
       const res = await restoreItem(token, apiBaseUrl, id, "menu");
-
-      if (
-        res?.responseStatus &&
-        Array.isArray(res.messages) &&
-        res.messages.length > 0
-      ) {
+      if (res.success) {
         refetch();
-        toast.success(res.messages[0]);
+        toast.success(res.message);
+      } else {
+        toast.error(res.message || "Error restoring menu");
       }
     } catch (error) {
-      toast.error("An error occurred while restoring the menu.");
-      console.error("Error default menu:", error);
+      toast.error("Error restoring menu.");
+      console.error("Error restoring menu:", error);
     } finally {
       setIsSettingDefaultLoading(false);
     }
@@ -191,17 +189,20 @@ const Menu = ({ params: { lang } }) => {
     try {
       setIsSettingDefaultLoading(true);
       const res = await changeItemStatus(apiBaseUrl, token, id, "menu");
-
+      if (res.message?.includes("not found")) {
+        toast.error(res.message);
+        return;
+      }
       if (
-        res?.responseStatus &&
-        Array.isArray(res.messages) &&
-        res.messages.length > 0
+        res?.success
       ) {
         refetch();
-        toast.success(res.messages[0]);
+        toast.success(res.message);
+      } else {
+        toast.error(res.message || "Error changing status menu.");
       }
     } catch (error) {
-      toast.error("An error occurred while changing status the menu.");
+      toast.error("Error changing status menu.");
       console.error("Error changing status menu:", error);
     } finally {
       setIsSettingDefaultLoading(false);
@@ -344,7 +345,7 @@ const Menu = ({ params: { lang } }) => {
         filteredSections={filteredMenus}
         setFilteredSections={setFilteredMenus}
       />
-{/* {viewMode === "card" ? (
+      {/* {viewMode === "card" ? (
   <CardGridRenderer
     labelLoading="menus"
     currentItems={currentItems}

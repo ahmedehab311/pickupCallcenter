@@ -61,9 +61,12 @@ export const changeItemStatus = async (apiBaseUrl, token, id, name) => {
       }
     );
 
-    console.log("apiBaseUrl from client", apiBaseUrl);
-
     const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Error deleting item");
+    }
+
     return data;
   } catch (error) {
     console.error("Error fetching menu:", error);
@@ -81,6 +84,11 @@ export const restoreItem = async (token, apiBaseUrl, id, name) => {
     );
 
     const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Error restore item");
+    }
+
     return data;
   } catch (error) {
     console.error("Error fetching menu:", error);
@@ -97,6 +105,11 @@ export const deleteItem = async (apiBaseUrl, token, id, name) => {
     );
 
     const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Error deleting item");
+    }
+
     return data;
   } catch (err) {
     console.error("Error deleting item:", err);
