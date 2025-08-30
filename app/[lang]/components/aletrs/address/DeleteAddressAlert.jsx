@@ -50,13 +50,7 @@ function DeleteAddressAlert({
                         onClick={() => handleDeleteAddress(address.id)}
                         disabled={lodaingEditDeletedAddress}
                     >
-                        {lodaingEditDeletedAddress ? (
-                            <span className="flex items-center justify-center">
-                                <FaSpinner className="animate-spin mr-2" />
-                            </span>
-                        ) : (
-                            "Ok"
-                        )}
+                        Ok
                     </AlertDialogAction>
 
                 </AlertDialogFooter>
