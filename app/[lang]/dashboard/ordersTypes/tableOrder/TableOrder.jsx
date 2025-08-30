@@ -236,7 +236,7 @@ export function BasicDataTable({
                 : "Other";
           return (
             <div className="flex flex-col">
-              <span className="whitespace-nowrap text-sm  flex flex-col text-[#000] dark:text-white">{row["TotalAmount"]}</span>
+              <span className="whitespace-nowrap text-sm   text-[#000] dark:text-white">{row["TotalAmount"]}</span>
               <span className="text-sm text-[#000] dark:text-white">
                 {paymentMethodText}
               </span>
