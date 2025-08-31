@@ -28,20 +28,20 @@ const BasicTable = ({ OrderDetails, OrderDetailsItem }) => {
         <TableBody>
           {OrderDetailsItem.map((item, index) => (
             <TableRow key={item.id || index}>
-              <TableCell className="text-[#000] dark:text-[#fff]">
+              <TableCell className="text-important">
                 {item?.info?.size_en || item?.name?.item_name}
               </TableCell>
-              <TableCell className="text-[#000] dark:text-[#fff]">
+              <TableCell className="text-important">
                 {item?.count}
               </TableCell>
-              <TableCell className="text-[#000] dark:text-[#fff]">
+              <TableCell className="text-important">
                 {item?.special || "—"}
               </TableCell>
              
-              <TableCell className="text-[#000] dark:text-[#fff]">
+              <TableCell className="text-important">
                 {parseFloat(item?.sub_total || 0).toFixed(2)}
               </TableCell>
-              <TableCell className="text-[#000] dark:text-[#fff]">
+              <TableCell className="text-important">
                 {parseFloat(item?.total_price || 0).toFixed(2)}
               </TableCell>
             </TableRow>
@@ -78,18 +78,18 @@ const BasicTable = ({ OrderDetails, OrderDetailsItem }) => {
               <React.Fragment key={item.id || index}>
                 {/* الصف الرئيسي للعنصر */}
                 <TableRow>
-                  <TableCell className="text-[#000] dark:text-[#fff]">
+                  <TableCell className="text-important">
                     {item?.count} ×{" "}
                     {item?.info?.size_en || item?.name?.item_name}
                   </TableCell>
 
-                  <TableCell className="text-[#000] dark:text-[#fff]">
+                  <TableCell className="text-important">
                     {item?.special || "—"}
                   </TableCell>
-                  <TableCell className="text-[#000] dark:text-[#fff]">
+                  <TableCell className="text-important">
                     {parseFloat(item?.sub_total || 0).toFixed(2)}
                   </TableCell>
-                  <TableCell className="text-[#000] dark:text-[#fff]">
+                  <TableCell className="text-important">
                     {parseFloat(item?.total_price || 0).toFixed(2)}
                   </TableCell>
                 </TableRow>

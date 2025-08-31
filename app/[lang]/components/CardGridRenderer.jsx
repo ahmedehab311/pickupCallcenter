@@ -7,6 +7,9 @@ import {
 } from "@/components/ui/CardSections";
 import { usePagination } from "@/hooks/usePagination";
 import { saveArrangement } from "../dashboard/sections/apisSection";
+import { useEffect, useState } from "react";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import StatusHandler from "@/lib/StatusHandler";
 function CardGridRenderer({
   currentItems,
   isLoading,
@@ -29,8 +32,19 @@ function CardGridRenderer({
   setDraggedIndex,
   filteredSections,
   setFilteredSections,
-  isInternalLoading,navigate
+  isInternalLoading, navigate, refetch
 }) {
+  const isOnline = useOnlineStatus();
+  const [wasOffline, setWasOffline] = useState(false);
+  useEffect(() => {
+    if (!isOnline) {
+      setWasOffline(true);
+    } else if (isOnline && wasOffline) {
+      toast.success("Online now!");
+      refetch();
+      setWasOffline(false);
+    }
+  }, [isOnline, wasOffline]);
   const truncateDescription = (description, maxLength = 50) => {
     // console.log("Description received:", description);
     if (!description) return "";
@@ -99,79 +113,72 @@ function CardGridRenderer({
 
   return (
     <div>
-      {isLoading || isInternalLoading ? (
-        <div className="flex items-center justify-center h-full">
-          <p className="text-center text-gray-500 py-10 capitalize">
-            Loading {labelLoading}...
-          </p>
-        </div>
-      ) : error ? (
-        <div className="flex items-center justify-center h-full">
-          <p className="text-center text-gray-500 py-10 capitalize">
-            Error loading {labelLoading}
-          </p>
-        </div>
-      ) : Array.isArray(currentItems) && currentItems.length ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-          {currentItems.map((section, index) => {
-            let deletedAt = section?.deleted_at;
-            let isDefault = section?.default;
-            return (
-              <div
-                key={section.id}
-                className={`card bg-popover  border border-gray-200 dark:border-none ${
-                  draggedIndex === index ? "opacity-50" : ""
-                }`}
-              >
-                <CardHeader
-                  imageUrl={`${BASE_URL()}/${subdomain}/${section.image}`}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, section.id)}
-                  onDragOver={(e) => handleDragOver(e, index)}
-                  onDrop={(e) => handleDrop(e, section.id)}
-                  onDragEnd={handleDragEnd}
-                />
+      <StatusHandler
+        isOnline={isOnline}
+        isLoading={isLoading}
+        error={error}
+        isEmpty={currentItems?.length === 0}
+        emptyMessage={`No ${labelLoading} found`}
+        loadingMessage={`Loading ${labelLoading}...`}
+        errorMessage={`Error loading ${labelLoading}`}
+      >
+        {
+          Array.isArray(currentItems) && currentItems.length && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+              {currentItems.map((section, index) => {
+                let deletedAt = section?.deleted_at;
+                let isDefault = section?.default;
+                return (
+                  <div
+                    key={section.id}
+                    className={`card bg-popover  border border-gray-200 dark:border-none ${draggedIndex === index ? "opacity-50" : ""
+                      }`}
+                  >
+                    <CardHeader
+                      imageUrl={`${BASE_URL()}/${subdomain}/${section.image}`}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, section.id)}
+                      onDragOver={(e) => handleDragOver(e, index)}
+                      onDrop={(e) => handleDrop(e, section.id)}
+                      onDragEnd={handleDragEnd}
+                    />
 
-                <CardContent
-                  sectionName={section?.name_en}
-                  description={truncateDescription(section?.description_en, 80)}
-                  isActive={getStatus(section)}
-                  onChangeStatus={() => handlechangeStatus(section.id)}
-                  isSection={true}
-                  className="card-content"
-                  trans={trans}
-                  deletedAt={section?.actions?.deletedAt}
-                  isLoading={isLoadingStatus}
-                  isSettingLoading={isSettingLoading}
-                />
-                <CardFooter
-                  sectionName={section?.name}
-                  onViewEdit={() => handleViewEdit(section.id)}
-                  onDelete={() => handleDelete(section.id)}
-                  onRestore={() => handleRestore(section.id)}
-                  onEnter={() => handleEnter(section.id)}
-                  // checked={getStatusDefault(section)}
-                  isActiveDefault={() => handleDefault(section.id)}
-                  isDefaultForMenu={isDefaultForMenu}
-                  isSection={true}
-                  trans={trans}
-                  isLoading={isLoadingStatus}
-                  isDefault={isDefault}
-                  deletedAt={deletedAt}
-                  isSettingLoading={isSettingLoading}
-                  navigate={navigate}
-                />
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="flex items-center justify-center h-full">
-          <p className="text-center text-gray-500 py-10 capitalize">
-            No {labelLoading} found
-          </p>
-        </div>
-      )}
+                    <CardContent
+                      sectionName={section?.name_en}
+                      description={truncateDescription(section?.description_en, 80)}
+                      isActive={getStatus(section)}
+                      onChangeStatus={() => handlechangeStatus(section.id)}
+                      isSection={true}
+                      className="card-content"
+                      trans={trans}
+                      deletedAt={section?.actions?.deletedAt}
+                      isLoading={isLoadingStatus}
+                      isSettingLoading={isSettingLoading}
+                    />
+                    <CardFooter
+                      sectionName={section?.name}
+                      onViewEdit={() => handleViewEdit(section.id)}
+                      onDelete={() => handleDelete(section.id)}
+                      onRestore={() => handleRestore(section.id)}
+                      onEnter={() => handleEnter(section.id)}
+                      // checked={getStatusDefault(section)}
+                      isActiveDefault={() => handleDefault(section.id)}
+                      isDefaultForMenu={isDefaultForMenu}
+                      isSection={true}
+                      trans={trans}
+                      isLoading={isLoadingStatus}
+                      isDefault={isDefault}
+                      deletedAt={deletedAt}
+                      isSettingLoading={isSettingLoading}
+                      navigate={navigate}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+      </StatusHandler>
+
     </div>
   );
 }

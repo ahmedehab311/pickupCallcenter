@@ -148,7 +148,7 @@ function NewAddressDialog({
                   type="text"
                   placeholder="Street"
                   {...registerAddNewAddress("street")}
-                  className="w-full text-[#000] dark:text-[#fff] "
+                  className="w-full text-important "
                 />
                 <p
                   className={`text-red-500 text-sm mt-1 transition-all duration-200 ${errorsAddNewAddress.street
@@ -165,7 +165,7 @@ function NewAddressDialog({
                   type="text"
                   placeholder="Building"
                   {...registerAddNewAddress("building")}
-                  className="w-full  text-[#000] dark:text-[#fff]"
+                  className="w-full  text-important"
                 />
                 {errorsAddNewAddress.street && <div className="h-[20px]"></div>}
               </div>
@@ -180,21 +180,21 @@ function NewAddressDialog({
                 // className={`${
                 //   registerAddNewAddress.floor ? "mb-1" : "mb-4"
                 // }`}
-                className=" text-[#000] dark:text-[#fff]"
+                className=" text-important"
               />
 
               <Input
                 type="text"
                 placeholder="Apt"
                 {...registerAddNewAddress("apt")}
-                className="mb-  text-[#000] dark:text-[#fff]"
+                className="mb-  text-important"
               />
             </div>
             <Input
               type="text"
               placeholder="Land mark"
               {...registerAddNewAddress("additionalInfo")}
-              className="mb-  text-[#000] dark:text-[#fff]"
+              className="mb-  text-important"
             />
 
             <div className="space-y-1">
@@ -219,7 +219,7 @@ function NewAddressDialog({
                   type="text"
                   placeholder="Enter address name"
                   {...registerAddNewAddress("name")}
-                  className="text-[#000] dark:text-[#fff]"
+                  className="text-important"
                 />
               )}
             </div>

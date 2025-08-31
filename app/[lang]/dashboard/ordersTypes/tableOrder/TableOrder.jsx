@@ -332,7 +332,7 @@ export function BasicDataTable({
             placeholder="Search by order id or phone"
             value={orderIdOrPhone}
             onChange={handleInputChange}
-            className="h-10 pr-8 text-[#000] dark:text-[#fff]"
+            className="h-10 pr-8 text-important"
             // onKeyDown={(e) => {
             //   if (e.key === "Enter") {
             //     refetchSearchUser({ force: true });
@@ -351,7 +351,7 @@ export function BasicDataTable({
           {orderIdOrPhone && (
             <button
               onClick={handleClearSearch}
-              className="absolute top-1/2 right-2 -translate-y-1/2 text-[#000] dark:text-[#fff] text-xs font-bold"
+              className="absolute top-1/2 right-2 -translate-y-1/2 text-important text-xs font-bold"
             >
               ✕
             </button>
@@ -430,7 +430,7 @@ export function BasicDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  <span className="animate-pulse text-[#000] dark:text-[#fff] flex justify-center items-center text-lg">
+                  <span className="animate-pulse text-important flex justify-center items-center text-lg">
                     Loading...
                   </span>
                 </TableCell>
@@ -441,7 +441,7 @@ export function BasicDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  <span className=" text-[#000] dark:text-[#fff] flex justify-center items-center text-lg">
+                  <span className=" text-important flex justify-center items-center text-lg">
                     Error loading data.
                   </span>
                 </TableCell>
@@ -452,7 +452,7 @@ export function BasicDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  <span className=" text-[#000] dark:text-[#fff] flex justify-center items-center text-lg">
+                  <span className=" text-important flex justify-center items-center text-lg">
                     No search results found.
                   </span>
                 </TableCell>
@@ -483,7 +483,7 @@ export function BasicDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  <span className=" text-[#000] dark:text-[#fff] flex justify-center items-center text-lg">
+                  <span className=" text-important flex justify-center items-center text-lg">
                     No results.
                   </span>
                 </TableCell>

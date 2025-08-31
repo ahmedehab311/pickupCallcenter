@@ -186,7 +186,7 @@ function EditAddressDiaolg({
               <Input
                 type="text"
                 {...registerEditAddressUser("street")}
-                className="w-full text-[#000] dark:text-[#fff]"
+                className="w-full text-important"
               />
             </div>
             <div className="flex-1">
@@ -194,7 +194,7 @@ function EditAddressDiaolg({
               <Input
                 type="text"
                 {...registerEditAddressUser("building")}
-                className="w-full text-[#000] dark:text-[#fff]"
+                className="w-full text-important"
               />
             </div>
           </div>
@@ -205,7 +205,7 @@ function EditAddressDiaolg({
               <Input
                 type="text"
                 {...registerEditAddressUser("floor")}
-                className="w-full text-[#000] dark:text-[#fff]"
+                className="w-full text-important"
               />
             </div>
             <div className="flex-1">
@@ -213,7 +213,7 @@ function EditAddressDiaolg({
               <Input
                 type="text"
                 {...registerEditAddressUser("apt")}
-                className="w-full text-[#000] dark:text-[#fff]"
+                className="w-full text-important"
               />
             </div>
           </div>
@@ -223,7 +223,7 @@ function EditAddressDiaolg({
             <Input
               type="text"
               {...registerEditAddressUser("additionalInfo")}
-              className="w-full text-[#000] dark:text-[#fff]"
+              className="w-full text-important"
             />
           </div>
 
@@ -253,7 +253,7 @@ function EditAddressDiaolg({
                   setCustomAddressName(e.target.value);
                   setValueEditAddressUser("name", e.target.value);
                 }}
-                className="text-[#000] dark:text-[#fff]"
+                className="text-important"
               />
             )}
           </div>

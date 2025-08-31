@@ -3,8 +3,9 @@
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import Image from "next/image";
-export const CardItem = ({ item, language, handleItemClick, placeholderImg }) => {
+export const CardItem = ({ item, language, handleItemClick, placeholderImg, items, errorMenu }) => {
   const [loaded, setLoaded] = useState(false);
+
 
   return (
     <Card
@@ -19,9 +20,8 @@ export const CardItem = ({ item, language, handleItemClick, placeholderImg }) =>
           alt="placeholder"
           width={150}
           height={150}
-          className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${
-            loaded ? "opacity-0" : "opacity-100"
-          }`}
+          className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${loaded ? "opacity-0" : "opacity-100"
+            }`}
         />
 
         {/* الصورة الأصلية */}
@@ -30,9 +30,8 @@ export const CardItem = ({ item, language, handleItemClick, placeholderImg }) =>
           alt={item?.name_en}
           width={150}
           height={150}
-          className={`w-full h-full object-cover transition-opacity duration-500 ${
-            loaded ? "opacity-100" : "opacity-0"
-          }`}
+          className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"
+            }`}
           onLoadingComplete={() => setLoaded(true)}
         />
       </div>
@@ -41,7 +40,7 @@ export const CardItem = ({ item, language, handleItemClick, placeholderImg }) =>
         <h3 className="text-sm text-muted-foreground mt-2">
           {language === "en" ? item.name_en : item.name_ar}
         </h3>
-        <p className="text-sm text-[#000] dark:text-[#fff] ">
+        <p className="text-sm text-important ">
           {item?.price?.toFixed(2)} EGP
         </p>
       </div>

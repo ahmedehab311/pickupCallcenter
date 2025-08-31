@@ -188,17 +188,17 @@ function SectionList({
   };
 
   const handleSaveArrange = async () => {
+    setIsSettingDefaultLoading(true);
     const ids = filteredSections.map((sections) => sections.id);
     const arrangement = filteredSections.map((_, index) => index + 1);
     // console.log("ids from api", ids);
     // console.log("arrangement from api", arrangement);
-
+    
     const body = {
       ids: ids,
       arrangement: arrangement,
     };
     try {
-      setIsSettingDefaultLoading(true);
       const res = await saveArrangement(token, apiBaseUrl, pageType, body);
       console.log("respone data :", res);
       if (
@@ -212,8 +212,10 @@ function SectionList({
     } catch (error) {
       toast.error("An error occurred while arrange the items.");
       console.error("error save arrangment", error);
+    }finally{
+
+      setIsSettingDefaultLoading(false);
     }
-    // setIsSettingDefaultLoading(false);
   };
   const pageCount = Math.ceil(filteredSections?.length / itemsPerPage);
   const offset = currentPage * itemsPerPage;

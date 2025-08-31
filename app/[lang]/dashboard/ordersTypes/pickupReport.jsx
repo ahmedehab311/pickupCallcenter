@@ -135,7 +135,7 @@ const UserDeviceReport = ({
   }
   if (hasNoResult) {
     return (
-      <div className="flex justify-center items-center h-[180px] text-[#000] dark:text-[#fff] text-lg">
+      <div className="flex justify-center items-center h-[180px] text-important text-lg">
         No results.
       </div>
     );

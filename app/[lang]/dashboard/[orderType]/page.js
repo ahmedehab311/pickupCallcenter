@@ -48,7 +48,7 @@ import {
   fetchTax,
   fetchorderSource,
 } from "./apICallCenter/ApisCallCenter";
-import { toast } from "react-hot-toast";
+import { toast, ToastBar } from "react-hot-toast";
 import {
   updateUserData,
   fetchAreas,
@@ -92,6 +92,9 @@ import ShowAlertBranchAlert from "../../components/aletrs/ShowAlertBranchAlert";
 import DeleteItemFromCartAlert from "../../components/aletrs/DeleteItemFromCartAlert";
 import CancelOrderAlert from "../../components/aletrs/CancelOrderAlert";
 import NewUserDialog from "./components/NewUserDialog";
+import { useSession } from "@/provider/SessionContext";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import StatusHandler from "@/lib/StatusHandler";
 const editUserDataSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters long"),
   phone: z.string().regex(/^\d{3,15}$/, "Invalid phone number"),
@@ -165,6 +168,9 @@ function CreateOrder({ params }) {
 
   const searchParams = useSearchParams();
   const { theme, color, setColor } = useThemeColor();
+  const { handleInvalidToken } = useSession();
+  const isOnline = useOnlineStatus();
+  const [wasOffline, setWasOffline] = useState(false);
   const setCollapsed = useSidebar((state) => state.setCollapsed);
   const queryClient = useQueryClient();
   const [phone, setPhone] = useState("");
@@ -211,6 +217,7 @@ function CreateOrder({ params }) {
   // if (process.env.NODE_ENV === "development") {
   //   console.log("branches", branches);
   //   console.log("selectedRestaurantId", selectedRestaurantId);
+  //   console.log("selectedAddress?.area", selectedAddress);
   //   console.log("selectedAddress?.area", selectedAddress?.area);
   //   // console.log("apiBaseUrl from create order", apiBaseUrl);
   //   // console.log("subdomain from create order", subdomain);
@@ -265,16 +272,14 @@ function CreateOrder({ params }) {
     keepPreviousData: true,
   });
 
-  // console.log("menu from create", menu);
-  const sections = menu?.sections
+  const sections = menu?.sections.length > 0
     ? [{ id: "all", name_en: "All", name_ar: "الكل" }, ...menu.sections]
-    : [{ id: "all", name_en: "All", name_ar: "الكل" }];
+    : [];
 
   const items =
     menu?.sections?.flatMap((section) =>
       section.items_and_offer.map((item) => ({
         id: item.id,
-        // name: item.name_en,
         name_en: item.name_en,
         name_ar: item.name_ar,
         price: item.sizes?.[0]?.prices?.[0]?.price,
@@ -325,7 +330,6 @@ function CreateOrder({ params }) {
   // if (process.env.NODE_ENV === "development") {
   //   // console.log("branches", branches);
   //   console.log("selectedUser", selectedUser);
-  //   console.log("isLoadingUserDataForSerach", isLoadingUserDataForSerach);
   // }
 
   const [activeSection, setActiveSection] = useState("all");
@@ -729,6 +733,20 @@ function CreateOrder({ params }) {
     setInitialized(true);
   }, [selectedItem, initialized]);
 
+  useEffect(() => {
+    if (errorMenu?.message === "Invalid token") {
+      handleInvalidToken();
+    }
+  }, [errorMenu, handleInvalidToken]);
+  useEffect(() => {
+    if (!isOnline) {
+      setWasOffline(true);
+    } else if (isOnline && wasOffline) {
+      toast.success("Online now!");
+      refetchMenu();
+      setWasOffline(false);
+    }
+  }, [isOnline, wasOffline]);
   const [extrasError, setExtrasError] = useState("");
   const selectedExtras = selectedItem?.selectedExtras;
   const groupMainExtraMax = selectedItem?.groupExtrasMainRule?.max;
@@ -1122,7 +1140,7 @@ function CreateOrder({ params }) {
       setErrorSearchUser("Please enter a valid search.");
     }
   };
-  
+
   useEffect(() => {
     if (!selectedUser) return;
 
@@ -2050,9 +2068,19 @@ function CreateOrder({ params }) {
       router.events?.off("routeChangeStart", handleRouteChange);
     };
   }, [queryClient]);
+  // if (isLoadingMenu) {
+  //   return <div>Loading...</div>;
+  // }
 
-  if (isLoadingBranchs) return <p>Loading branches...</p>;
-  if (errorBranchs) return <p>Error loading branches: {error.message}</p>;
+  // if (errorMenu) {
+  //   return <div>Error: fetch data</div>;
+  // }
+
+  // if (!menu || !menu.sections || menu.sections.length === 0) {
+  //   return <div>No results.</div>;
+  // }
+  // if (isLoadingBranchs) return <p>Loading branches...</p>;
+  // if (errorBranchs) return <p>Error loading branches: {error.message}</p>;
   return (
     <div className="flex flex-col gap-4">
 
@@ -2072,15 +2100,17 @@ function CreateOrder({ params }) {
               <Input
                 type="text"
                 placeholder="Search"
-                className="pl-7 w-full text-[#000] dark:text-[#fff] "
+                className="pl-7 w-full text-important "
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                disabled={errorMenu || isLoadingMenu || !isOnline}
               />
+
 
               {searchQuery && (
                 <button
                   onClick={handleClearSearch}
-                  className="absolute top-1/2 right-2 -translate-y-1/2 text-[#000] dark:text-[#fff] text-xs font-bold"
+                  className="absolute top-1/2 right-2 -translate-y-1/2 text-important text-xs font-bold"
                 >
                   ✕
                 </button>
@@ -2088,7 +2118,7 @@ function CreateOrder({ params }) {
             </div>
 
             {/*  التابات */}
-            <div className="flex gap-4 flex-wrap border-b pb-2 mt-3">
+            {/* <div className="flex gap-4 flex-wrap border-b pb-2 mt-3">
               {filteredSections.map((section) => (
                 <button
                   key={section.id}
@@ -2121,8 +2151,95 @@ function CreateOrder({ params }) {
                   />
                 ))}
               </div>
-            </InfiniteScroll>
+            </InfiniteScroll> */}
+            <div>
+              {/* Sections */}
+              <div className={`flex gap-4 flex-wrap ${isOnline ? "border-b" : ""} pb-2 mt-3`} >
+                {/* {!isOnline ? (
+                  <div className="w-full text-red-500 text-lg flex justify-center">🚨 Internet disconnected</div>
+                ) : isLoadingMenu ? (
+                  <div className="w-full animate-pulse text-important text-lg flex justify-center">Loading sections...</div>
+                ) : errorMenu ? (
+                  <div className="w-full text-red-500  text-lg flex justify-center">Error loading sections</div>
+                ) : filteredSections.length === 0 ? (
+                  <div className="w-full text-important text-lg flex justify-center">No sections found
+                  </div>
 
+                ) : (
+                  filteredSections.map((section) => (
+                    <button
+                      key={section.id}
+                      className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300
+              ${activeSection === section.id
+                          ? "bg-black text-white"
+                          : "bg-gray-200 text-gray-600"
+                        }`}
+                      onClick={() => setActiveSection(section.id)}
+                    >
+                      {language === "en" ? section.name_en : section.name_ar}
+                    </button>
+                  ))
+                )} */}
+                <StatusHandler
+                  isOnline={isOnline}
+                  isLoading={isLoadingMenu}
+                  error={errorMenu}
+                  isEmpty={filteredSections.length === 0}
+                  emptyMessage="No sections found"
+                  loadingMessage="Loading sections..."
+                  errorMessage="Error loading sections"
+                >
+                  {filteredSections.map((section) => (
+                    <button
+                      key={section.id}
+                      className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300
+        ${activeSection === section.id
+                          ? "bg-black text-white"
+                          : "bg-gray-200 text-gray-600"
+                        }`}
+                      onClick={() => setActiveSection(section.id)}
+                    >
+                      {language === "en" ? section.name_en : section.name_ar}
+                    </button>
+                  ))}
+                </StatusHandler>
+
+              </div>
+            </div>
+
+            {/* Items */}
+            {isOnline && (
+              isLoadingMenu ? (
+                <div className="w-full animate-pulse text-important text-lg flex justify-center my-2">Loading items...</div>
+              ) : errorMenu ? (
+                <div className="w-full text-red-500 text-lg flex justify-center my-2">Error loading items</div>
+              )
+                : items.length === 0 ? (
+                  <div className="w-full text-important text-lg flex justify-center my-2">
+                    No items found </div>
+                ) : (
+                  <InfiniteScroll
+                    dataLength={visibleItems}
+                    next={fetchMoreData}
+                    hasMore={visibleItems < displayedItems.length}
+                    loader={<h4 className="text-center p-4">Loading...</h4>}
+                  >
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                      {displayedItems.slice(0, visibleItems).map((item) => (
+                        <CardItem
+                          key={item.id}
+                          item={item}
+                          language={language}
+                          handleItemClick={handleItemClick}
+                          placeholderImg={placeholderImg}
+                          items={items}
+                          errorMenu={errorMenu}
+                        />
+                      ))}
+                    </div>
+                  </InfiniteScroll>
+                )
+            )}
             {/* <DialogItemForMenu
                     isItemDialogOpen={isItemDialogOpen}
                     setIsItemDialogOpen={setIsItemDialogOpen}
@@ -2334,10 +2451,10 @@ function CreateOrder({ params }) {
                                   }));
                                 }}
                               />
-                              <span className="text-[#000] dark:text-[#fff]">
+                              <span className="text-important">
                                 {extra.name}
                               </span>
-                              <span className="text-[#000] dark:text-[#fff]">
+                              <span className="text-important">
                                 {Number(extra.price) > 0 &&
                                   `(${Number(extra.price).toFixed(
                                     2
@@ -2484,10 +2601,10 @@ function CreateOrder({ params }) {
                                   checked={!!selected}
                                   readOnly
                                 />
-                                <span className="text-[#000] dark:text-[#fff]">
+                                <span className="text-important">
                                   {extra.name}
                                 </span>
-                                <span className="text-[#000] dark:text-[#fff]">
+                                <span className="text-important">
                                   {Number(extra.price) > 0 &&
                                     `(${Number(extra.price).toFixed(
                                       2
@@ -2688,10 +2805,10 @@ function CreateOrder({ params }) {
                                   });
                                 }}
                               />
-                              <span className="text-[#000] dark:text-[#fff]">
+                              <span className="text-important">
                                 {extra.name}
                               </span>
-                              <span className="text-[#000] dark:text-[#fff]">
+                              <span className="text-important">
                                 {Number(extra.price) > 0 &&
                                   `(${Number(extra.price).toFixed(
                                     2
@@ -2711,7 +2828,7 @@ function CreateOrder({ params }) {
                       onChange={(e) => setNote(e.target.value)}
                       type="text"
                       placeholder="Note"
-                      className="w-full text-[#000] dark:text-[#fff]"
+                      className="w-full text-important"
                     />
                   </div>
                   <div className="sticky bottom-[-23px] bg-white dark:bg-black p-4 border-t border-gray-300 dark:border-gray-700 shadow-md z-50 mt-4">
@@ -2886,7 +3003,7 @@ function CreateOrder({ params }) {
             <div className="flex gap-1 items-center justify-between mb-3">
               <div className="relative flex-grow">
                 <span className="absolute top-1/2 left-2 -translate-y-1/2">
-                  <Search className="w-4 h-4 text-gray-500" />
+                  <Search className="w-4 h-4 text-gray-500" disabled={!isOnline} />
                 </span>
 
                 <Input
@@ -2895,14 +3012,14 @@ function CreateOrder({ params }) {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  className="pl-7 pr-8 w-full text-[#000] dark:text-[#fff]"
-                  disabled={isEditMode}
+                  className="pl-7 pr-8 w-full text-important"
+                  disabled={isEditMode || !isOnline}
                 />
                 {search && (
                   <button
                     onClick={handleClear}
                     disabled={isEditMode}
-                    className="absolute top-1/2 right-2 -translate-y-1/2 text-[#000] dark:text-[#fff] text-xs font-bold"
+                    className="absolute top-1/2 right-2 -translate-y-1/2 text-important text-xs font-bold"
                   >
                     ✕
                   </button>
@@ -2929,7 +3046,7 @@ function CreateOrder({ params }) {
                   onMouseOut={(e) =>
                     (e.currentTarget.style.backgroundColor = "#007bff")
                   }
-                  disabled={isEditMode}
+                  disabled={isEditMode || !isOnline}
                 >
                   <FiSearch className="w-4 h-4" />
                 </Button>
@@ -2953,7 +3070,7 @@ function CreateOrder({ params }) {
                   onMouseOut={(e) =>
                     (e.currentTarget.style.backgroundColor = "#007bff")
                   }
-                  disabled={isEditMode}
+                  disabled={isEditMode || !isOnline}
                 >
                   <Admin />
                 </Button>
@@ -2974,7 +3091,7 @@ function CreateOrder({ params }) {
                   </p>
                   <Button
                     onClick={() => setShowUserWarningDialog(false)}
-                    className=" px-4 py-2 rounded text-[#000] dark:text-[#fff]"
+                    className=" px-4 py-2 rounded text-important"
                   >
                     OK
                   </Button>
@@ -2996,7 +3113,7 @@ function CreateOrder({ params }) {
                   </p>
                   <Button
                     onClick={() => setShowBranchWarningDialog(false)}
-                    className=" px-4 py-2 rounded text-[#000] dark:text-[#fff]"
+                    className=" px-4 py-2 rounded text-important"
                   >
                     OK
                   </Button>
@@ -3058,7 +3175,7 @@ function CreateOrder({ params }) {
             {isOpenUserData && hasSearched ? (
               isLoadingUserDataForSerach || showManualLoading ? (
                 <div className="mt-2 p-2 rounded-md">
-                  <p className=" text-center">LOADING...</p>
+                  <p className=" text-center">loading...</p>
                 </div>
               ) : selectedUser ? (
                 <div className="mt-2 p-2 rounded-md">
@@ -3623,44 +3740,44 @@ function CreateOrder({ params }) {
                       <Table>
                         <TableBody>
                           <TableRow>
-                            <TableCell className="text-[#000] dark:text-[#fff]">
+                            <TableCell className="text-important">
                               Subtotal
                             </TableCell>
-                            <TableCell className="text-[#000] dark:text-[#fff] ml-">
+                            <TableCell className="text-important ml-">
                               {cartItems?.length}
                             </TableCell>
-                            <TableCell className="text-[#000] dark:text-[#fff]">
+                            <TableCell className="text-important">
                               {grandTotal.toFixed(2)} EGP
                             </TableCell>
                           </TableRow>
                           <TableRow>
-                            <TableCell className="text-[#000] dark:text-[#fff]">
+                            <TableCell className="text-important">
                               Discount
                             </TableCell>
-                            <TableCell className="text-[#000] dark:text-[#fff]">
+                            <TableCell className="text-important">
                               0%
                             </TableCell>
-                            <TableCell className="text-[#000] dark:text-[#fff]">
+                            <TableCell className="text-important">
                               0
                             </TableCell>
                           </TableRow>
                           <TableRow>
-                            <TableCell className="text-[#000] dark:text-[#fff]">
+                            <TableCell className="text-important">
                               Delivery
                             </TableCell>
                             <TableCell></TableCell>
-                            <TableCell className="text-[#000] dark:text-[#fff]">
+                            <TableCell className="text-important">
                               {Delivery || 0} EGP
                             </TableCell>
                           </TableRow>
                           <TableRow>
-                            <TableCell className="text-[#000] dark:text-[#fff]">
+                            <TableCell className="text-important">
                               VAT
                             </TableCell>
-                            <TableCell className="text-[#000] dark:text-[#fff]">
+                            <TableCell className="text-important">
                               {Tax}%
                             </TableCell>
-                            <TableCell className="text-[#000] dark:text-[#fff]">
+                            <TableCell className="text-important">
                               {/* {(grandTotal + Delivery * (Tax / 100)).toFixed(2)} */}
                               {((grandTotal + Delivery) * (Tax / 100)).toFixed(
                                 2
@@ -3672,11 +3789,11 @@ function CreateOrder({ params }) {
                           <TableRow>
                             <TableCell
                               colSpan="2"
-                              className="text-sm  font-semibold text-[#000] dark:text-[#fff]"
+                              className="text-sm  font-semibold text-important"
                             >
                               Total
                             </TableCell>
-                            <TableCell className="text-sm  font-semibold text-right text-[#000] dark:text-[#fff]">
+                            <TableCell className="text-sm  font-semibold text-right text-important">
                               {totalAmount.toFixed(2)} EGP
                             </TableCell>
                           </TableRow>
@@ -3814,15 +3931,15 @@ function CreateOrder({ params }) {
 
                               <div className="flex flex-col lg:flex-row lg:items-center gap-2">
                                 <div className="flex w-1/2 items-center">
-                                  <label className="text-[#000] dark:text-[#fff] font-medium text-[] mb-1  mr-2">
+                                  <label className="text-important font-medium text-[] mb-1  mr-2">
                                     Address:
                                   </label>
                                   {selectedOrderType?.value === 1 ? (
-                                    <p className="w-full text-[#000] dark:text-[#fff]">
+                                    <p className="w-full text-important">
                                       {selectedAddress?.address1}
                                     </p>
                                   ) : (
-                                    <p className="w-full text-[#000] dark:text-[#fff]">
+                                    <p className="w-full text-important">
                                       Pickup
                                     </p>
                                   )}
@@ -4046,7 +4163,7 @@ function CreateOrder({ params }) {
 
                               <div className="flex items-center justify-between mt-5">
                                 <div className="text-sm font-medium text-[#]">
-                                  <span className="text- text-[#000] dark:text-[#fff]">
+                                  <span className="text- text-important">
                                     Total Order : {finalTotal.toFixed(2)} EGP
                                   </span>
                                 </div>
@@ -4136,7 +4253,7 @@ function CreateOrder({ params }) {
                 >
                   <label
                     htmlFor="username"
-                    className="block text-sm font-medium text-[#000] dark:text-[#fff]"
+                    className="block text-sm font-medium text-important"
                   >
                     Username
                     {/* <span className="text-red-500">*</span> */}
@@ -4148,7 +4265,7 @@ function CreateOrder({ params }) {
                     placeholder="Username"
                     {...registerEdit("username")}
                     className={`${errorsEdit.username ? "mb-1" : "mb-4"
-                      } text-[#000] dark:text-[#fff]`}
+                      } text-important`}
                   />
                   {errorsEdit.username && (
                     <p className="text-red-500 text-sm my-1">
@@ -4159,7 +4276,7 @@ function CreateOrder({ params }) {
                   {/* Phone */}
                   <label
                     htmlFor="phone"
-                    className="block text-sm font-medium text-[#000] dark:text-[#fff]"
+                    className="block text-sm font-medium text-important"
                   >
                     Phone
                     {/* <span className="text-red-500">*</span>    */}
@@ -4170,7 +4287,7 @@ function CreateOrder({ params }) {
                     placeholder="Phone"
                     {...registerEdit("phone")}
                     className={`${errorsEdit.phone ? "mb-1" : "mb-4"
-                      } text-[#000] dark:text-[#fff]`}
+                      } text-important`}
                   />
                   {errorsEdit.phone && (
                     <p className="text-red-500 text-sm">
@@ -4181,7 +4298,7 @@ function CreateOrder({ params }) {
                   {/* Phone 2 */}
                   <label
                     htmlFor="phone2"
-                    className="block text-sm font-medium text-[#000] dark:text-[#fff]"
+                    className="block text-sm font-medium text-important"
                   >
                     Phone 2
                   </label>
@@ -4191,7 +4308,7 @@ function CreateOrder({ params }) {
                     placeholder="Phone 2"
                     {...registerEdit("phone2", { required: false })}
                     className={`${errorsEdit.phone2 ? "mb-1" : "mb-4"
-                      } text-[#000] dark:text-[#fff]`}
+                      } text-important`}
                   />
                   {errorsEdit.phone2 && (
                     <p className="text-red-500 text-sm mt-1">
@@ -4202,7 +4319,7 @@ function CreateOrder({ params }) {
                   {/* Email */}
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-[#000] dark:text-[#fff]"
+                    className="block text-sm font-medium text-important"
                   >
                     Email
                   </label>
@@ -4212,7 +4329,7 @@ function CreateOrder({ params }) {
                     placeholder="Email"
                     {...registerEdit("email", { required: false })}
                     className={`${errorsEdit.email ? "mb-1" : "mb-4"
-                      } text-[#000] dark:text-[#fff]`}
+                      } text-important`}
                   />
                   {errorsEdit.email && (
                     <p className="text-red-500 text-sm mt-1">

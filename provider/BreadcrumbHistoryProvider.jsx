@@ -147,7 +147,7 @@ const BreadcrumbContext = createContext();
 
 export const BreadcrumbHistoryProvider = ({ children }) => {
   const { apiBaseUrl } = useSubdomin();
-  const token = localStorage.getItem("token") 
+  const token = localStorage.getItem("token")
   const { data: Menus, isLoading } = useSections(
     token && apiBaseUrl ? token : null,
     apiBaseUrl,
@@ -266,7 +266,7 @@ const getSmartLabel = (pathname, Menus, Sections, Items) => {
   ) {
     const id = Number(cleanedParts[2]);
     const found = Menus.find((m) => m.id === id);
-    return found?.name_en || `Menu ${id}`;
+    return found?.name_en || `Menu ${id} ` || "Menu";
   }
   if (
     cleanedParts.length >= 3 &&
@@ -276,7 +276,7 @@ const getSmartLabel = (pathname, Menus, Sections, Items) => {
   ) {
     const id = Number(cleanedParts[2]);
     const found = Items.find((m) => m.id === id);
-    return found?.name_en || `Item ${id}`;
+    return found?.name_en || `Item ${id}` || "item";
   }
   if (last === "view") {
     const id = prev;

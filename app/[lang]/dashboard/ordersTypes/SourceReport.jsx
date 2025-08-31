@@ -230,9 +230,9 @@ const UserDeviceReport = ({
     !orders ||
     !orders.sources ||
     series.reduce((a, b) => a + b, 0) === 0;
-  if (isLoadingorders) {
+if (isLoadingorders) {
     return (
-      <div className="flex justify-center items-center h-[180px] animate-pulse text-[#fff] text-lg">
+      <div className="flex justify-center items-center h-[250px] animate-pulse text-[#fff] text-lg">
         Loading...
       </div>
     );
@@ -240,15 +240,14 @@ const UserDeviceReport = ({
 
   if (errororders) {
     return (
-      <div className="flex justify-center items-center h-[180px] text-red-500 text-lg">
+      <div className="flex justify-center items-center h-[250px] text-red-500 text-lg">
         Error loading chart
       </div>
     );
   }
-
   if (hasNoResult) {
     return (
-      <div className="flex justify-center items-center h-[180px] text-[#000] dark:text-[#fff] text-lg">
+      <div className="flex justify-center items-center h-[180px] text-important text-lg">
         No results.
       </div>
     );

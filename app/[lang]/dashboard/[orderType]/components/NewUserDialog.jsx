@@ -100,7 +100,7 @@ function NewUserDialog({
     } catch (error) {
       const errorMessage = error.message || "Unexpected error";
       console.error(error);
-      // toast.error(errorMessage);
+      toast.error("User added faild");
     } finally {
       setLodaingCreateUserData(false);
     }
@@ -131,7 +131,7 @@ function NewUserDialog({
                   type="text"
                   placeholder="Username"
                   {...registerAddNewUser("username")}
-                  className="w-full text-[#000] dark:text-[#fff]"
+                  className="w-full text-important"
                 />
                 {errorsAddNewUser.username && (
                   <p className="text-red-500 text-sm h-[20px] mt-2">
@@ -174,7 +174,7 @@ function NewUserDialog({
                   type="number"
                   placeholder="Phone"
                   {...registerAddNewUser("phone")}
-                  className="w-full  text-[#000] dark:text-[#fff]"
+                  className="w-full  text-important"
                 />
                 {errorsAddNewUser.phone && (
                   <p className="text-red-500 text-sm h-[20px] mt-2">
@@ -187,7 +187,7 @@ function NewUserDialog({
                   type="number"
                   placeholder="Phone 2"
                   {...registerAddNewUser("phone2")}
-                  className="w-full text-[#000] dark:text-[#fff]"
+                  className="w-full text-important"
                 />
                 {/* {errorsAddNewUser.phone2 && (
                   <p className="text-red-500 text-sm h-[20px] mt-2">
@@ -204,7 +204,7 @@ function NewUserDialog({
                   type="text"
                   placeholder="Street"
                   {...registerAddNewUser("street")}
-                  className="w-full text-[#000] dark:text-[#fff]"
+                  className="w-full text-important"
                 />
                 <p
                   className={`text-red-500 text-sm mt-1 transition-all duration-200 ${errorsAddNewUser.street
@@ -222,7 +222,7 @@ function NewUserDialog({
                   type="text"
                   placeholder="Building"
                   {...registerAddNewUser("building")}
-                  className="w-full text-[#000] dark:text-[#fff]"
+                  className="w-full text-important"
                 />
                 {errorsAddNewUser.street && <div className="h-[20px]"></div>}
               </div>
@@ -233,21 +233,21 @@ function NewUserDialog({
                 type="text"
                 placeholder="Floor"
                 {...registerAddNewUser("floor")}
-                className=" text-[#000] dark:text-[#fff]"
+                className=" text-important"
               />
 
               <Input
                 type="text"
                 placeholder="Apt"
                 {...registerAddNewUser("apt")}
-                className="mb-1 text-[#000] dark:text-[#fff]"
+                className="mb-1 text-important"
               />
             </div>
             <Input
               type="text"
               placeholder="Land mark"
               {...registerAddNewUser("additionalInfo")}
-              className="mb-4 text-[#000] dark:text-[#fff]"
+              className="mb-4 text-important"
             />
 
             <div className="space-y-1">
@@ -273,7 +273,7 @@ function NewUserDialog({
                   type="text"
                   placeholder="Enter address name"
                   {...registerAddNewUser("name")}
-                  className="text-[#000] dark:text-[#fff]"
+                  className="text-important"
                 />
               )}
             </div>

@@ -218,10 +218,10 @@ function DialogItemForMenu({
                                        }));
                                      }}
                                    />
-                                   <span className="text-[#000] dark:text-[#fff]">
+                                   <span className="text-important">
                                      {extra.name}
                                    </span>
-                                   <span className="text-[#000] dark:text-[#fff]">
+                                   <span className="text-important">
                                      {Number(extra.price) > 0 &&
                                        `(${Number(extra.price).toFixed(
                                          2
@@ -368,10 +368,10 @@ function DialogItemForMenu({
                                        checked={!!selected}
                                        readOnly
                                      />
-                                     <span className="text-[#000] dark:text-[#fff]">
+                                     <span className="text-important">
                                        {extra.name}
                                      </span>
-                                     <span className="text-[#000] dark:text-[#fff]">
+                                     <span className="text-important">
                                        {Number(extra.price) > 0 &&
                                          `(${Number(extra.price).toFixed(
                                            2
@@ -572,10 +572,10 @@ function DialogItemForMenu({
                                        });
                                      }}
                                    />
-                                   <span className="text-[#000] dark:text-[#fff]">
+                                   <span className="text-important">
                                      {extra.name}
                                    </span>
-                                   <span className="text-[#000] dark:text-[#fff]">
+                                   <span className="text-important">
                                      {Number(extra.price) > 0 &&
                                        `(${Number(extra.price).toFixed(
                                          2
@@ -595,7 +595,7 @@ function DialogItemForMenu({
                            onChange={(e) => setNote(e.target.value)}
                            type="text"
                            placeholder="Note"
-                           className="w-full text-[#000] dark:text-[#fff]"
+                           className="w-full text-important"
                          />
                        </div>
                        <div className="sticky bottom-[-23px] bg-white dark:bg-black p-4 border-t border-gray-300 dark:border-gray-700 shadow-md z-50 mt-4">

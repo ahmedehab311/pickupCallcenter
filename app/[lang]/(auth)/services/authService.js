@@ -26,11 +26,11 @@ export const loginUser = async (credentials,apiBaseUrl,subdomain) => {
       // });  
       
  
-      localStorage.setItem("user", JSON.stringify(response.data.data.user));
+      localStorage.setItem("user", JSON.stringify(response?.data?.data?.user));
       
       return {
-        user: response.data.data.user,
-        token: response.data.data.token,
+        user: response?.data?.data?.user,
+        token: response?.data.data.token,
         messages: messages || [],
       };
     }else {

@@ -9,7 +9,7 @@ export const fetchRestaurantsList = async (token, apiBaseUrl) => {
     const response = await axios.get(
       `${apiBaseUrl}/callcenter/get/restaurants?api_token=${token}`
     );
-    // console.log("API Response:", response);
+    console.log("API Response:", response);
     // console.log("API response?.data?.data?.restaurants:", response?.data?.data?.restaurants);
     return response?.data?.data?.restaurants;
   } catch (error) {
@@ -26,7 +26,7 @@ export const fetchBranches = async (restaurantId, area, token, apiBaseUrl) => {
       }`
     );
 
-    // console.log("API Response branches:", response);
+    console.log("API Response branches:", response);
     // console.log("API Response.data branches:", response.data.data);
     // // console.log("API Response branches:", response.data.messages.branches);
     // console.log("API Response branches restaurantId:", restaurantId);
@@ -38,32 +38,46 @@ export const fetchBranches = async (restaurantId, area, token, apiBaseUrl) => {
   }
 };
 
-export const fetchMenu = async (restaurantId, priceList, token, apiBaseUrl) => {
-  try {
-    const response = await axios.get(
-      `${apiBaseUrl}/callcenter/get/restaurant/menus?api_token=${token}&restaurantId=${restaurantId}&priceList=${priceList}`,
-      {
-        params: {
-          api_token: token,
-          restaurantId,
-          priceList,
-          fields: "id,name,price,category",
-        },
-      }
-    );
-    // console.log("priceList fetchMenu", priceList);
-    return response.data.data.menus[0];
-  } catch (error) {
-    console.error("Error fetching menu:", error);
-    throw error;
-  }
-};
+  export const fetchMenu = async (restaurantId, priceList, token, apiBaseUrl) => {
+    try {
+      const response = await axios.get(
+        `${apiBaseUrl}/callcenter/get/restaurant/menus?api_token=${token}&restaurantId=${restaurantId}&priceList=${priceList}`,
+        {
+          params: {
+            api_token: token,
+            restaurantId,
+            priceList,
+            fields: "id,name,price,category",
+          },
+        }
+      );
+      console.log("API Response manu ---===---==--:", response);
+      
+      const message = response?.data?.message;
+      
+      console.log("message:", message);
+    if (
+      typeof message === "string" &&
+      message.toLowerCase().includes("invalid token")
+    ) {
+      // نرمي error عشان نوصله في onError
+      throw new Error("Invalid token");
+    }
+      
+      // console.log("priceList fetchMenu", priceList);
+      return response.data.data.menus[0];
+    } catch (error) {
+      console.error("Error fetching menu:", error);
+      throw error;
+    }
+  };
 
 export const fetchViewItem = async (BranchId, itemId, token, apiBaseUrl) => {
   try {
     const response = await axios.get(
       `${apiBaseUrl}/callcenter/get/menu/item?api_token=${token}&branch_id=${BranchId}&item_id=${itemId}`
     );
+    
     console.log("fetch View Item:", response);
     console.log("BranchId:", BranchId);
     console.log("itemId:", itemId);

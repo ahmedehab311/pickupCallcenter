@@ -30,12 +30,16 @@ import CardGridRenderer from "../../components/CardGridRenderer";
 import TableRenderer from "../../components/TableRenderer";
 import { useToken } from "@/provider/TokenContext";
 import { fetchAllSections, useSections } from "../sections/apisSection";
+import StatusHandler from "@/lib/StatusHandler";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 // import { TokenProvider } from "@/context/TokenContext";
 const Menu = ({ params: { lang } }) => {
   const router = useRouter();
   // const { token } = useToken();
   const token = localStorage.getItem("token");
   const { apiBaseUrl, subdomain } = useSubdomin();
+  const isOnline = useOnlineStatus();
+  const [wasOffline, setWasOffline] = useState(false);
   const [filteredMenus, setFilteredMenus] = useState();
   const [pageSize, setPageSize] = useState("10");
   const [viewMode, setViewMode] = useState("card");
@@ -130,7 +134,15 @@ const Menu = ({ params: { lang } }) => {
 
     setFilteredMenus(updatedSections);
   };
-
+  useEffect(() => {
+    if (!isOnline) {
+      setWasOffline(true);
+    } else if (isOnline && wasOffline) {
+      toast.success("Online now!");
+      refetchMenu();
+      setWasOffline(false);
+    }
+  }, [isOnline, wasOffline]);
   useEffect(() => {
     applyFiltersAndSort();
   }, [searchTerm, sortOption, filterOption, pageSize, Menus]);
@@ -319,7 +331,15 @@ const Menu = ({ params: { lang } }) => {
     Table
   </button>
 </div> */}
-
+        {/* <StatusHandler
+          isOnline={isOnline}
+          isLoading={isLoading}
+          error={error}
+          isEmpty={filteredMenus?.length === 0}
+          emptyMessage="No menus found"
+          loadingMessage="Loading menus..."
+          errorMessage="Error loading menus"
+        ></StatusHandler> */}
       </div>
       <CardGridRenderer
         labelLoading="menus"
@@ -336,7 +356,6 @@ const Menu = ({ params: { lang } }) => {
         handleEnter={handleEnter}
         handleViewEdit={handleViewEdit}
         handleDelete={handleDelete}
-
         handlechangeStatus={handlechangeStatus}
         isSettingLoading={isSettingLoading}
         subdomain={subdomain}
@@ -344,6 +363,7 @@ const Menu = ({ params: { lang } }) => {
         setDraggedIndex={setDraggedIndex}
         filteredSections={filteredMenus}
         setFilteredSections={setFilteredMenus}
+        refetch={refetch}
       />
       {/* {viewMode === "card" ? (
   <CardGridRenderer
