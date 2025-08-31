@@ -306,6 +306,7 @@ export default function ItemsList({
           setFilteredSections={setFilteredItem}
           isInternalLoading={isInternalLoading}
           setIsInternalLoading={setIsInternalLoading}
+          refetch={refetch}
         />
 
         <PaginationAllItems

@@ -275,6 +275,7 @@ function SectionList({
         filteredSections={filteredSections}
         setFilteredSections={setFilteredSections}
         navigate={navigate}
+        refetch ={refetch}
       />
 
       <PaginationAllItems
