@@ -51,7 +51,7 @@ function PaginationAllItems({
   return (
     <div>
       {pageCount > 1 && currentItems && !isLoading && (
-        <Pagination>
+        <Pagination>  
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious

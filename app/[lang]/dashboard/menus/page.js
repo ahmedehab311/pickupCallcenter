@@ -139,7 +139,7 @@ const Menu = ({ params: { lang } }) => {
       setWasOffline(true);
     } else if (isOnline && wasOffline) {
       toast.success("Online now!");
-      refetchMenu();
+      refetch();
       setWasOffline(false);
     }
   }, [isOnline, wasOffline]);

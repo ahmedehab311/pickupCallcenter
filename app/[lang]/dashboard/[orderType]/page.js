@@ -2118,55 +2118,22 @@ function CreateOrder({ params }) {
             </div>
 
             {/*  التابات */}
-            {/* <div className="flex gap-4 flex-wrap border-b pb-2 mt-3">
-              {filteredSections.map((section) => (
-                <button
-                  key={section.id}
-                  className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300
-        ${activeSection === section.id
-                      ? "bg-black text-white"
-                      : "bg-gray-200 text-gray-600"
-                    }
-      `}
-                  onClick={() => setActiveSection(section.id)}
-                >
-                  {language === "en" ? section.name_en : section.name_ar}
-                </button>
-              ))}
-            </div>
-            <InfiniteScroll
-              dataLength={visibleItems}
-              next={fetchMoreData}
-              hasMore={visibleItems < displayedItems.length}
-              loader={<h4 className="text-center p-4">Loading...</h4>}
-            >
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                {displayedItems.slice(0, visibleItems).map((item) => (
-                  <CardItem
-                    key={item.id}
-                    item={item}
-                    language={language}
-                    handleItemClick={handleItemClick}
-                    placeholderImg={placeholderImg}
-                  />
-                ))}
-              </div>
-            </InfiniteScroll> */}
             <div>
               {/* Sections */}
-              <div className={`flex gap-4 flex-wrap ${isOnline ? "border-b" : ""} pb-2 mt-3`} >
-                {/* {!isOnline ? (
-                  <div className="w-full text-red-500 text-lg flex justify-center">🚨 Internet disconnected</div>
-                ) : isLoadingMenu ? (
-                  <div className="w-full animate-pulse text-important text-lg flex justify-center">Loading sections...</div>
-                ) : errorMenu ? (
-                  <div className="w-full text-red-500  text-lg flex justify-center">Error loading sections</div>
-                ) : filteredSections.length === 0 ? (
-                  <div className="w-full text-important text-lg flex justify-center">No sections found
-                  </div>
+              <div className={`flex gap-4 flex-wrap
+               ${isOnline && !isLoadingMenu && !errorMenu && filteredSections.length === 0 ? "border-b" : ""}
+               ${!isLoadingMenu && !errorMenu && filteredSections.length === 0 ? "" : "mt-3"}`} >
 
-                ) : (
-                  filteredSections.map((section) => (
+                <StatusHandler
+                  isOnline={isOnline}
+                  isLoading={isLoadingMenu}
+                  error={errorMenu}
+                  isEmpty={filteredSections.length === 0}
+                  emptyMessage="No menu found"
+                  loadingMessage="Loading menu ..."
+                  errorMessage="Error loading menu "
+                >
+                  {filteredSections.map((section) => (
                     <button
                       key={section.id}
                       className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300
@@ -2178,30 +2145,8 @@ function CreateOrder({ params }) {
                     >
                       {language === "en" ? section.name_en : section.name_ar}
                     </button>
-                  ))
-                )} */}
-                <StatusHandler
-                  isOnline={isOnline}
-                  isLoading={isLoadingMenu}
-                  error={errorMenu}
-                  isEmpty={filteredSections.length === 0}
-                  emptyMessage="No sections found"
-                  loadingMessage="Loading sections..."
-                  errorMessage="Error loading sections"
-                >
-                  {filteredSections.map((section) => (
-                    <button
-                      key={section.id}
-                      className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300
-        ${activeSection === section.id
-                          ? "bg-black text-white"
-                          : "bg-gray-200 text-gray-600"
-                        }`}
-                      onClick={() => setActiveSection(section.id)}
-                    >
-                      {language === "en" ? section.name_en : section.name_ar}
-                    </button>
-                  ))}
+                  )
+                  )}
                 </StatusHandler>
 
               </div>
@@ -2209,36 +2154,26 @@ function CreateOrder({ params }) {
 
             {/* Items */}
             {isOnline && (
-              isLoadingMenu ? (
-                <div className="w-full animate-pulse text-important text-lg flex justify-center my-2">Loading items...</div>
-              ) : errorMenu ? (
-                <div className="w-full text-red-500 text-lg flex justify-center my-2">Error loading items</div>
-              )
-                : items.length === 0 ? (
-                  <div className="w-full text-important text-lg flex justify-center my-2">
-                    No items found </div>
-                ) : (
-                  <InfiniteScroll
-                    dataLength={visibleItems}
-                    next={fetchMoreData}
-                    hasMore={visibleItems < displayedItems.length}
-                    loader={<h4 className="text-center p-4">Loading...</h4>}
-                  >
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                      {displayedItems.slice(0, visibleItems).map((item) => (
-                        <CardItem
-                          key={item.id}
-                          item={item}
-                          language={language}
-                          handleItemClick={handleItemClick}
-                          placeholderImg={placeholderImg}
-                          items={items}
-                          errorMenu={errorMenu}
-                        />
-                      ))}
-                    </div>
-                  </InfiniteScroll>
-                )
+              <InfiniteScroll
+                dataLength={visibleItems}
+                next={fetchMoreData}
+                hasMore={visibleItems < displayedItems.length}
+                loader={<h4 className="text-center p-4">Loading...</h4>}
+              >
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                  {displayedItems.slice(0, visibleItems).map((item) => (
+                    <CardItem
+                      key={item.id}
+                      item={item}
+                      language={language}
+                      handleItemClick={handleItemClick}
+                      placeholderImg={placeholderImg}
+                      items={items}
+                      errorMenu={errorMenu}
+                    />
+                  ))}
+                </div>
+              </InfiniteScroll>
             )}
             {/* <DialogItemForMenu
                     isItemDialogOpen={isItemDialogOpen}
