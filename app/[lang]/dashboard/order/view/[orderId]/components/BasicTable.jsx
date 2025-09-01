@@ -12,13 +12,13 @@ import React from "react";
 const BasicTable = ({ OrderDetails, OrderDetailsItem }) => {
   const handleEditOrder = () => {
     localStorage.setItem("order", JSON.stringify(Order));
-    router.push(`/${language}/dashboard/edit-order`); 
+    router.push(`/${language}/dashboard/edit-order`);
   };
   if (!OrderDetailsItem) return null;
 
   return (
     <>
-      <div className="max-h-[px] overflow-auto  border rounded-md">
+      <div className="max-h-[px] overflow-auto pt-3  border rounded-md">
         <div className="flex justify-between  m-[10px]">
           <div className="flex justify-between items-center w-1/2">
             <div className="flex items-center gap-2">
@@ -33,12 +33,12 @@ const BasicTable = ({ OrderDetails, OrderDetailsItem }) => {
 
               <p>Status: {OrderDetails?.status}</p>
             </div>
-
             <div className="">
               <Button className="py-[6px]" onClick={handleEditOrder}>
                 Edit
               </Button>
             </div>
+
 
           </div>
         </div>
