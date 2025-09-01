@@ -12,8 +12,7 @@ import React from "react";
 const BasicTable = ({ OrderDetails, OrderDetailsItem }) => {
   const handleEditOrder = () => {
     localStorage.setItem("order", JSON.stringify(Order));
-    // هنا سنوجه المستخدم إلى صفحة التعديل (edit-order) بدلاً من create-order
-    router.push(`/${language}/dashboard/edit-order`); // لاحظ التغيير هنا
+    router.push(`/${language}/dashboard/edit-order`); 
   };
   if (!OrderDetailsItem) return null;
 
