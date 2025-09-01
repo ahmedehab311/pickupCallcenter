@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -9,50 +10,20 @@ import {
 } from "@/components/ui/table";
 import React from "react";
 const BasicTable = ({ OrderDetails, OrderDetailsItem }) => {
+  const handleEditOrder = () => {
+    localStorage.setItem("order", JSON.stringify(Order));
+    // هنا سنوجه المستخدم إلى صفحة التعديل (edit-order) بدلاً من create-order
+    router.push(`/${language}/dashboard/edit-order`); // لاحظ التغيير هنا
+  };
   if (!OrderDetailsItem) return null;
-  // console.log("OrderDetailsItem", OrderDetailsItem);
-  // console.log("OrderDetails", OrderDetails);
 
   return (
     <>
-      {/* <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Item</TableHead>
-            <TableHead>Count</TableHead>
-            <TableHead>Notes</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Total</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {OrderDetailsItem.map((item, index) => (
-            <TableRow key={item.id || index}>
-              <TableCell className="text-important">
-                {item?.info?.size_en || item?.name?.item_name}
-              </TableCell>
-              <TableCell className="text-important">
-                {item?.count}
-              </TableCell>
-              <TableCell className="text-important">
-                {item?.special || "—"}
-              </TableCell>
-             
-              <TableCell className="text-important">
-                {parseFloat(item?.sub_total || 0).toFixed(2)}
-              </TableCell>
-              <TableCell className="text-important">
-                {parseFloat(item?.total_price || 0).toFixed(2)}
-              </TableCell>
-            </TableRow>
-            
-          ))}
-        </TableBody>
-      </Table> */}
       <div className="max-h-[px] overflow-auto  border rounded-md">
         <div className="flex justify-between  m-[10px]">
           <div className="flex justify-between items-center w-1/2">
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+
               {
                 OrderDetails?.check_id && (
 
@@ -60,8 +31,16 @@ const BasicTable = ({ OrderDetails, OrderDetailsItem }) => {
                 )
               }
               <p>Source: {OrderDetails?.source}</p>
+
+              <p>Status: {OrderDetails?.status}</p>
             </div>
-            <p>Status: {OrderDetails?.status}</p>
+
+            <div className="">
+              <Button className="py-[6px]" onClick={handleEditOrder}>
+                Edit
+              </Button>
+            </div>
+
           </div>
         </div>
         <Table>

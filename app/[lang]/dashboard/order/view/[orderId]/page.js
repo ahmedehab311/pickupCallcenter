@@ -159,11 +159,7 @@ export default function OrderViewPage({ params }) {
   // const handlePrint = () => {
   //   window.print();
   // };
-  const handleEditOrder = () => {
-    localStorage.setItem("order", JSON.stringify(Order));
-    // هنا سنوجه المستخدم إلى صفحة التعديل (edit-order) بدلاً من create-order
-    router.push(`/${language}/dashboard/edit-order`); // لاحظ التغيير هنا
-  };
+
   
   // console.log("selectedStatus",selectedStatus);
   
@@ -314,16 +310,7 @@ export default function OrderViewPage({ params }) {
         </div>
       </div>
 
-      <div className="flex justify-center items-center">
-        <div className="flex gap-2">
-          <Button className="py-[6px]" onClick={handleEditOrder}>
-            Edit
-          </Button>
-          {/* <Button className="py-[6px]" onClick={() => handlePrint()}>
-            Print
-          </Button> */}
-        </div>
-      </div>
+   
     </Card>
 
     {/* الكرت الثاني */}

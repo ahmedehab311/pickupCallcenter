@@ -131,8 +131,6 @@ const createOrderSchema = z.object({
 
 function CreateOrder({ params }) {
   const { orderType } = params;
-
-
   const {
     register: registerEdit,
     handleSubmit: handleSubmitEdit,
@@ -164,7 +162,6 @@ function CreateOrder({ params }) {
   //   console.log("subdomain from create order", subdomain);
   // }
   const router = useRouter();
-
   const searchParams = useSearchParams();
   const { theme, color, setColor } = useThemeColor();
   const { handleInvalidToken } = useSession();
@@ -177,15 +174,10 @@ function CreateOrder({ params }) {
   const [selectedBranchId, setSelectedBranchId] = useState(null);
   const [selectedBranchIdCreateOrder, setSelectedBranchIdCreateOrder] =
     useState(null);
-  // console.log("selectedBranchId",selectedBranchId);
-
   const [SelectedBranchPriceist, setSelectedBranchPriceList] = useState(1);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [token, setToken] = useState(null);
-  // console.log("selectedRestaurantId",selectedRestaurantId);
-  // console.log("area :", selectedAddress?.area);
 
-  // apis
   // api restaurants select
   const {
     data: dataRestaurants,
@@ -197,6 +189,7 @@ function CreateOrder({ params }) {
     queryFn: () => fetchRestaurantsList(token, apiBaseUrl),
     enabled: !!token,
   });
+
   const {
     data: branches,
     isLoadingBranchs,
@@ -338,7 +331,6 @@ function CreateOrder({ params }) {
   const [openEditAddressDialog, setOpenEditAddressDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [restaurantsSelect, setRestaurantsSelect] = useState([]);
-
   const [isNewUserDialogOpen, setIsNewUserDialogOpen] = useState(false);
   const [isNewAddressDialogOpen, setIsNewAddressDialogOpen] = useState(false);
   const [createOrderDialogOpen, setCreateOrderDialogOpen] = useState(false);
@@ -352,6 +344,36 @@ function CreateOrder({ params }) {
   const [massegeInvaildToken, setMassegeInvaildToken] = useState(null);
   const [isBranchManuallySelected, setIsBranchManuallySelected] =
     useState(false);
+  const [editingItemIndex, setEditingItemIndex] = useState(null);
+  const [showUserWarningDialog, setShowUserWarningDialog] = useState(false);
+  const [showBranchWarningDialog, setShowBranchWarningDialog] = useState(false);
+  const [sessionExpiredDialog, setSessionExpiredDialog] = useState(false);
+  const [totalOptionPrices, setTotalOptionPrices] = useState(0);
+  const [totalExtrasPrices, setTotalExtrasPrices] = useState(0);
+  const [totalMainExtrasPrices, setTotalMainExtrasPrices] = useState(0);
+  const [height, setHeight] = useState("0px");
+  const [initialized, setInitialized] = useState(false);
+  const [search, setSearch] = useState("");
+  const [allUserData, setAllUserData] = useState(null);
+  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [selectedAddressArray, setSelectedAddressArray] = useState([]);
+  const [selectedBranchName, setSelectedBranchName] = useState("");
+  const [selectedBranchInSelected, setSelectedBranchInSelected] =
+    useState(null);
+  const [branchId, setBranchId] = useState(null);
+  const [selectedBranchNew, setSelectedBranchNew] = useState(null);
+  const [deliveryMethod, setDeliveryMethod] = useState("delivery");
+  const [branchOptions, setBranchOptions] = useState([]);
+  const [savedBranch, setSavedBranch] = useState(null);
+  const [orderNote, setOrderNote] = useState("");
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [deliveryTypeFromOrder, setDeliveryTypeFromOrder] = useState(null);
+  const [deliveryMethodHasBeenSet, setDeliveryMethodHasBeenSet] =
+    useState(false);
+  const [addressWasManuallySelected, setAddressWasManuallySelected] =
+    useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const contentRef = useRef(null);
 
   useEffect(() => {
     const tokenStorage =
@@ -366,14 +388,6 @@ function CreateOrder({ params }) {
       router.push(`/${language}/login`);
     }
   }, []);
-  const [editingItemIndex, setEditingItemIndex] = useState(null);
-  const [showUserWarningDialog, setShowUserWarningDialog] = useState(false);
-  const [showBranchWarningDialog, setShowBranchWarningDialog] = useState(false);
-  const [sessionExpiredDialog, setSessionExpiredDialog] = useState(false);
-
-  const [totalOptionPrices, setTotalOptionPrices] = useState(0);
-  const [totalExtrasPrices, setTotalExtrasPrices] = useState(0);
-  const [totalMainExtrasPrices, setTotalMainExtrasPrices] = useState(0);
 
   useEffect(() => {
     const extrasTotal =
@@ -390,6 +404,94 @@ function CreateOrder({ params }) {
     setTotalExtrasPrices(extrasTotal);
     setTotalMainExtrasPrices(mainExtrasTotal);
   }, [selectedItem]);
+
+  useEffect(() => {
+    if (contentRef.current && selectedItem?.extrasData?.length > 0) {
+      if (isOpen) {
+        const scrollHeight = contentRef.current.scrollHeight;
+        setHeight(`${scrollHeight}px`);
+
+        const timeout = setTimeout(() => {
+          setHeight("auto");
+        }, 300);
+        return () => clearTimeout(timeout);
+      } else {
+        setHeight(`${contentRef.current.scrollHeight}px`);
+        requestAnimationFrame(() => {
+          setHeight("0px");
+        });
+      }
+    }
+  }, [isOpen, selectedItem?.extrasData]);
+
+  useEffect(() => {
+    setCollapsed(true);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedItem || initialized) return;
+
+    setIsOpen(true); // extras
+    setIsOpenMainExtra(true); // mainExtras
+    setIsOpenMainOption(true); // optionSize
+
+    setInitialized(true);
+  }, [selectedItem, initialized]);
+
+  useEffect(() => {
+    if (errorMenu?.message === "Invalid token") {
+      handleInvalidToken();
+    }
+  }, [errorMenu, handleInvalidToken]);
+  useEffect(() => {
+    if (!isOnline) {
+      setWasOffline(true);
+    } else if (isOnline && wasOffline) {
+      toast.success("Online now!");
+      refetchMenu();
+      setWasOffline(false);
+    }
+  }, [isOnline, wasOffline]);
+  const [extrasError, setExtrasError] = useState("");
+  const selectedExtras = selectedItem?.selectedExtras;
+  const groupMainExtraMax = selectedItem?.groupExtrasMainRule?.max;
+  const groupMax = selectedItem?.groupExtrasRules?.max;
+  // const groupMax = selectedItem?.groupExtrasRules?.max;
+  const groupMin = selectedItem?.groupExtrasRules?.min;
+  const extrasCount = selectedItem?.extrasData?.length || 0;
+  const extrasmainExtrasCount = selectedItem?.mainExtras?.length || 0;
+  const selectedCount = selectedExtras?.length;
+  // console.log("groupMainExtraMax",groupMainExtraMax);
+
+  useEffect(() => {
+    if (!selectedItem) return;
+
+    const totalSelected = selectedItem?.selectedExtras?.reduce(
+      (sum, ex) => sum + (ex.quantity || 0),
+      0
+    );
+    const totalMainSelected = selectedItem?.selectedMainExtras?.length;
+
+    if (
+      (groupMax > 0 && totalSelected === groupMax) ||
+      (groupMax === 0 && totalSelected === extrasCount)
+    ) {
+      setIsOpen(false);
+    }
+    if (
+      (groupMainExtraMax > 0 && totalMainSelected === groupMainExtraMax) ||
+      (groupMainExtraMax === 0 && totalMainSelected === extrasmainExtrasCount)
+    ) {
+      setIsOpenMainExtra(false);
+    }
+  }, [
+    selectedItem?.selectedExtras,
+    selectedItem?.selectedIdSize,
+    selectedItem?.selectedMainExtras,
+  ]);
+  // console.log("selectedItem?.selectedIdSize", selectedItem?.selectedIdSize);
+
+  // console.log("selectedItem?.selectedExtras", selectedItem?.selectedExtras);
 
   const handleItemClick = async (item) => {
     if (!selectedUser) {
@@ -505,27 +607,6 @@ function CreateOrder({ params }) {
     }
   };
 
-  const contentRef = useRef(null);
-  const [height, setHeight] = useState("0px");
-
-  useEffect(() => {
-    if (contentRef.current && selectedItem?.extrasData?.length > 0) {
-      if (isOpen) {
-        const scrollHeight = contentRef.current.scrollHeight;
-        setHeight(`${scrollHeight}px`);
-
-        const timeout = setTimeout(() => {
-          setHeight("auto");
-        }, 300);
-        return () => clearTimeout(timeout);
-      } else {
-        setHeight(`${contentRef.current.scrollHeight}px`);
-        requestAnimationFrame(() => {
-          setHeight("0px");
-        });
-      }
-    }
-  }, [isOpen, selectedItem?.extrasData]);
 
   const handleEditItem = async (item) => {
     setNote(item.note || "");
@@ -716,77 +797,6 @@ function CreateOrder({ params }) {
       console.error("Error fetching item details:", error);
     }
   };
-
-  const [initialized, setInitialized] = useState(false);
-  useEffect(() => {
-    setCollapsed(true);
-  }, []);
-
-  useEffect(() => {
-    if (!selectedItem || initialized) return;
-
-    setIsOpen(true); // extras
-    setIsOpenMainExtra(true); // mainExtras
-    setIsOpenMainOption(true); // optionSize
-
-    setInitialized(true);
-  }, [selectedItem, initialized]);
-
-  useEffect(() => {
-    if (errorMenu?.message === "Invalid token") {
-      handleInvalidToken();
-    }
-  }, [errorMenu, handleInvalidToken]);
-  useEffect(() => {
-    if (!isOnline) {
-      setWasOffline(true);
-    } else if (isOnline && wasOffline) {
-      toast.success("Online now!");
-      refetchMenu();
-      setWasOffline(false);
-    }
-  }, [isOnline, wasOffline]);
-  const [extrasError, setExtrasError] = useState("");
-  const selectedExtras = selectedItem?.selectedExtras;
-  const groupMainExtraMax = selectedItem?.groupExtrasMainRule?.max;
-  const groupMax = selectedItem?.groupExtrasRules?.max;
-  // const groupMax = selectedItem?.groupExtrasRules?.max;
-  const groupMin = selectedItem?.groupExtrasRules?.min;
-  const extrasCount = selectedItem?.extrasData?.length || 0;
-  const extrasmainExtrasCount = selectedItem?.mainExtras?.length || 0;
-  const selectedCount = selectedExtras?.length;
-  // console.log("groupMainExtraMax",groupMainExtraMax);
-
-  useEffect(() => {
-    if (!selectedItem) return;
-
-    const totalSelected = selectedItem?.selectedExtras?.reduce(
-      (sum, ex) => sum + (ex.quantity || 0),
-      0
-    );
-    const totalMainSelected = selectedItem?.selectedMainExtras?.length;
-
-    if (
-      (groupMax > 0 && totalSelected === groupMax) ||
-      (groupMax === 0 && totalSelected === extrasCount)
-    ) {
-      setIsOpen(false);
-    }
-    if (
-      (groupMainExtraMax > 0 && totalMainSelected === groupMainExtraMax) ||
-      (groupMainExtraMax === 0 && totalMainSelected === extrasmainExtrasCount)
-    ) {
-      setIsOpenMainExtra(false);
-    }
-  }, [
-    selectedItem?.selectedExtras,
-    selectedItem?.selectedIdSize,
-    selectedItem?.selectedMainExtras,
-  ]);
-  // console.log("selectedItem?.selectedIdSize", selectedItem?.selectedIdSize);
-
-  // console.log("selectedItem?.selectedExtras", selectedItem?.selectedExtras);
-
   const toggleOption = () => {
     setIsOpenMainOption(!isOpenMainOption);
   };
@@ -803,7 +813,6 @@ function CreateOrder({ params }) {
     setOpenDialog(true);
   };
 
-  const [searchQuery, setSearchQuery] = useState("");
   const handleClearSearch = () => setSearchQuery("");
 
   const displayedItems = useMemo(() => {
@@ -838,34 +847,6 @@ function CreateOrder({ params }) {
     );
   }, [searchQuery, displayedItems]);
 
-  const [search, setSearch] = useState("");
-  const [allUserData, setAllUserData] = useState(null);
-  const [selectedBranch, setSelectedBranch] = useState(null);
-
-  const [selectedAddressArray, setSelectedAddressArray] = useState([]);
-  // console.log("selectedAddressArray", selectedAddressArray);
-  const [selectedBranchName, setSelectedBranchName] = useState("");
-  const [selectedBranchInSelected, setSelectedBranchInSelected] =
-    useState(null);
-  // console.log("selectedBranchInSelected", selectedBranchInSelected);
-
-  const [branchId, setBranchId] = useState(null);
-  const [selectedBranchNew, setSelectedBranchNew] = useState(null);
-  const [deliveryMethod, setDeliveryMethod] = useState("delivery");
-
-  const [branchOptions, setBranchOptions] = useState([]);
-  const [savedBranch, setSavedBranch] = useState(null);
-  // console.log("savedBranch", savedBranch);
-  // console.log("selectedBranchInSelected", selectedBranchInSelected);
-
-  const [orderNote, setOrderNote] = useState("");
-
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [deliveryTypeFromOrder, setDeliveryTypeFromOrder] = useState(null);
-  const [deliveryMethodHasBeenSet, setDeliveryMethodHasBeenSet] =
-    useState(false);
-  const [addressWasManuallySelected, setAddressWasManuallySelected] =
-    useState(false);
 
   useEffect(() => {
     const orderData = localStorage.getItem("order");

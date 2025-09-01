@@ -259,7 +259,7 @@ export default function ItemsList({
   return (
     <>
       {subSections && (
-        <SubSectionView lang={lang} filteredSubSection={filteredSubSection} />
+        <SubSectionView lang={lang} filteredSubSection={filteredSubSection}   />
       )}
       <Card className="gap-6 p-4 mt-3">
         <TaskHeader

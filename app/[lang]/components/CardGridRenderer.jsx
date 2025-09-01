@@ -37,18 +37,18 @@ function CardGridRenderer({
   isInternalLoading, navigate, refetch
 }) {
   const isOnline = useOnlineStatus();
-  const [wasOffline, setWasOffline] = useState(false);
+  // const [wasOffline, setWasOffline] = useState(false);
   
   const { handleInvalidToken } = useSession();
-  useEffect(() => {
-    if (!isOnline) {
-      setWasOffline(true);
-    } else if (isOnline && wasOffline) {
-      toast.success("Online now!");
-      refetch();
-      setWasOffline(false);
-    }
-  }, [isOnline, wasOffline]);
+  // useEffect(() => {
+  //   if (!isOnline) {
+  //     setWasOffline(true);
+  //   } else if (isOnline && wasOffline) {
+  //     toast.success("Online now!");
+  //     refetch();
+  //     setWasOffline(false);
+  //   }
+  // }, [isOnline, wasOffline]);
   useEffect(() => {
     if (error?.message === "Invalid token") {
       handleInvalidToken();
@@ -61,13 +61,6 @@ function CardGridRenderer({
       ? description.slice(0, maxLength) + "..."
       : description;
   };
-
-  // const handleToggleActive = (checked, sectionId) => {
-  //   setLocalStatuses((prev) => ({
-  //     ...prev,
-  //     [sectionId]: checked,
-  //   }));
-  // };
   const getStatus = (section) => {
     // لو المستخدم غيّر السويتش، نستخدم القيمة اللي في localStatuses
     if (section.id in localStatuses) return localStatuses[section.id];

@@ -6,6 +6,8 @@ import { useSubdomin } from "@/provider/SubdomainContext";
 import { useToken } from "@/provider/TokenContext";
 import { useSections } from "../apisSection";
 import SectionList from "@/app/[lang]/components/SectionList";
+import { useEffect, useState } from "react";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 export default function SectionsForMenu({ params: { lang } }) {
   const { id } = useParams();
   // const { token } = useToken();
@@ -18,6 +20,18 @@ export default function SectionsForMenu({ params: { lang } }) {
     error,
     refetch,
   } = useSections(token, apiBaseUrl, "sections", id);
+    const isOnline = useOnlineStatus();
+    const [wasOffline, setWasOffline] = useState(false);
+  
+    useEffect(() => {
+      if (!isOnline) {
+        setWasOffline(true);
+      } else if (isOnline && wasOffline) {
+        toast.success("Online now!");
+        refetch();
+        setWasOffline(false);
+      }
+    }, [isOnline, wasOffline]);
   return (
     <SectionList
       lang={lang}
