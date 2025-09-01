@@ -129,7 +129,6 @@ const createOrderSchema = z.object({
   notes: z.string().optional(),
 });
 
-
 function CreateOrder({ params }) {
   const { orderType } = params;
 
@@ -2121,8 +2120,8 @@ function CreateOrder({ params }) {
             <div>
               {/* Sections */}
               <div className={`flex gap-4 flex-wrap
-               ${isOnline && !isLoadingMenu && !errorMenu && filteredSections.length === 0 ? "border-b" : ""}
-               ${!isLoadingMenu && !errorMenu && filteredSections.length === 0 ? "" : "mt-3"}`} >
+          ${isOnline && !isLoadingMenu && !errorMenu && filteredSections.length > 0 ? "border-b pb-2 mt-5" : ""}
+             `} >
 
                 <StatusHandler
                   isOnline={isOnline}
@@ -2136,10 +2135,10 @@ function CreateOrder({ params }) {
                   {filteredSections.map((section) => (
                     <button
                       key={section.id}
-                      className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300
+                      className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-300 
               ${activeSection === section.id
                           ? "bg-black text-white"
-                          : "bg-gray-200 text-gray-600"
+                          : "bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-black"
                         }`}
                       onClick={() => setActiveSection(section.id)}
                     >
@@ -2151,7 +2150,7 @@ function CreateOrder({ params }) {
 
               </div>
             </div>
-
+            <br />
             {/* Items */}
             {isOnline && (
               <InfiniteScroll
@@ -3056,58 +3055,8 @@ function CreateOrder({ params }) {
               </div>
             )}
 
-            {/* {sessionExpiredDialog && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm text-center">
-      <div className="text-yellow-500 text-5xl mb-4">⚠️</div>
-      <h2 className="text-lg font-semibold mb-2 text-red-600">
-        Session Expired
-      </h2>
-  
-      <button
-        onClick={() => {
-          localStorage.clear();
-          Cookies.remove("token");
-          window.location.replace(`/${language}/login`);
-        }}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Go to Login
-      </button>
-    </div>
-  </div>
-)} */}
 
-            {/* {selectedUser && isOpenUserData && (
-              <div className="mt-2 p-2  rounded-md">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">
-                    {selectedUser.user_name}
-                  </h3>
-                  <Button
-                    disabled={isEditMode}
-                    className="my3"
-                    onClick={() => setOpenEditDialog(true)}
-                  >
-                    <FiEdit />
-                  </Button>
-                </div>
-
-                <div className="mt-2">
-                  <p className="mb-2 flex">Phone: {selectedUser.phone}</p>
-
-                  {selectedUser?.phone2 && (
-                    <p>Phone2: {selectedUser?.phone2 || ""} </p>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-4 mt-2">
-                  <p>Orders Count: {selectedUser?.orders_count}</p>
-                  <p>Points: {selectedUser?.user?.points}</p>
-                </div>
-              </div>
-            )} */}
-            {isOpenUserData && hasSearched ? (
+            {isOpenUserData && hasSearched && isOnline ? (
               isLoadingUserDataForSerach || showManualLoading ? (
                 <div className="mt-2 p-2 rounded-md">
                   <p className=" text-center">loading...</p>
@@ -3146,41 +3095,9 @@ function CreateOrder({ params }) {
               )
             ) : null}
             <h3 className="text-lg font-semibold "></h3>
-            {/* {isOpenUserData && (
-  <div className="mt-2 p-2 rounded-md">
-    {selectedUser ? (
-      <>
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold">
-            {selectedUser.user_name}
-          </h3>
-          <Button className="my3" onClick={() => setOpenEditDialog(true)}>
-            <FiEdit />
-          </Button>
-        </div>
-
-        <div className="mt-2">
-          <p className="mb-2 flex">Phone: {selectedUser.phone}</p>
-          {selectedUser?.phone2 && <p>Phone2: {selectedUser?.phone2}</p>}
-        </div>
-
-        <div className="flex items-center gap-4 mt-2">
-          <p>Orders Count: {selectedUser.orders_count}</p>
-          <p>Points: {selectedUser.user.points}</p>
-        </div>
-      </>
-    ) : (
-      hasSearched && !isLoadingUserDataForSerach && (
-        <p className="text-red-500 flex justify-between items-center">
-          {errorSearchUser ? errorSearchUser : "No user found"}
-        </p>
-      )
-    )}
-  </div>
-)} */}
           </Card>
 
-          {selectedUser && !(isLoadingUserDataForSerach || showManualLoading) && (
+          {selectedUser && !(isLoadingUserDataForSerach || showManualLoading) && isOnline && (
             <>
               <Card className="p-4 s w-full mt-0">
                 <div
@@ -3303,7 +3220,7 @@ function CreateOrder({ params }) {
             </>
           )}
 
-          {cartItems.length > 0 && (
+          {cartItems.length > 0 && isOnline && (
             <>
               <h3 className="text-lg font-semibold"></h3>
               <Card className="w-full mt-0 mb-3">
@@ -3665,7 +3582,7 @@ function CreateOrder({ params }) {
               </Card>
             </>
           )}
-          {cartItems.length > 0 && (
+          {cartItems.length > 0 && isOnline && (
             <>
               <h3 className="text-lg font-semibold"></h3>
               <Card className="w-full p-2 shadow-md rounded-lg mt-0">

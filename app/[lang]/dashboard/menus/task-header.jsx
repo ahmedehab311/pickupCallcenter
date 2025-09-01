@@ -204,11 +204,12 @@ const TaskHeader = ({
             className="flex items-center justify-center w-full max-w-[180px] mr-4"
           >
             {/* Save Arrangement */}
-            {isLoading ? (
+            {/* {isLoading ? (
               <FaSpinner className="animate-spin" />
             ) : (
-              "Save Arrangement"
-            )}
+              
+            )} */}
+            Save Arrangement
           </Button>
           {/* <Button
               type="submit"

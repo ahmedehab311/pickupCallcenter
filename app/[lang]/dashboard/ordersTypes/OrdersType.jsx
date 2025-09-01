@@ -21,8 +21,10 @@ import BranchesReport from "./BranchesReport";
 import TableOrder from "./tableOrder/TableOrder";
 import "./index.css";
 import { useSession } from "@/provider/SessionContext";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 function OrdersType() {
   const { apiBaseUrl } = useSubdomin();
+  const isOnline = useOnlineStatus();
   const [selectedStatus, setSelectedStatus] = useState("Total");
   const [selectedDayNumber, setSelectedDayNumber] = useState(1);
   const [token, setToken] = useState(null);
@@ -82,7 +84,7 @@ function OrdersType() {
   const language =
     typeof window !== "undefined" ? localStorage.getItem("language") : null;
 
-  const stats = [ 
+  const stats = [
     {
       icon: Package,
       // number: `${orders?.total?.count}`,
@@ -119,7 +121,7 @@ function OrdersType() {
     {
       icon: Truck,
       number: orders?.countByStatus?.inWay?.count ?? "—",
-      label: "In way",  
+      label: "In way",
       statusKey: "In-way",
       borderColor: "border-[#B53471]",
       color: "text-[#B53471]",
@@ -154,80 +156,90 @@ function OrdersType() {
   return (
     <>
 
-      {selectedStatus === "Total" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full pt-2 mb-1">
-          <Card >
-            <CardHeader className="border-none p-4 pb-1 text-primary font-semibold">Order Source</CardHeader>
-            <CardContent className="p-2 pt-0">
-              <div className="dashtail-legend ">
-                <UserDeviceReport
-                  orders={orders}
-                  errororders={errororders}
-                  isLoadingorders={isLoadingorders}
-                />
-              </div>
-            </CardContent>
-          </Card>
+      {selectedStatus === "Total" && isOnline && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full pt-2 mb-1">
+            <Card >
+              <CardHeader className="border-none p-4 pb-1 text-primary font-semibold">Order Source</CardHeader>
+              <CardContent className="p-2 pt-0">
+                <div className="dashtail-legend ">
+                  <UserDeviceReport
+                    orders={orders}
+                    errororders={errororders}
+                    isLoadingorders={isLoadingorders}
+                  />
+                </div>
+              </CardContent>
+            </Card>
 
-          <Card >
-            <CardHeader className="border-none p-4 pb-1 text-primary font-semibold">Delivery Types</CardHeader>
-            <CardContent className="p-2 pt-0">
-              <div className="dashtail-legend">
-                <PickupReport
-                  orders={orders}
-                  selectedStatus={selectedStatus}
-                  errororders={errororders}
-                  isLoadingorders={isLoadingorders}
-                  error={error}
-                />
-              </div>
-            </CardContent>
-          </Card>
+            <Card >
+              <CardHeader className="border-none p-4 pb-1 text-primary font-semibold">Delivery Types</CardHeader>
+              <CardContent className="p-2 pt-0">
+                <div className="dashtail-legend">
+                  <PickupReport
+                    orders={orders}
+                    selectedStatus={selectedStatus}
+                    errororders={errororders}
+                    isLoadingorders={isLoadingorders}
+                    error={error}
+                  />
+                </div>
+              </CardContent>
+            </Card>
 
-          <Card >
-            <CardHeader className="border-none p-4 pb-1 text-primary font-semibold">Branches</CardHeader>
-            <CardContent className="p-2 pt-0">
-              <div className="dashtail-legend">
-                <BranchesReport
-                  orders={orders}
-                  selectedStatus={selectedStatus}
-                  errororders={errororders}
-                  isLoadingorders={isLoadingorders}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            <Card >
+              <CardHeader className="border-none p-4 pb-1 text-primary font-semibold">Branches</CardHeader>
+              <CardContent className="p-2 pt-0">
+                <div className="dashtail-legend">
+                  <BranchesReport
+                    orders={orders}
+                    selectedStatus={selectedStatus}
+                    errororders={errororders}
+                    isLoadingorders={isLoadingorders}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </>
       )}
 
-      <div className="w-full  my-7">
-        <div className={selectedStatus === "Total" ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" : "flex flex-wrap gap-4"}>
-          {stats.map((stat, index) => (
-            <StatCard
-              key={index}
-              icon={stat.icon}
-              number={stat.number}
-              label={stat.label}
-              onClick={() => setSelectedStatus(stat.statusKey)}
-              color={stat.color}
-              borderColor={stat.borderColor}
-              language={language}
-              errororders={errororders}
-              isLoadingorders={isLoadingorders}
-              selectedStatus={selectedStatus}
-              statusKey={stat.statusKey}
-            />
-          ))}
-        </div>
+      {
+        isOnline ? (
+          <div className="w-full  my-7">
+            <div className={selectedStatus === "Total" ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" : "flex flex-wrap gap-4"}>
+              {stats.map((stat, index) => (
+                <StatCard
+                  key={index}
+                  icon={stat.icon}
+                  number={stat.number}
+                  label={stat.label}
+                  onClick={() => setSelectedStatus(stat.statusKey)}
+                  color={stat.color}
+                  borderColor={stat.borderColor}
+                  language={language}
+                  errororders={errororders}
+                  isLoadingorders={isLoadingorders}
+                  selectedStatus={selectedStatus}
+                  statusKey={stat.statusKey}
+                />
+              ))}
+            </div>
 
-      </div>
+          </div>
+        ) : (
+          <div className="flex justify-center items-center h-40 w-full text-lg  text-red-500 ">
+             🚨 Internet disconnected
+          </div>
+        )
+      }
 
       {/* الجدول */}
       <div>
         <Card className="h-full p-3">
           <TableOrder
             orders={orders}
-             stats={stats}
+            stats={stats}
             selectedStatus={selectedStatus}
             selectedDayNumber={selectedDayNumber}
             setSelectedDayNumber={setSelectedDayNumber}
@@ -241,6 +253,7 @@ function OrdersType() {
             setSearchTrigger={setSearchTrigger}
             searchUser={searchUser}
             refetchSearchUser={refetchSearchUser}
+            isOnline={isOnline}
           />
         </Card>
       </div>

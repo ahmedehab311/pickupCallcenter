@@ -11,7 +11,7 @@ export const CardItem = ({ item, language, handleItemClick, placeholderImg, item
     <Card
       onClick={() => handleItemClick(item)}
       key={item.id}
-      className="p-0 shadow-md rounded-lg overflow-hidden mt-7 text-white cursor-pointer"
+      className="p-0 shadow-md rounded-lg overflow-hidden mt-2 text-white cursor-pointer  border border-gray-200 hover:border-gray-400 transition-colors"
     >
       <div className="w-full h-40 relative">
         {/* Placeholder */}
@@ -35,7 +35,7 @@ export const CardItem = ({ item, language, handleItemClick, placeholderImg, item
           onLoadingComplete={() => setLoaded(true)}
         />
       </div>
-
+{/* object-fill */}
       <div className="flex justify-between items-center gap-3 p-3">
         <h3 className="text-sm text-muted-foreground mt-2">
           {language === "en" ? item.name_en : item.name_ar}

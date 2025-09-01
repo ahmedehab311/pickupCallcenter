@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import StatusHandler from "@/lib/StatusHandler";
 import toast from "react-hot-toast";
+import { useSession } from "@/provider/SessionContext";
 function CardGridRenderer({
   currentItems,
   isLoading,
@@ -37,6 +38,8 @@ function CardGridRenderer({
 }) {
   const isOnline = useOnlineStatus();
   const [wasOffline, setWasOffline] = useState(false);
+  
+  const { handleInvalidToken } = useSession();
   useEffect(() => {
     if (!isOnline) {
       setWasOffline(true);
@@ -46,6 +49,11 @@ function CardGridRenderer({
       setWasOffline(false);
     }
   }, [isOnline, wasOffline]);
+  useEffect(() => {
+    if (error?.message === "Invalid token") {
+      handleInvalidToken();
+    }
+  }, [error, handleInvalidToken]);
   const truncateDescription = (description, maxLength = 50) => {
     // console.log("Description received:", description);
     if (!description) return "";

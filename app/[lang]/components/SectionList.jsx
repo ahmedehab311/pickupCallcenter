@@ -14,6 +14,7 @@ import {
 } from "@/app/[lang]/dashboard/sections/apisSection";
 import PaginationAllItems from "./Pagination";
 import toast from "react-hot-toast";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 function SectionList({
   lang,
   sections,
@@ -28,6 +29,7 @@ function SectionList({
   pageType,
 }) {
   const router = useRouter();
+   const isOnline = useOnlineStatus();
   const [filteredSections, setFilteredSections] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("");
@@ -285,6 +287,7 @@ function SectionList({
         offset={offset}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
+        isOnline={isOnline}
       />
     </Card>
   );

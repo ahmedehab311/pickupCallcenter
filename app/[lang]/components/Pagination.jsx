@@ -7,12 +7,35 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 function PaginationAllItems({
   isLoading,
   pageCount,
   currentItems,
-  currentPage,setCurrentPage
+  currentPage, setCurrentPage
 }) {
+
+  const isOnline = useOnlineStatus();
+  // const [wasOffline, setWasOffline] = useState(false);
+
+  // useEffect(() => {
+  //   if (!isOnline) {
+  //     setWasOffline(true);
+  //     // selectedUser
+  //   } else if (isOnline && wasOffline) {
+  //     // toast.success("Online now!");
+  //     // refetchMenu();
+  //     setWasOffline(false);
+  //   }
+  // }, [isOnline, wasOffline]);
+  console.log({
+    pageCount,
+    currentItemsLength: currentItems?.length,
+    isLoading,
+    isOnline
+  });
   const getVisiblePages = (currentPage, pageCount) => {
     const pages = [];
 
@@ -50,8 +73,8 @@ function PaginationAllItems({
   const visiblePages = getVisiblePages(currentPage, pageCount);
   return (
     <div>
-      {pageCount > 1 && currentItems && !isLoading && (
-        <Pagination>  
+      {pageCount > 1 && currentItems?.length > 0 && !isLoading && isOnline && (
+        <Pagination>
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious

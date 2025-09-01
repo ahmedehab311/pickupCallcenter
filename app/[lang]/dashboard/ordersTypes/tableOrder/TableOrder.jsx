@@ -30,6 +30,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Icon } from "@iconify/react";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 export function BasicDataTable({
   orders,
   searchUser,
@@ -49,6 +50,7 @@ export function BasicDataTable({
   const language =
     typeof window !== "undefined" ? localStorage.getItem("language") : null;
   const [hasSearched, setHasSearched] = useState(false);
+  const isOnline = useOnlineStatus();
 
   const router = useRouter();
   const { theme } = useTheme();
@@ -156,11 +158,11 @@ export function BasicDataTable({
         accessorKey: "Restaurant",
         header: "Restaurant",
         cell: (info) => {
-              const row = info.row.original;
+          const row = info.row.original;
           return (
             <div className="flex flex-col">
               <span className="text-sm text-[#000] dark:text-white">{row["Restaurant"]}</span>
-        
+
             </div>
           )
         }
@@ -183,15 +185,15 @@ export function BasicDataTable({
       {
         accessorKey: "Branch",
         header: "Branch",
-            cell: (info) => {
-                const row = info.row.original;
-            return (
-              <div className="flex flex-col">
-                <span className="text-sm text-[#000] dark:text-white">{row["Branch"]}</span>
-          
-              </div>
-            )
-          }
+        cell: (info) => {
+          const row = info.row.original;
+          return (
+            <div className="flex flex-col">
+              <span className="text-sm text-[#000] dark:text-white">{row["Branch"]}</span>
+
+            </div>
+          )
+        }
       },
       {
         accessorKey: "Customer",
@@ -211,12 +213,12 @@ export function BasicDataTable({
       {
         accessorKey: "Address",
         header: "Address",
-         cell: (info) => {
-              const row = info.row.original;
+        cell: (info) => {
+          const row = info.row.original;
           return (
             <div className="flex flex-col">
               <span className="text-sm text-[#000] dark:text-white">{row["Address"]}</span>
-        
+
             </div>
           )
         }
@@ -339,6 +341,7 @@ export function BasicDataTable({
             //       setHasSearched(true);
             //   }
             // }}
+            disabled={!isOnline}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 latestSearchRef.current = orderIdOrPhone;
@@ -397,7 +400,7 @@ export function BasicDataTable({
             value={daysNumberOptions.find(
               (option) => option.value === selectedDayNumber
             )}
-            isDisabled={hasSearched}
+            isDisabled={hasSearched || !isOnline}
           />
         </div>
       </div>
@@ -424,7 +427,17 @@ export function BasicDataTable({
           </TableHeader>
 
           <TableBody>
-            {isLoadingorders || isLoadingSearchUser ? (
+            {!isOnline ? (
+
+              <TableCell
+                colSpan={columns.length}
+                className="h-24 text-center"
+              >
+                <span className="text-red-500 flex justify-center items-center text-lg  w-full  ">
+                  🚨 Internet disconnected
+                </span>
+              </TableCell>
+            ) : isLoadingorders || isLoadingSearchUser ? (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
