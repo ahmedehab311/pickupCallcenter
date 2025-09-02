@@ -6,10 +6,7 @@ export const fetchAllSections = async (token, apiBaseUrl, name, id) => {
       ? `${apiBaseUrl}/v1/call-center/${name}/${id}?api_token=${token}`
       : `${apiBaseUrl}/v1/call-center/${name}?api_token=${token}`;
     const response = await axios.get(url);
-  
-      const message = response?.data?.message;
-      
-      console.log("message:", message);
+    const message = response?.data?.message;
     if (
       typeof message === "string" &&
       message.toLowerCase().includes("invalid token")

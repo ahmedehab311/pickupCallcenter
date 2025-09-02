@@ -22,10 +22,14 @@ import TableOrder from "./tableOrder/TableOrder";
 import "./index.css";
 import { useSession } from "@/provider/SessionContext";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { useBreadcrumbHistory } from "@/provider/BreadcrumbHistoryProvider";
+import { useOrder } from "@/hooks/OrderContext";
 function OrdersType() {
+  const { addCustomBreadcrumb, clearCustomBreadcrumbs } = useBreadcrumbHistory();
   const { apiBaseUrl } = useSubdomin();
   const isOnline = useOnlineStatus();
-  const [selectedStatus, setSelectedStatus] = useState("Total");
+  // const [selectedStatus, setSelectedStatus] = useState("Total");
+  const { selectedStatus, setSelectedStatus } = useOrder(); 
   const [selectedDayNumber, setSelectedDayNumber] = useState(1);
   const [token, setToken] = useState(null);
   const {
@@ -81,6 +85,7 @@ function OrdersType() {
   if (error?.message === "Invalid token") {
     handleInvalidToken();
   }
+
   const language =
     typeof window !== "undefined" ? localStorage.getItem("language") : null;
 
@@ -158,7 +163,7 @@ function OrdersType() {
 
       {selectedStatus === "Total" && isOnline && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full pt-2 mb-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full mt-3 mb-5 ">
             <Card >
               <CardHeader className="border-none p-4 pb-1 text-primary font-semibold">Order Source</CardHeader>
               <CardContent className="p-2 pt-0">
@@ -204,34 +209,43 @@ function OrdersType() {
         </>
       )}
 
-      {
-        isOnline ? (
-          <div className="w-full  my-7">
-            <div className={selectedStatus === "Total" ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" : "flex flex-wrap gap-4"}>
-              {stats.map((stat, index) => (
-                <StatCard
-                  key={index}
-                  icon={stat.icon}
-                  number={stat.number}
-                  label={stat.label}
-                  onClick={() => setSelectedStatus(stat.statusKey)}
-                  color={stat.color}
-                  borderColor={stat.borderColor}
-                  language={language}
-                  errororders={errororders}
-                  isLoadingorders={isLoadingorders}
-                  selectedStatus={selectedStatus}
-                  statusKey={stat.statusKey}
-                />
-              ))}
-            </div>
+      {isOnline ? (
+        <div className="w-full  mt-3 mb-5">
+          <div className={selectedStatus === "Total" ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" : "flex flex-wrap gap-4"}>
+            {stats.map((stat, index) => (
+              <StatCard
+                key={index}
+                icon={stat.icon}
+                number={stat.number}
+                label={stat.label}
+        onClick={() => { 
+  // ما نضيفش breadcrumb لـ "Total"
+  if (stat.statusKey === "Total") {
+    setSelectedStatus("Total");
+    clearCustomBreadcrumbs(); // نمسح أي أوردرز موجودة
+  } else {
+    setSelectedStatus(stat.statusKey);
+    clearCustomBreadcrumbs();
+    addCustomBreadcrumb(`${stat.label} Orders`);
+  }
+}}
+                color={stat.color}
+                borderColor={stat.borderColor}
+                language={language}
+                errororders={errororders}
+                isLoadingorders={isLoadingorders}
+                selectedStatus={selectedStatus}
+                statusKey={stat.statusKey}
+              />
+            ))}
+          </div>
 
-          </div>
-        ) : (
-          <div className="flex justify-center items-center h-40 w-full text-lg  text-red-500 ">
-             🚨 Internet disconnected
-          </div>
-        )
+        </div>
+      ) : (
+        <div className="flex justify-center items-center h-40 w-full text-lg  text-red-500 ">
+          🚨 Internet disconnected
+        </div>
+      )
       }
 
       {/* الجدول */}

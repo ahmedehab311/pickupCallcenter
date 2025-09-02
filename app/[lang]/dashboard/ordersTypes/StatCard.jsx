@@ -1,16 +1,14 @@
 // components/StatCard.js
 "use client";
+import { useBreadcrumbHistory } from "@/provider/BreadcrumbHistoryProvider";
 import { useEffect, useState } from "react";
-
 import CountUp from "react-countup";
 export default function StatCard({
   icon: Icon,
   number,
   label,
   onClick,
-  
   color,
-  orders,
   borderColor,
   isLoadingorders,
   selectedStatus,

@@ -166,19 +166,6 @@ export const BreadcrumbHistoryProvider = ({ children }) => {
   const pathname = usePathname();
   const [breadcrumbs, setBreadcrumbs] = useState([]);
 
-  // useEffect(() => {
-  //   if (!pathname || isLoading || !Menus?.length) return;
-
-  //   setBreadcrumbs((prev) => {
-  //     const existingIndex = prev.findIndex((b) => b.path === pathname);
-  //     if (existingIndex !== -1) {
-  //       return prev.slice(0, existingIndex + 1);
-  //     }
-
-  //     const label = getSmartLabel(pathname, Menus, Sections, Items);
-  //     return [...prev, { path: pathname, label }];
-  //   });
-  // }, [pathname, Menus, isLoading, Sections, Items]);
   useEffect(() => {
     const loadSizeViewLabel = async () => {
       const parts = pathname.split("/").filter(Boolean);
@@ -190,7 +177,11 @@ export const BreadcrumbHistoryProvider = ({ children }) => {
       const last = cleanedParts.at(-1);
       const prev = cleanedParts.at(-2);
       const beforePrev = cleanedParts.at(-3);
-
+       const isDashboard = pathname === '/en/dashboard' || pathname.endsWith('/dashboard');
+      if (!isDashboard) {
+        // نمسح فقط الـ breadcrumbs المخصصة (الأوردرز) لكن نستمر في إضافة العادية
+        setBreadcrumbs(prev => prev.filter(b => b.path !== null));
+      }
       // ✅ لو الصفحة هي /dashboard/size/:id/view
       if (last === "view" && beforePrev === "size") {
         const sizeId = prev;
@@ -236,9 +227,31 @@ export const BreadcrumbHistoryProvider = ({ children }) => {
 
     loadSizeViewLabel();
   }, [pathname, Menus, isLoading, Sections, Items]);
+  // جوة BreadcrumbHistoryProvider
+// في BreadcrumbHistoryProvider
+const addCustomBreadcrumb = (label) => {
+  // ما نضيفش "Total Orders" عشان ميظهرش
+  if (label.includes("Total Orders")) {
+    return; // ما نضيفش حاجة
+  }
+  
+  setBreadcrumbs((prev) => {
+    const exists = prev.find((b) => b.label === label);
+    if (exists) return prev; // لو موجود خلاص
+    
+    return [...prev, { path: null, label }];
+  });
+};
+ const clearCustomBreadcrumbs = () => {
+  setBreadcrumbs(prev => {
+    // نمسح كل الـ breadcrumbs المخصصة (اللي مالهاوش path)
+    return prev.filter(b => b.path !== null);
+  });
+};
+
 
   return (
-    <BreadcrumbContext.Provider value={{ breadcrumbs }}>
+    <BreadcrumbContext.Provider value={{ breadcrumbs, addCustomBreadcrumb, clearCustomBreadcrumbs }}>
       {children}
     </BreadcrumbContext.Provider>
   );

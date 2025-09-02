@@ -213,33 +213,207 @@
 // };
 
 // export default DynamicBreadcrumbs;
+// "use client";
+// import Link from "next/link";
+// import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
+// import { useBreadcrumbHistory } from "@/provider/BreadcrumbHistoryProvider";
+// import { usePathname } from "next/navigation";
+
+// const DynamicBreadcrumbs = () => {
+//   const { breadcrumbs,addCustomBreadcrumb, clearCustomBreadcrumbs } = useBreadcrumbHistory();
+//   const pathname = usePathname();
+//  const handleDashboardClick = () => {
+//     if (selectedStatus !== "Total") {
+//       setSelectedStatus("Total");
+//       clearCustomBreadcrumbs();
+//     }
+//   };
+//   if (!breadcrumbs.length) return null;
+
+//   return (
+//     <div className="py-1">
+//       <Breadcrumbs>
+//         {breadcrumbs.map((crumb, i) => {
+//           const isActive = pathname === crumb.path || !crumb.path; // اللي مالوش path نعتبره active
+//           return (
+//             <BreadcrumbItem
+//               key={i}
+//               isCurrent={isActive}
+//               className={isActive ? "text-primary font-semibold" : ""}
+//             >
+//               {crumb.path ? (
+//                 <Link href={crumb.path}>{crumb.label}</Link>
+//               ) : (
+//                 <span>{crumb.label}</span>
+//               )}
+//             </BreadcrumbItem>
+//           );
+//         })}
+
+//       </Breadcrumbs>
+//     </div>
+//   );
+// };
+
+// export default DynamicBreadcrumbs;
+
+// "use client";
+// import Link from "next/link";
+// import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
+// import { useBreadcrumbHistory } from "@/provider/BreadcrumbHistoryProvider";
+// import { usePathname } from "next/navigation";
+// import { useOrder } from "@/hooks/OrderContext";
+
+// const DynamicBreadcrumbs = () => {
+//   const { selectedStatus, setSelectedStatus } = useOrder(); 
+//   const { breadcrumbs, clearCustomBreadcrumbs } = useBreadcrumbHistory();
+//   const pathname = usePathname();
+
+//   // دالة للضغط على Dashboard
+//   const handleDashboardClick = () => {
+//     if (selectedStatus !== "Total") {
+//       setSelectedStatus("Total");
+//       clearCustomBreadcrumbs();
+//     }
+//   };
+
+//   // لا نعرض شيء إذا كان selectedStatus = "Total"
+//   if (selectedStatus === "Total") return null;
+
+//   // نجيب فقط الـ breadcrumbs العادية (اللي ليها path)
+//   const normalBreadcrumbs = breadcrumbs.filter(b => b.path !== null);
+
+//   // نجيب الـ breadcrumbs المخصصة (اللي مالهاوش path - الأوردرز)
+//   const customBreadcrumbs = breadcrumbs.filter(b => b.path === null);
+
+//   return (
+//     <div className="py-1">
+//       <Breadcrumbs>
+//         {normalBreadcrumbs.map((crumb, i) => {
+//           const isActive = pathname === crumb.path;
+//           return (
+//             <BreadcrumbItem
+//               key={i}
+//               isCurrent={isActive}
+//               className={isActive ? "text-primary font-semibold" : ""}
+//             >
+//               {crumb.path === "/en/dashboard" ? (
+//                 <Link 
+//                   href={crumb.path} 
+//                   onClick={handleDashboardClick}
+//                   className="text-blue-500 hover:underline"
+//                 >
+//                   {crumb.label}
+//                 </Link>
+//               ) : (
+//                 <Link href={crumb.path}>{crumb.label}</Link>
+//               )}
+//             </BreadcrumbItem>
+//           );
+//         })}
+
+//         {/* نعرض خانة الأوردرز فقط إذا كانت موجودة */}
+//         {customBreadcrumbs.map((crumb, i) => (
+//           <BreadcrumbItem
+//             key={`custom-${i}`}
+//             isCurrent={true}
+//             className="text-primary font-semibold"
+//           >
+//             <span>{crumb.label}</span>
+//           </BreadcrumbItem>
+//         ))}
+//       </Breadcrumbs>
+//     </div>
+//   );
+// };
+
+// export default DynamicBreadcrumbs;
 "use client";
 import Link from "next/link";
 import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
 import { useBreadcrumbHistory } from "@/provider/BreadcrumbHistoryProvider";
 import { usePathname } from "next/navigation";
+import { useOrder } from "@/hooks/OrderContext";
 
 const DynamicBreadcrumbs = () => {
-  const { breadcrumbs } = useBreadcrumbHistory();
+  const { selectedStatus, setSelectedStatus } = useOrder();
+  const { breadcrumbs, clearCustomBreadcrumbs } = useBreadcrumbHistory();
   const pathname = usePathname();
 
-  if (!breadcrumbs.length) return null;
+  const handleDashboardClick = (e) => {
+    e.preventDefault();
+    if (selectedStatus !== "Total") {
+      setSelectedStatus("Total");
+      clearCustomBreadcrumbs(); // دي هتمسح أي أوردرز
+    }
+
+  };
+
+  // نحدد إذا كنا في صفحة الداشبورد
+  const isDashboardPage = pathname === "/en/dashboard" || pathname.endsWith("/dashboard");
+
+  // نجيب الـ breadcrumbs العادية (اللي ليها path)
+  const normalBreadcrumbs = breadcrumbs.filter(b => b.path !== null);
+
+  // نجيب الـ breadcrumbs المخصصة (اللي مالهاوش path - الأوردرز)
+  const customBreadcrumbs = breadcrumbs.filter(b => b.path === null);
+
+  // ما نعرضش حاجة إذا مفيش breadcrumbs خالص
+  if (normalBreadcrumbs.length === 0 && customBreadcrumbs.length === 0) return null;
 
   return (
-    <div className="py-1">
+    <div>
       <Breadcrumbs>
-        {breadcrumbs.map((crumb, i) => {
+        {normalBreadcrumbs.map((crumb, i) => {
           const isActive = pathname === crumb.path;
+          const isLast = i === normalBreadcrumbs.length - 1 && customBreadcrumbs.length === 0;
+
+          // تحديد إذا Dashboard بيكون لينك أو مجرد نص
+          const isDashboardLink = crumb.path === "/en/dashboard" || crumb.path.endsWith("/dashboard");
+
           return (
             <BreadcrumbItem
               key={i}
-              isCurrent={isActive}
+              isCurrent={isLast && customBreadcrumbs.length === 0}
               className={isActive ? "text-primary font-semibold" : ""}
             >
-              <Link href={crumb.path}>{crumb.label}</Link>
+              {isDashboardLink ? (
+                // Dashboard link - بيتصرف بشكل مختلف حسب الحالة
+                isDashboardPage && selectedStatus !== "Total" ? (
+                  // في الداشبورد و selectedStatus != Total - بيكون لينك يضبط الحالة
+                  <Link
+                    href={crumb.path}
+                    onClick={handleDashboardClick}
+                    className="text-black font-semibold "
+                  >
+                    {/* {crumb.label}/Total */}
+
+                    Total
+                  </Link>
+                ) : (
+                  // في صفحة تانية أو selectedStatus = Total - بيكون لينك عادي
+                  <Link href={crumb.path}>
+                    {crumb.label}
+                  </Link>
+                )
+              ) : (
+                // أي لينك تاني غير Dashboard
+                <Link href={crumb.path}>{crumb.label} </Link>
+              )}
             </BreadcrumbItem>
           );
         })}
+
+        {/* نعرض خانة الأوردرز فقط إذا كانت موجودة */}
+        {customBreadcrumbs.map((crumb, i) => (
+          <BreadcrumbItem
+            key={`custom-${i}`}
+            isCurrent={true}
+            className="text-primary font-semibold"
+          >
+            <span>{crumb.label}</span>
+          </BreadcrumbItem>
+        ))}
       </Breadcrumbs>
     </div>
   );

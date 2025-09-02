@@ -226,7 +226,7 @@ function SectionList({
     return <div>Loading...</div>;
   }
   return (
-    <Card className="gap-6 p-4">
+    <Card className="gap-6 p-4 mt-3 mb-5">
       <div>
         <TaskHeader
           onSearch={(term) => setSearchTerm(term)}

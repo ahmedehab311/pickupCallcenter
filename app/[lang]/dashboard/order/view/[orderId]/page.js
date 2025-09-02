@@ -6,11 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import BasicTable from "./components/BasicTable";
 import Select from "react-select";
 import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
-// import {  } from "next/navigation";
 import { selectStyles } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { fetchBranches } from "@/app/[lang]/dashboard/[orderType]/apICallCenter/ApisCallCenter";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -23,28 +19,16 @@ import { toast } from "react-hot-toast";
 export default function OrderViewPage({ params }) {
   const { orderId } = params;
   const { theme } = useTheme();
-  const router = useRouter();
-  const [color, setColor] = useState("");
   const { apiBaseUrl, subdomain } = useSubdomin();
-  const [Order, setOrder] = useState([]);
+  const [color, setColor] = useState("");
+  const [order, setOrder] = useState([]);
   const [OrderDetails, setOrderDetails] = useState([]);
   const [OrderDetailsItem, setOrderDetailsItem] = useState([]);
   const language =
     typeof window !== "undefined" ? localStorage.getItem("language") : null;
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  useEffect(() => {
-    const fetchdata = async () => {
-      const response = await fetchViewOrder(token, apiBaseUrl, orderId);
-      console.log("response", response);
-      if (response) {
-        setOrder(response);
-        setOrderDetails(response.details);
-        setOrderDetailsItem(response.items);
-      }
-    };
-    fetchdata();
-  }, [apiBaseUrl, orderId, token]);
+
 
   const {
     data: branches,
@@ -70,7 +54,7 @@ export default function OrderViewPage({ params }) {
       !!token,
   });
 
-  
+
   const {
     data: Deliveries,
     isLoadingDeliveries,
@@ -94,13 +78,18 @@ export default function OrderViewPage({ params }) {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);
-  // console.log("branches",branches);
-  // console.log("selectedBranch",selectedBranch);
-  // console.log("Order",Order);
-  // console.log("OrderDetails",OrderDetails);
-  // console.log(" OrderDetails?.restaurant_id", OrderDetails?.restaurant_id);
-  // console.log("OrderDetails?.area_id", OrderD  etails?.area_id);
-  // NOkK5Mft
+  useEffect(() => {
+    const fetchdata = async () => {
+      const response = await fetchViewOrder(token, apiBaseUrl, orderId);
+      // console.log("response", response);
+      if (response) {
+        setOrder(response);
+        setOrderDetails(response.details);
+        setOrderDetailsItem(response.items);
+      }
+    };
+    fetchdata();
+  }, [apiBaseUrl, orderId, token]);
   useEffect(() => {
     if (branches?.length > 0) {
       setBranchOptions(
@@ -156,20 +145,14 @@ export default function OrderViewPage({ params }) {
       setSelectedDelivery(foundDelivery || null);
     }
   }, [DeliveryOptions, OrderDetails?.delivery?.delivery_id]);
-  // const handlePrint = () => {
-  //   window.print();
-  // };
 
-  
-  // console.log("selectedStatus",selectedStatus);
-  
   const handleChangeStatus = async (selected) => {
     if (selected.value === selectedStatus?.value) {
-      return; 
+      return;
     }
-    
+
     setSelectedStatus(selected);
-    
+
     try {
       const response = await updateStatusOrder(
         apiBaseUrl,
@@ -181,8 +164,8 @@ export default function OrderViewPage({ params }) {
 
       if (response) {
         toast.success(response.data.data.message);
-      
-// console.log("selectedStatus.value",selectedStatus.value);
+
+        // console.log("selectedStatus.value",selectedStatus.value);
 
       } else {
         toast.error("Something went wrong");
@@ -195,7 +178,7 @@ export default function OrderViewPage({ params }) {
   };
   const handleChangeBranch = async (selected) => {
     if (selected.value === selectedBranch?.value) {
-      return; 
+      return;
     }
     setSelectedBranch(selected);
     try {
@@ -206,10 +189,10 @@ export default function OrderViewPage({ params }) {
         selected.value
       );
       response.data;
-      
-     
+
+
       if (response) {
-    
+
         toast.success(response.data.data.message);
 
       } else {
@@ -223,9 +206,9 @@ export default function OrderViewPage({ params }) {
   };
   const handleChangeDelivery = async (selected) => {
     if (selected?.value === selectedDelivery?.value) {
-      return; 
+      return;
     }
-    
+
     setSelectedDelivery(selected);
 
     // console.log("selected:", selected);
@@ -235,7 +218,7 @@ export default function OrderViewPage({ params }) {
         apiBaseUrl,
         token,
         orderId,
-        selected.value 
+        selected.value
       );
       response.data;
       // console.log("response updateDelivery", response);
@@ -257,137 +240,137 @@ export default function OrderViewPage({ params }) {
   }
   return (
     <>
-    
 
-     <div className="flex gap-4">
-  {/* الجدول على الشمال */}
-  <div className="w-1/2">
-    <Card title="Order Info">
-      <BasicTable
-        OrderDetailsItem={OrderDetailsItem}
-        OrderDetails={OrderDetails}
-      />
-    </Card>
-  </div>
 
-  {/* الكروت على اليمين تحت بعض */}
-  <div className="w-1/2 flex flex-col gap-4">
-    {/* الكرت الأول */}
-    <Card title="Order Details" className="p-4">
-      <div className="flex justify-between my-2">
-        <p>Name: {OrderDetails?.user_data?.user_name}</p>
-        <p>Phone: {OrderDetails?.user_data?.phone}</p>
-      </div>
-      <div className="flex justify-between">
-        <p>Order date: {OrderDetails?.created_at}</p>
-        <p>Order id: {OrderDetails?.order_id}</p>
-      </div>
-
-      <div className="flex gap-2 justify-between my-4">
-        <div className="w-[48%]">
-          <p className="mb-1 text-sm">Change branch:</p>
-          <Select
-            options={branchOptions}
-            placeholder="Select branch"
-            className="react-select"
-            classNamePrefix="select"
-            styles={selectStyles(theme, color)}
-            value={selectedBranch}
-            onChange={handleChangeBranch}
-          />
+      <div className="flex gap-4  flex-col md:flex-row">
+        {/* الجدول على الشمال */}
+        <div className="md:w-1/2 w-full" >
+          <Card title="Order Info" className="p-4 shadow-sm rounded-2xl">
+            <BasicTable
+              OrderDetailsItem={OrderDetailsItem}
+              OrderDetails={OrderDetails} order={order} language={language}
+            />
+          </Card>
         </div>
-        <div className="w-[48%]">
-          <p className="mb-1 text-sm">Change status:</p>
-          <Select
-            placeholder="Change Status"
-            className="react-select"
-            classNamePrefix="select"
-            styles={selectStyles(theme, color)}
-            options={statusOptions}
-            value={selectedStatus}
-            onChange={handleChangeStatus}
-          />
+
+        {/* الكروت على اليمين تحت بعض */}
+        <div className="md:w-1/2 w-full flex flex-col gap-4">
+          {/* الكرت الأول */}
+          <Card title="Order Details" className="p-4">
+            <div className="flex justify-between my-2">
+              <p>Name: {OrderDetails?.user_data?.user_name}</p>
+              <p>Phone: {OrderDetails?.user_data?.phone}</p>
+            </div>
+            <div className="flex justify-between">
+              <p>Order date: {OrderDetails?.created_at}</p>
+              <p>Order id: {OrderDetails?.order_id}</p>
+            </div>
+
+            <div className="flex gap-2 justify-between my-4">
+              <div className="w-[48%]">
+                <p className="mb-1 text-sm">Change branch:</p>
+                <Select
+                  options={branchOptions}
+                  placeholder="Select branch"
+                  className="react-select"
+                  classNamePrefix="select"
+                  styles={selectStyles(theme, color)}
+                  value={selectedBranch}
+                  onChange={handleChangeBranch}
+                />
+              </div>
+              <div className="w-[48%]">
+                <p className="mb-1 text-sm">Change status:</p>
+                <Select
+                  placeholder="Change Status"
+                  className="react-select"
+                  classNamePrefix="select"
+                  styles={selectStyles(theme, color)}
+                  options={statusOptions}
+                  value={selectedStatus}
+                  onChange={handleChangeStatus}
+                />
+              </div>
+            </div>
+
+
+          </Card>
+
+          {/* الكرت الثاني */}
+          <Card title="Order Details" className="p-4">
+            {/* Address في أول الكارت */}
+            <p className="mb-4">
+              <span className="font-semibold">Address:</span>{" "}
+              {OrderDetails?.address_info?.address1 || "Pickup"}
+            </p>
+
+            {/* صفين، كل صف فيه 3 عناصر */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <span className="font-semibold">Area: </span>
+                {OrderDetails?.address_info?.area_details?.area_name_en || "-"}
+              </div>
+              <div>
+                <span className="font-semibold">Floor: </span>
+                {OrderDetails?.address_info?.floor || "-"}
+              </div>
+              <div>
+                <span className="font-semibold">Street: </span>
+                {OrderDetails?.address_info?.street || "-"}
+              </div>
+
+              <div>
+                <span className="font-semibold">Building: </span>
+                {OrderDetails?.address_info?.building || "-"}
+              </div>
+              <div>
+                <span className="font-semibold">Apartment: </span>
+                {OrderDetails?.address_info?.apartment || "-"}
+              </div>
+              <div>
+                <span className="font-semibold">Additional Info: </span>
+                {OrderDetails?.address_info?.additional || "-"}
+              </div>
+            </div>
+          </Card>
+
+
+          {/* الكرت الثالث */}
+          <Card title="Order Details" className="p-4 ">
+            <h2 className="text-md font-semibold mb-2">Delivery details</h2>
+            <div className="flex justify-between my-2 flex-wrap gap-4">
+              <p>
+                <span className="font-semibold">Name:</span>{" "}
+                {OrderDetails?.delivery?.delivery_details?.user_name || "-"}
+              </p>
+              <p>
+                <span className="font-semibold">Phone:</span>{" "}
+                {OrderDetails?.delivery?.delivery_details?.phone || "-"}
+              </p>
+              <p>
+                <span className="font-semibold">Phone2:</span>{" "}
+                {OrderDetails?.delivery?.delivery_details?.phone2 || "-"}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 mb-2">
+              <p className="text-sm min-w-[130px] font-semibold">Change dispatcher:</p>
+              <div className="flex-1">
+                <Select
+                  placeholder="Change dispatcher"
+                  className="react-select"
+                  classNamePrefix="select"
+                  styles={selectStyles(theme, color)}
+                  options={DeliveryOptions}
+                  value={selectedDelivery}
+                  onChange={handleChangeDelivery}
+                />
+              </div>
+            </div>
+
+          </Card>
         </div>
       </div>
-
-   
-    </Card>
-
-    {/* الكرت الثاني */}
-  <Card title="Order Details" className="p-4">
-  {/* Address في أول الكارت */}
-  <p className="mb-4">
-    <span className="font-semibold">Address:</span>{" "}
-    {OrderDetails?.address_info?.address1 || "Pickup"}
-  </p>
-
-  {/* صفين، كل صف فيه 3 عناصر */}
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div>
-      <span className="font-semibold">Area: </span>
-      {OrderDetails?.address_info?.area_details?.area_name_en || "-"}
-    </div>
-    <div>
-      <span className="font-semibold">Floor: </span>
-      {OrderDetails?.address_info?.floor || "-"}
-    </div>
-    <div>
-      <span className="font-semibold">Street: </span>
-      {OrderDetails?.address_info?.street || "-"}
-    </div>
-
-    <div>
-      <span className="font-semibold">Building: </span>
-      {OrderDetails?.address_info?.building || "-"}
-    </div>
-    <div>
-      <span className="font-semibold">Apartment: </span>
-      {OrderDetails?.address_info?.apartment || "-"}
-    </div>
-    <div>
-      <span className="font-semibold">Additional Info: </span>
-      {OrderDetails?.address_info?.additional || "-"}
-    </div>
-  </div>
-</Card>
-
-
-    {/* الكرت الثالث */}
-    <Card title="Order Details" className="p-4">
-      <h2 className="text-md font-semibold mb-2">Delivery details</h2>
-     <div className="flex justify-between my-2 flex-wrap gap-4">
-  <p>
-    <span className="font-semibold">Name:</span>{" "}
-    {OrderDetails?.delivery?.delivery_details?.user_name || "-"}
-  </p>
-  <p>
-    <span className="font-semibold">Phone:</span>{" "}
-    {OrderDetails?.delivery?.delivery_details?.phone || "-"}
-  </p>
-  <p>
-    <span className="font-semibold">Phone2:</span>{" "}
-    {OrderDetails?.delivery?.delivery_details?.phone2 || "-"}
-  </p>
-</div>
-
-   <div className="flex items-center gap-2 mb-2">
-  <p className="text-sm min-w-[130px] font-semibold">Change dispatcher:</p>
-  <div className="flex-1">
-    <Select
-      placeholder="Change dispatcher"
-      className="react-select"
-      classNamePrefix="select"
-      styles={selectStyles(theme, color)}
-      options={DeliveryOptions}
-      value={selectedDelivery}
-      onChange={handleChangeDelivery}
-    />
-  </div>
-</div>
-
-    </Card>
-  </div>
-</div>
 
 
     </>

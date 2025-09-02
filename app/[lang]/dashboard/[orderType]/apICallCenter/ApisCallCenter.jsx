@@ -26,7 +26,7 @@ export const fetchBranches = async (restaurantId, area, token, apiBaseUrl) => {
       }`
     );
 
-    console.log("API Response branches:", response);
+    // console.log("API Response branches:", response);
     // console.log("API Response.data branches:", response.data.data);
     // // console.log("API Response branches:", response.data.messages.branches);
     // console.log("API Response branches restaurantId:", restaurantId);
@@ -51,11 +51,10 @@ export const fetchBranches = async (restaurantId, area, token, apiBaseUrl) => {
           },
         }
       );
-      console.log("API Response manu ---===---==--:", response);
       
       const message = response?.data?.message;
       
-      console.log("message:", message);
+
     if (
       typeof message === "string" &&
       message.toLowerCase().includes("invalid token")

@@ -261,7 +261,7 @@ export default function ItemsList({
       {subSections && (
         <SubSectionView lang={lang} filteredSubSection={filteredSubSection}   />
       )}
-      <Card className="gap-6 p-4 mt-3">
+      <Card className="gap-6 p-4 mt-3 ">
         <TaskHeader
           onSearch={(term) => setSearchTerm(term)}
           onPageSizeChange={(value) => setPageSize(value)}
