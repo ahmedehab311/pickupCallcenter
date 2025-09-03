@@ -64,7 +64,7 @@ const VerticalHeader = ({ handleOpenSearch }) => {
   let searchButtonContent = null;
 
   const MainLogo = (
-    <Link href="/dashboard" className=" text-primary ">
+    <Link href="/en/dashboard" className=" text-primary ">
       <SiteLogo className="h-7 w-7" />
     </Link>
   );

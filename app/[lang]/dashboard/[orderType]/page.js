@@ -157,10 +157,10 @@ function CreateOrder({ params }) {
   const language = localStorage.getItem("language") || "en";
   // console.log("language order", language);
   const { apiBaseUrl, subdomain } = useSubdomin();
-  // if (process.env.NODE_ENV === "development") {
-  //   console.log("apiBaseUrl from create order", apiBaseUrl);
-  //   console.log("subdomain from create order", subdomain);
-  // }
+  if (process.env.NODE_ENV === "development") {
+    console.log("apiBaseUrl from create order", apiBaseUrl);
+    console.log("subdomain from create order", subdomain);
+  }
   const router = useRouter();
   const searchParams = useSearchParams();
   const { theme, color, setColor } = useThemeColor();

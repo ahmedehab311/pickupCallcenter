@@ -21,8 +21,7 @@ export const fetchRestaurantsList = async (token, apiBaseUrl) => {
 export const fetchBranches = async (restaurantId, area, token, apiBaseUrl) => {
   try {
     const response = await axios.get(
-      `${apiBaseUrl}/callcenter/get/branches?api_token=${token}&restaurantId=${restaurantId}&areaId=${
-        area ? area : ""
+      `${apiBaseUrl}/callcenter/get/branches?api_token=${token}&restaurantId=${restaurantId}&areaId=${area ? area : ""
       }`
     );
 
@@ -38,22 +37,22 @@ export const fetchBranches = async (restaurantId, area, token, apiBaseUrl) => {
   }
 };
 
-  export const fetchMenu = async (restaurantId, priceList, token, apiBaseUrl) => {
-    try {
-      const response = await axios.get(
-        `${apiBaseUrl}/callcenter/get/restaurant/menus?api_token=${token}&restaurantId=${restaurantId}&priceList=${priceList}`,
-        {
-          params: {
-            api_token: token,
-            restaurantId,
-            priceList,
-            fields: "id,name,price,category",
-          },
-        }
-      );
-      
-      const message = response?.data?.message;
-      
+export const fetchMenu = async (restaurantId, priceList, token, apiBaseUrl) => {
+  try {
+    const response = await axios.get(
+      `${apiBaseUrl}/callcenter/get/restaurant/menus?api_token=${token}&restaurantId=${restaurantId}&priceList=${priceList}`,
+      {
+        params: {
+          api_token: token,
+          restaurantId,
+          priceList,
+          fields: "id,name,price,category",
+        },
+      }
+    );
+
+    const message = response?.data?.message;
+
 
     if (
       typeof message === "string" &&
@@ -62,24 +61,24 @@ export const fetchBranches = async (restaurantId, area, token, apiBaseUrl) => {
       // نرمي error عشان نوصله في onError
       throw new Error("Invalid token");
     }
-      
-      // console.log("priceList fetchMenu", priceList);
-      return response.data.data.menus[0];
-    } catch (error) {
-      console.error("Error fetching menu:", error);
-      throw error;
-    }
-  };
+
+    // console.log("priceList fetchMenu", priceList);
+    return response.data.data.menus[0];
+  } catch (error) {
+    console.error("Error fetching menu:", error);
+    throw error;
+  }
+};
 
 export const fetchViewItem = async (BranchId, itemId, token, apiBaseUrl) => {
   try {
     const response = await axios.get(
       `${apiBaseUrl}/callcenter/get/menu/item?api_token=${token}&branch_id=${BranchId}&item_id=${itemId}`
     );
-    
-    console.log("fetch View Item:", response);
-    console.log("BranchId:", BranchId);
-    console.log("itemId:", itemId);
+
+    // console.log("fetch View Item:", response);
+    // console.log("BranchId:", BranchId);
+    // console.log("itemId:", itemId);
 
     return response.data;
   } catch (error) {
@@ -101,20 +100,7 @@ export const fetchTax = async (apiBaseUrl) => {
     throw error;
   }
 };
-// export const fetchorderSource = async (restaurantId,token,apiBaseUrl) => {
-//   try {
-//     const response = await axios.get(
-//       `${apiBaseUrl}/callcenter/get/sources?api_token=${token}&restaurantId=${restaurantId}`
-//     );
-//     console.log("API Response sources:", response);
-//     console.log("API Response sources restaurantId:", restaurantId);
 
-//     return response.data.messages.sources;
-//   } catch (error) {
-//     console.error("Error fetching fetch Order Type:", error);
-//     throw error;
-//   }
-// };
 export const fetchorderSource = async (restaurantId, token, apiBaseUrl) => {
   try {
     const response = await fetch(

@@ -389,7 +389,8 @@ const DynamicBreadcrumbs = () => {
                   >
                     {/* {crumb.label}/Total */}
 
-                    Total
+                    {/* Total */}
+                    {crumb.label}
                   </Link>
                 ) : (
                   // في صفحة تانية أو selectedStatus = Total - بيكون لينك عادي

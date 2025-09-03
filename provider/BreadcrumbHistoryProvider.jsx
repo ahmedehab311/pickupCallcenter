@@ -177,6 +177,7 @@ export const BreadcrumbHistoryProvider = ({ children }) => {
       const last = cleanedParts.at(-1);
       const prev = cleanedParts.at(-2);
       const beforePrev = cleanedParts.at(-3);
+      
        const isDashboard = pathname === '/en/dashboard' || pathname.endsWith('/dashboard');
       if (!isDashboard) {
         // نمسح فقط الـ breadcrumbs المخصصة (الأوردرز) لكن نستمر في إضافة العادية
