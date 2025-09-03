@@ -9,7 +9,7 @@ export const fetchRestaurantsList = async (token, apiBaseUrl) => {
     const response = await axios.get(
       `${apiBaseUrl}/callcenter/get/restaurants?api_token=${token}`
     );
-    console.log("API Response:", response);
+    // console.log("API Response:", response);
     // console.log("API response?.data?.data?.restaurants:", response?.data?.data?.restaurants);
     return response?.data?.data?.restaurants;
   } catch (error) {
@@ -92,8 +92,9 @@ export const fetchViewItem = async (BranchId, itemId, token, apiBaseUrl) => {
 export const fetchTax = async (apiBaseUrl) => {
   try {
     const response = await axios.get(`${apiBaseUrl}/settings`);
-    // console.log("API Response branches:", response.data.data.settings.tax);
-    // console.log("API Response branches restaurantId:", restaurantId);
+    // console.log("API Response fetchTax:", response);
+    // console.log("API Response fetchTax:", response.data.data.settings.tax);
+    // console.log("API Response fetchTax restaurantId:", restaurantId);
     return response.data.data.settings.tax;
   } catch (error) {
     console.error("Error fetching Tax:", error);

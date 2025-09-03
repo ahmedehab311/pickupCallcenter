@@ -8,7 +8,7 @@ export const getSubdomain = () => {
   const host = window.location.hostname;
   const parts = host.split(".");
 
-  if (host === "localhost") return "nst-new";
+  if (host === "localhost") return "carlos-delivery";
   return parts.length > 2 ? parts[0] : "";
 };
 // carlos-delivery

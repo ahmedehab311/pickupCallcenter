@@ -328,6 +328,7 @@
 // };
 
 // export default DynamicBreadcrumbs;
+
 "use client";
 import Link from "next/link";
 import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";

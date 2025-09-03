@@ -1935,9 +1935,14 @@ function CreateOrder({ params }) {
   const Delivery =
     selectedOrderType?.value === 2
       ? 0
-      : parseFloat(savedBranch?.deliveryFees) || 0;
+      : parseFloat(savedBranch?.deliveryFees) || selectedUser?.address[0]?.branch[0]?.delivery_fees || 0;
+  const taxCalc = Number(Tax) / 100
 
-  const vatAmount = (grandTotal - discount + Delivery) * 0.14;
+  // console.log("taxCalc", taxCalc);
+  // console.log("savedBranch", savedBranch);
+  // console.log("savedBranch[0]", selectedUser?.address[0]?.branch[0]?.delivery_fees);
+
+  const vatAmount = Tax > 0 ? (grandTotal - discount + Delivery) * taxCalc : 0;
   const totalAmount = grandTotal - discount + vatAmount + Delivery;
 
   const finalTotal = useMemo(() => {
@@ -3227,7 +3232,7 @@ function CreateOrder({ params }) {
                               const itemTotal = total + extrasTotal;
 
                               return (
-                                <div key={item.id} className="p-2 mb-4">
+                                <div key={item.cartId} className="p-2 mb-4">
                                   <div className="flex justify-between gap-2 pb-2 mb-1">
                                     <span className="text-center break-words whitespace-nowrap overflow-hidden text-[14px] font-semibold">
                                       {item.selectedInfo}
@@ -3476,7 +3481,7 @@ function CreateOrder({ params }) {
                                       {(() => {
                                         const isUnchangedItem =
                                           (item.selectedExtras?.length || 0) === 0 &&
-                                          (item.selectedMainExtras?.length || 0) === 0 &&
+                                          (item.se  lectedMainExtras?.length || 0) === 0 &&
                                           (item.selectedoption?.length || 0) === 0 &&
                                           item.sub_total;
 
@@ -3511,16 +3516,17 @@ function CreateOrder({ params }) {
                                     </span> */}
                                     <span>
                                       {(() => {
-                                        const isUnchangedItem =
+                                        const noExtras =
                                           (item.selectedExtras?.length || 0) === 0 &&
                                           (item.selectedMainExtras?.length || 0) === 0 &&
-                                          (item.selectedoption?.length || 0) === 0 &&
-                                          item.sub_total;
+                                          (item.selectedoption?.length || 0) === 0;
 
-                                        if (isUnchangedItem) {
-                                          const baseSubTotal = Number(item.sub_total) || 0;
-                                          const quantity = Number(item.quantity) || 1;
-                                          return `${(baseSubTotal * quantity).toFixed(2)} EGP`;
+                                        const basePrice = Number(item.price) || 0;
+                                        const quantity = Number(item.quantity) || 1;
+
+                                        if (noExtras) {
+                                          // اضرب السعر × الكمية
+                                          return `${(basePrice * quantity).toFixed(2)} EGP`;
                                         }
 
                                         const optionsTotal = (item.selectedoption || []).reduce(
@@ -3538,15 +3544,12 @@ function CreateOrder({ params }) {
                                           0
                                         );
 
-                                        const basePrice = Number(item.price) || 0;
-                                        const quantity = Number(item.quantity) || 1;
-
-                                        const total =
-                                          (basePrice + optionsTotal + extrasTotal + mainExtrasTotal) * quantity;
+                                        const total = (basePrice + optionsTotal + extrasTotal + mainExtrasTotal) * quantity;
 
                                         return `${total.toFixed(2)} EGP`;
                                       })()}
                                     </span>
+
                                   </div>
                                   {index !== cartItems.length - 1 && (
                                     <div className="border-b border-gray-500 -mx-4 mt-4"></div>
@@ -3612,9 +3615,9 @@ function CreateOrder({ params }) {
                             </TableCell>
                             <TableCell className="text-important">
                               {/* {(grandTotal + Delivery * (Tax / 100)).toFixed(2)} */}
-                              {((grandTotal + Delivery) * (Tax / 100)).toFixed(
+                              {Tax > 0 ? ((grandTotal + Delivery) * taxCalc).toFixed(
                                 2
-                              )}
+                              ) : 0}
                             </TableCell>
                           </TableRow>
                         </TableBody>
