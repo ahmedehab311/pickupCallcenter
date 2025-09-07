@@ -42,7 +42,7 @@ const TaskHeader = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [localCreateButtonText, setLocalCreateButtonText] = useState("");
   const [pageSizePlaceholder, setPageSizePlaceholder] = useState("");
-  const allowedPageSizes = [10, 25, 50, "all"];
+  const allowedPageSizes = ["all", 15, 30, 60];
   const isPageSizeValid =
     allowedPageSizes.map(String).includes(pageSize?.toString()) &&
     (pageSize === "all" || parseInt(pageSize) <= itemsCount); // ← الشرط الجديد

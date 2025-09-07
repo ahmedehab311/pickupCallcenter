@@ -33,6 +33,10 @@ const schema = z.object({
 
 const LogInForm = ({ children }) => {
   const { apiBaseUrl, subdomain } = useSubdomin();
+  if (process.env.NODE_ENV === "development") {
+    console.log("apiBaseUrl from create order", apiBaseUrl);
+    console.log("subdomain from create order", subdomain);
+  }
   const router = useRouter();
   const dispatch = useDispatch();
   const { currentLang } = useLanguage();

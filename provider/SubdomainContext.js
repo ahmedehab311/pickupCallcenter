@@ -6,6 +6,8 @@ export const useSubdomin = () => useContext(subdomainContext);
 export const SubdominProvider = ({ children }) => {
   const [subdomain, setSubdomin] = useState(null);
   const [apiBaseUrl, setApiBaseUrl] = useState("");
+
+
   useEffect(() => {
     const host = window.location.hostname;
     const subdomain = host?.split(".")[0];
@@ -15,16 +17,17 @@ export const SubdominProvider = ({ children }) => {
   useEffect(() => {
     // get domin
     const detectedSubdomain = getSubdomain();
-    setSubdomin(detectedSubdomain);
+    // setSubdomin(detectedSubdomain);
+    setSubdomin("nst-new");
   }, []);
 
   useEffect(() => {
     if (subdomain) {
       const baseUrl = BASE_URL();
-
-      let cleanedBaseUrl = baseUrl?.replace(/\/api\/?$/, "");
-
-      setApiBaseUrl(`${cleanedBaseUrl}/${subdomain}/api`);
+      // let cleanedBaseUrl = baseUrl?.replace(/\/api\/?$/, "");
+      let cleanedBaseUrl = "http://staging.myres.me";
+      // setApiBaseUrl(`${cleanedBaseUrl}/${subdomain}/api`);
+      setApiBaseUrl(`${cleanedBaseUrl}/api`);
     }
   }, [subdomain]);
   // useEffect(() => {
