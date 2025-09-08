@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Select from "react-select";
 import { useSelector, useDispatch } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -15,14 +16,14 @@ import dialogConfig from "@/config/dialogConfig";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import Cookies from "js-cookie";
-import { FaSpinner } from "react-icons/fa";
+import { selectStyles } from "@/lib/utils";
+import { useThemeColor } from "@/hooks/useThemeColor";
 const TaskHeader = ({
   onSearch,
   onSort,
   onPageSizeChange,
   onFilterChange,
   searchPlaceholder = "Search",
-
   createTargetPath = "item",
   createButtonText,
   pageType = "",
@@ -34,14 +35,22 @@ const TaskHeader = ({
   isLoading,
   pageSize,
   isSettingLoading,
-  filters = [],
+
 }) => {
+  const { theme, color, setColor } = useThemeColor();
   const pathname = usePathname();
   const dispatch = useDispatch();
   const [dialogType, setDialogType] = useState("sections");
   const [searchTerm, setSearchTerm] = useState("");
   const [localCreateButtonText, setLocalCreateButtonText] = useState("");
   const [pageSizePlaceholder, setPageSizePlaceholder] = useState("");
+  const filters =
+    [
+      { value: "active", label: trans?.sectionsItems?.active },
+      { value: "inactive", label: trans?.sectionsItems?.inactive },
+      { value: "have_image", label: trans?.sectionsItems?.haveImage },
+      { value: "deleted", label: "Deleted" },
+    ]
   const allowedPageSizes = ["all", 15, 30, 60];
   const isPageSizeValid =
     allowedPageSizes.map(String).includes(pageSize?.toString()) &&
@@ -54,6 +63,19 @@ const TaskHeader = ({
     setSearchTerm(value);
     onSearch(value);
   };
+  const [selectedOptions, setSelectedOptions] = useState([]);
+
+  const handleChange = (selected) => {
+    if (!selected || selected.length === 0) {
+      setSelectedOptions([]);
+      onFilterChange([]); // فاضي
+      return;
+    }
+    const values = selected.map((s) => s.value);
+    setSelectedOptions(selected);
+    onFilterChange(values);
+  };
+
 
   useEffect(() => {
     let label = pageTypeLabel || pageType;
@@ -177,21 +199,53 @@ const TaskHeader = ({
         {/* Filter */}
         {filters.length > 0 && (
           <div className="relative">
-            <Selected onValueChange={onFilterChange}>
-              <SelectTrigger className="min-w-[160px] whitespace-nowrap">
-                <SelectValue placeholder={trans?.sectionsItems?.filterBy} />
-              </SelectTrigger>
-              <SelectContent>
-                {filters.map((filter) => (
-                  <SelectItem key={filter.value} value={filter.value}>
-                    {filter.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Selected>
+            {/* <Select
+              closeMenuOnSelect={false}
+        hideSelectedOptions={false}
+              // {...field}
+              options={filters || []}
+            placeholder={trans?.sectionsItems?.filterBy  || "Filter by..."} 
+              className="react-select w-full mb"
+              classNamePrefix="select"
+                  isMulti
+              onChange={onFilterChange}
+               components={{ MultiValue: () => null }}
+              styles={selectStyles(theme, color)}
+                value={[]}
+            /> */}
+            <Select
+              isMulti
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              options={filters}
+              value={selectedOptions}
+              onChange={handleChange}
+              placeholder={trans?.sectionsItems?.filterBy || "Filter by..."}
+              components={{
+                MultiValue: () => null, ClearIndicator: () => null,
+                MultiValueRemove: () => null
+              }}
+              controlShouldRenderValue={false}
+              className="react-select min-w-[130px] whitespace-nowrap "
+              classNamePrefix="select"
+              styles={selectStyles(theme, color)}
+            />
+
           </div>
         )}
       </div>
+      {/* <Selected onValueChange={onFilterChange}>
+          <SelectTrigger className="min-w-[160px] whitespace-nowrap">
+            <SelectValue placeholder={trans?.sectionsItems?.filterBy} />
+          </SelectTrigger>
+          <SelectContent>
+            {filters.map((filter) => (
+              <SelectItem key={filter.value} value={filter.value}>
+                {filter.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Selected> */}
       {/* Create Button */}
 
       {arrange && (

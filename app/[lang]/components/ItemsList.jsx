@@ -32,6 +32,7 @@ import {
 import toast from "react-hot-toast";
 import SubSectionView from "../dashboard/section/[id]/SubSectionView";
 import PaginationAllItems from "./Pagination";
+import { applyFiltersAndSort } from "@/lib/applyFiltersAndSort";
 export default function ItemsList({
   lang,
   Sections,
@@ -68,57 +69,70 @@ export default function ItemsList({
 
   const itemsPerPage =
     pageSize === "all" ? filteredItem.length : parseInt(pageSize);
-
-  const applyFiltersAndSort = () => {
-    // let updatedSections = [...Menus];
-    if (!Array.isArray(Sections)) return;
+  useEffect(() => {
+    // reset الصفحة هنا
     setCurrentPage(0);
-    let updatedSections = [...Sections];
 
-    // search
-    if (searchTerm) {
-      updatedSections = updatedSections.filter(
-        (section) =>
-          section.name_en?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-          section?.description_en
-            ?.toLowerCase()
-            ?.includes(searchTerm.toLowerCase())
-      );
-    }
+    const updatedSections = applyFiltersAndSort({
+      data: Sections,
+      searchTerm,
+      filters: filterOption,
+      sortOption,
+      pageSize,
+    });
 
-    // filter
-    if (filterOption === "active") {
-      updatedSections = updatedSections.filter(
-        (section) => section?.status === true
-      );
-    } else if (filterOption === "inactive") {
-      updatedSections = updatedSections.filter(
-        (section) => section?.status === false
-      );
-    } else if (filterOption === "deleted") {
-      updatedSections = updatedSections.filter(
-        (section) => section?.deleted_at !== ""
-      );
-    } else if (filterOption === "have_image") {
-      updatedSections = updatedSections.filter((section) => section.image);
-    }
+   setFilteredItem(updatedSections);
+  }, [Sections, searchTerm, filterOption, sortOption, pageSize]);
+  // const applyFiltersAndSort = () => {
+  //   // let updatedSections = [...Menus];
+  //   if (!Array.isArray(Sections)) return;
+  //   setCurrentPage(0);
+  //   let updatedSections = [...Sections];
 
-    // arang
-    if (sortOption === "alphabetical") {
-      updatedSections.sort((a, b) => a.name_en.localeCompare(b.name_en));
-    } else if (sortOption === "recent") {
-      updatedSections.sort((a, b) => b.id - a.id);
-    } else if (sortOption === "old") {
-      updatedSections.sort((a, b) => a.id - b.id);
-    }
-    // pagenation
-    // if (pageSize !== "all") {
-    //   const size = parseInt(pageSize, 10);
-    //   updatedSections = updatedSections.slice(0, size);
-    // }
+  //   // search
+  //   if (searchTerm) {
+  //     updatedSections = updatedSections.filter(
+  //       (section) =>
+  //         section.name_en?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+  //         section?.description_en
+  //           ?.toLowerCase()
+  //           ?.includes(searchTerm.toLowerCase())
+  //     );
+  //   }
 
-    setFilteredItem(updatedSections);
-  };
+  //   // filter
+  //   if (filterOption === "active") {
+  //     updatedSections = updatedSections.filter(
+  //       (section) => section?.status === true
+  //     );
+  //   } else if (filterOption === "inactive") {
+  //     updatedSections = updatedSections.filter(
+  //       (section) => section?.status === false
+  //     );
+  //   } else if (filterOption === "deleted") {
+  //     updatedSections = updatedSections.filter(
+  //       (section) => section?.deleted_at !== ""
+  //     );
+  //   } else if (filterOption === "have_image") {
+  //     updatedSections = updatedSections.filter((section) => section.image);
+  //   }
+
+  //   // arang
+  //   if (sortOption === "alphabetical") {
+  //     updatedSections.sort((a, b) => a.name_en.localeCompare(b.name_en));
+  //   } else if (sortOption === "recent") {
+  //     updatedSections.sort((a, b) => b.id - a.id);
+  //   } else if (sortOption === "old") {
+  //     updatedSections.sort((a, b) => a.id - b.id);
+  //   }
+  //   // pagenation
+  //   // if (pageSize !== "all") {
+  //   //   const size = parseInt(pageSize, 10);
+  //   //   updatedSections = updatedSections.slice(0, size);
+  //   // }
+
+  //   setFilteredItem(updatedSections);
+  // };
   useEffect(() => {
     if (token && apiBaseUrl && id) {
       refetch();
@@ -131,9 +145,9 @@ export default function ItemsList({
   const handleEnter = (itemId) => {
     router.push(`/${lang}/dashboard/sizes/${itemId}`);
   };
-    const handleViewEdit = (itemId) => {
-      router.push(`/${lang}/dashboard/item/${itemId}/view`);
-    };
+  const handleViewEdit = (itemId) => {
+    router.push(`/${lang}/dashboard/item/${itemId}/view`);
+  };
   const handleDelete = async (id) => {
     try {
       setIsSettingDefaultLoading(true);
@@ -187,7 +201,7 @@ export default function ItemsList({
   const handlechangeStatus = async (id) => {
     try {
       setIsSettingDefaultLoading(true);
-           const res = await changeItemStatus(apiBaseUrl,token, id, navigate);
+      const res = await changeItemStatus(apiBaseUrl, token, id, navigate);
 
       if (
         res?.responseStatus &&
@@ -259,12 +273,13 @@ export default function ItemsList({
   return (
     <>
       {subSections && (
-        <SubSectionView lang={lang} filteredSubSection={filteredSubSection}   />
+        <SubSectionView lang={lang} filteredSubSection={filteredSubSection} />
       )}
       <Card className="gap-6 p-4 mt-3 ">
         <TaskHeader
           onSearch={(term) => setSearchTerm(term)}
           onPageSizeChange={(value) => setPageSize(value)}
+            onFilterChange={(option) => setFilterOption(option)} 
           pageSize={pageSize}
           createButtonText={trans?.button?.item}
           pageType={pageType}

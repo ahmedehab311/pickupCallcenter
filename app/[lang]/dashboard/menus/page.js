@@ -32,6 +32,7 @@ import { useToken } from "@/provider/TokenContext";
 import { fetchAllSections, useSections } from "../sections/apisSection";
 import StatusHandler from "@/lib/StatusHandler";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { applyFiltersAndSort } from "@/lib/applyFiltersAndSort";
 // import { TokenProvider } from "@/context/TokenContext";
 const Menu = ({ params: { lang } }) => {
   const router = useRouter();
@@ -83,57 +84,76 @@ const Menu = ({ params: { lang } }) => {
   //   itemsPerPage,
   //   currentPage
   // );
-  const applyFiltersAndSort = () => {
-    // let updatedSections = [...Menus];
-    if (!Array.isArray(Menus)) return;
-    setCurrentPage(0);
-    let updatedSections = [...Menus];
 
-    // search
-    if (searchTerm) {
-      updatedSections = updatedSections.filter(
-        (section) =>
-          section.name_en?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-          section?.description_en
-            ?.toLowerCase()
-            ?.includes(searchTerm.toLowerCase())
-      );
-    }
+useEffect(() => {
+  // reset الصفحة هنا
+  setCurrentPage(0);
 
-    // filter
-    if (filterOption === "active") {
-      updatedSections = updatedSections.filter(
-        (section) => section?.status === true
-      );
-    } else if (filterOption === "inactive") {
-      updatedSections = updatedSections.filter(
-        (section) => section?.status === false
-      );
-    } else if (filterOption === "have_image") {
-    } else if (filterOption === "deleted") {
-      updatedSections = updatedSections.filter(
-        (section) => section?.deleted_at !== ""
-      );
-    } else if (filterOption === "have_image") {
-      updatedSections = updatedSections.filter((section) => section.image);
-    }
+  const updatedSections = applyFiltersAndSort({
+    data: Menus,
+    searchTerm,
+    filters: filterOption,
+    sortOption,
+    pageSize,
+  });
 
-    // arang
-    if (sortOption === "alphabetical") {
-      updatedSections.sort((a, b) => a.name_en.localeCompare(b.name_en));
-    } else if (sortOption === "recent") {
-      updatedSections.sort((a, b) => b.id - a.id);
-    } else if (sortOption === "old") {
-      updatedSections.sort((a, b) => a.id - b.id);
-    }
-    // pagenation
-    // if (pageSize !== "all") {
-    //   const size = parseInt(pageSize, 10);
-    //   updatedSections = updatedSections.slice(0, size);
-    // }
+  setFilteredMenus(updatedSections);
+}, [Menus, searchTerm, filterOption, sortOption, pageSize]);
 
-    setFilteredMenus(updatedSections);
-  };
+  //   const applyFiltersAndSort = () => {
+  //     // let updatedSections = [...Menus];
+  //     if (!Array.isArray(Menus)) return;
+  //     setCurrentPage(0);
+  //     let updatedSections = [...Menus];
+
+  //     // search
+  //     if (searchTerm) {
+  //       updatedSections = updatedSections.filter(
+  //         (section) =>
+  //           section.name_en?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+  //           section?.description_en
+  //             ?.toLowerCase()
+  //             ?.includes(searchTerm.toLowerCase())
+  //       );
+  //     }
+
+
+  //     if (Array.isArray(filterOption) && filterOption.length > 0) {
+  //   if (filterOption.includes("all")) {
+  //     // سيبها زي ماهي (يعني كل العناصر)
+  //   } else {
+  //     if (filterOption.includes("active")) {
+  //       updatedSections = updatedSections.filter(
+  //         (section) => section?.status === true
+  //       );
+  //     }
+  //     if (filterOption.includes("inactive")) {
+  //       updatedSections = updatedSections.filter(
+  //         (section) => section?.status === false
+  //       );
+  //     }
+  //     if (filterOption.includes("deleted")) {
+  //       updatedSections = updatedSections.filter(
+  //         (section) => section?.deleted_at !== ""
+  //       );
+  //     }
+  //     if (filterOption.includes("have_image")) {
+  //       updatedSections = updatedSections.filter((section) => section.image);
+  //     }
+  //   }
+  // }
+
+  //     // arang
+  //     if (sortOption === "alphabetical") {
+  //       updatedSections.sort((a, b) => a.name_en.localeCompare(b.name_en));
+  //     } else if (sortOption === "recent") {
+  //       updatedSections.sort((a, b) => b.id - a.id);
+  //     } else if (sortOption === "old") {
+  //       updatedSections.sort((a, b) => a.id - b.id);
+  //     }
+
+  //     setFilteredMenus(updatedSections);
+  //   };
   useEffect(() => {
     if (!isOnline) {
       setWasOffline(true);

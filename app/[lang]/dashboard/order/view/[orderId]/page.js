@@ -242,7 +242,7 @@ export default function OrderViewPage({ params }) {
     <>
 
 
-      <div className="flex gap-4  flex-col md:flex-row">
+      <div className="flex gap-4  flex-col md:flex-row mt-3 mb-5 ">
         {/* الجدول على الشمال */}
         <div className="md:w-1/2 w-full" >
           <Card title="Order Info" className="p-4 shadow-sm rounded-2xl">
@@ -256,7 +256,7 @@ export default function OrderViewPage({ params }) {
         {/* الكروت على اليمين تحت بعض */}
         <div className="md:w-1/2 w-full flex flex-col gap-4">
           {/* الكرت الأول */}
-          <Card title="Order Details" className="p-4">
+          <Card title="Order Details" className="p-4 shadow-sm rounded-2xl">
             <div className="flex justify-between my-2">
               <p>Name: {OrderDetails?.user_data?.user_name}</p>
               <p>Phone: {OrderDetails?.user_data?.phone}</p>
@@ -297,7 +297,7 @@ export default function OrderViewPage({ params }) {
           </Card>
 
           {/* الكرت الثاني */}
-          <Card title="Order Details" className="p-4">
+          <Card title="Order Details" className="p-4 shadow-sm rounded-2xl">
             {/* Address في أول الكارت */}
             <p className="mb-4">
               <span className="font-semibold">Address:</span>{" "}
@@ -336,7 +336,7 @@ export default function OrderViewPage({ params }) {
 
 
           {/* الكرت الثالث */}
-          <Card title="Order Details" className="p-4 ">
+          <Card title="Order Details" className="p-4 shadow-sm rounded-2xl">
             <h2 className="text-md font-semibold mb-2">Delivery details</h2>
             <div className="flex justify-between my-2 flex-wrap gap-4">
               <p>

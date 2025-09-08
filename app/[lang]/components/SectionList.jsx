@@ -15,6 +15,7 @@ import {
 import PaginationAllItems from "./Pagination";
 import toast from "react-hot-toast";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { applyFiltersAndSort } from "@/lib/applyFiltersAndSort";
 function SectionList({
   lang,
   sections,
@@ -46,56 +47,95 @@ function SectionList({
   const wasSearching = useRef(false);
   const itemsPerPage =
     pageSize === "all" ? filteredSections.length : parseInt(pageSize);
+useEffect(() => {
+  // reset الصفحة هنا
+  setCurrentPage(0);
 
-  const applyFiltersAndSort = () => {
-    // let updatedSections = [...Menus];
-    if (!Array.isArray(sections)) return;
-    let updatedSections = [...sections];
+  const updatedSections = applyFiltersAndSort({
+    data: sections,
+    searchTerm,
+    filters: filterOption,
+    sortOption,
+    pageSize,
+  });
 
-    // search
-    if (searchTerm) {
-      updatedSections = updatedSections.filter(
-        (section) =>
-          section.name_en?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-          section?.description_en
-            ?.toLowerCase()
-            ?.includes(searchTerm.toLowerCase())
-      );
-    }
+  setFilteredSections(updatedSections);
+}, [sections, searchTerm, filterOption, sortOption, pageSize]);
 
-    // filter
-    if (filterOption === "active") {
-      updatedSections = updatedSections.filter(
-        (section) => section?.status === true
-      );
-    } else if (filterOption === "inactive") {
-      updatedSections = updatedSections.filter(
-        (section) => section?.status === false
-      );
-    } else if (filterOption === "deleted") {
-      updatedSections = updatedSections.filter(
-        (section) => section?.deleted_at !== ""
-      );
-    } else if (filterOption === "have_image") {
-      updatedSections = updatedSections.filter((section) => section.image);
-    }
+//   const applyFiltersAndSort = () => {
+//     if (!Array.isArray(sections)) return;
+//     let updatedSections = [...sections];
 
-    // arang
-    if (sortOption === "alphabetical") {
-      updatedSections.sort((a, b) => a.name_en.localeCompare(b.name_en));
-    } else if (sortOption === "recent") {
-      updatedSections.sort((a, b) => b.id - a.id);
-    } else if (sortOption === "old") {
-      updatedSections.sort((a, b) => a.id - b.id);
-    }
-    // pagenation
-    // if (pageSize !== "all") {
-    //   const size = parseInt(pageSize, 10);
-    //   updatedSections = updatedSections.slice(0, size);
-    // }
+//     // search
+//     if (searchTerm) {
+//       updatedSections = updatedSections.filter(
+//         (section) =>
+//           section.name_en?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+//           section?.description_en
+//             ?.toLowerCase()
+//             ?.includes(searchTerm.toLowerCase())
+//       );
+//     }
 
-    setFilteredSections(updatedSections);
-  };
+//     // filter
+//     // if (filterOption === "active") {
+//     //   updatedSections = updatedSections.filter(
+//     //     (section) => section?.status === true
+//     //   );
+//     // } else if (filterOption === "inactive") {
+//     //   updatedSections = updatedSections.filter(
+//     //     (section) => section?.status === false
+//     //   );
+//     // } else if (filterOption === "deleted") {
+//     //   updatedSections = updatedSections.filter(
+//     //     (section) => section?.deleted_at !== ""
+//     //   );
+//     // } else if (filterOption === "have_image") {
+//     //   updatedSections = updatedSections.filter((section) => section.image);
+//     // }
+//     // filter
+// if (Array.isArray(filterOption) && filterOption.length > 0) {
+//   if (filterOption.includes("all")) {
+//     // سيبها زي ماهي (يعني كل العناصر)
+//   } else {
+//     if (filterOption.includes("active")) {
+//       updatedSections = updatedSections.filter(
+//         (section) => section?.status === true
+//       );
+//     }
+//     if (filterOption.includes("inactive")) {
+//       updatedSections = updatedSections.filter(
+//         (section) => section?.status === false
+//       );
+//     }
+//     if (filterOption.includes("deleted")) {
+//       updatedSections = updatedSections.filter(
+//         (section) => section?.deleted_at !== ""
+//       );
+//     }
+//     if (filterOption.includes("have_image")) {
+//       updatedSections = updatedSections.filter((section) => section.image);
+//     }
+//   }
+// }
+
+
+//     // arang
+//     if (sortOption === "alphabetical") {
+//       updatedSections.sort((a, b) => a.name_en.localeCompare(b.name_en));
+//     } else if (sortOption === "recent") {
+//       updatedSections.sort((a, b) => b.id - a.id);
+//     } else if (sortOption === "old") {
+//       updatedSections.sort((a, b) => a.id - b.id);
+//     }
+//     // pagenation
+//     // if (pageSize !== "all") {
+//     //   const size = parseInt(pageSize, 10);
+//     //   updatedSections = updatedSections.slice(0, size);
+//     // }
+
+//     setFilteredSections(updatedSections);
+//   };
 
   useEffect(() => {
     if (searchTerm && !wasSearching.current) {
@@ -238,13 +278,7 @@ function SectionList({
           // searchPlaceholder={trans?.sectionsItems.searchSections}
           pageType={pageType}
           createTargetPath={navigate}
-          filters={[
-            { value: "active", label: trans?.sectionsItems?.active },
-            { value: "inactive", label: trans?.sectionsItems?.inactive },
-            { value: "have_image", label: trans?.sectionsItems?.haveImage },
-            { value: "deleted", label: "Deleted" },
-            { value: "all", label: trans?.sectionsItems?.all },
-          ]}
+        
           trans={trans}
           handleSaveArrange={handleSaveArrange}
           arrange={true}

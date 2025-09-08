@@ -29,7 +29,7 @@ function OrdersType() {
   const { apiBaseUrl } = useSubdomin();
   const isOnline = useOnlineStatus();
   // const [selectedStatus, setSelectedStatus] = useState("Total");
-  const { selectedStatus, setSelectedStatus } = useOrder(); 
+  const { selectedStatus, setSelectedStatus } = useOrder();
   const [selectedDayNumber, setSelectedDayNumber] = useState(1);
   const [token, setToken] = useState(null);
   const {
@@ -157,11 +157,13 @@ function OrdersType() {
     },
 
   ];
+  console.log("orders", orders);
 
+  // orders?.total?.count > 0 &&
   return (
     <>
 
-      {selectedStatus === "Total" && isOnline && (
+      {selectedStatus === "Total" && isOnline && orders?.total?.count > 0 && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full mt-3 mb-5 ">
             <Card >
@@ -218,17 +220,17 @@ function OrdersType() {
                 icon={stat.icon}
                 number={stat.number}
                 label={stat.label}
-        onClick={() => { 
-  // ما نضيفش breadcrumb لـ "Total"
-  if (stat.statusKey === "Total") {
-    setSelectedStatus("Total");
-    clearCustomBreadcrumbs(); // نمسح أي أوردرز موجودة
-  } else {
-    setSelectedStatus(stat.statusKey);
-    clearCustomBreadcrumbs();
-    addCustomBreadcrumb(`${stat.label} Orders`);
-  }
-}}
+                onClick={() => {
+                  // ما نضيفش breadcrumb لـ "Total"
+                  if (stat.statusKey === "Total") {
+                    setSelectedStatus("Total");
+                    clearCustomBreadcrumbs(); // نمسح أي أوردرز موجودة
+                  } else {
+                    setSelectedStatus(stat.statusKey);
+                    clearCustomBreadcrumbs();
+                    addCustomBreadcrumb(`${stat.label} Orders`);
+                  }
+                }}
                 color={stat.color}
                 borderColor={stat.borderColor}
                 language={language}
