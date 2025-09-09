@@ -5,7 +5,6 @@ import {
 } from "@/components/ui/table";
 export default function TableHeadOrder() {
     return (
-        // 
         <TableHeader>
             <TableRow className="bg-gray-100 dark:bg-gray-900">
                 <TableHead className="w-1/4">Item</TableHead>
