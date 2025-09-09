@@ -17,17 +17,17 @@ export const SubdominProvider = ({ children }) => {
   useEffect(() => {
     // get domin
     const detectedSubdomain = getSubdomain();
-    // setSubdomin(detectedSubdomain);
-    setSubdomin("nst-new");
+    setSubdomin(detectedSubdomain);
+    // setSubdomin("nst-new");
   }, []);
 
   useEffect(() => {
     if (subdomain) {
       const baseUrl = BASE_URL();
-      // let cleanedBaseUrl = baseUrl?.replace(/\/api\/?$/, "");
-      let cleanedBaseUrl = "http://staging.myres.me";
-      // setApiBaseUrl(`${cleanedBaseUrl}/${subdomain}/api`);
-      setApiBaseUrl(`${cleanedBaseUrl}/api`);
+      let cleanedBaseUrl = baseUrl?.replace(/\/api\/?$/, "");
+      // let cleanedBaseUrl = "http://staging.myres.me";
+      setApiBaseUrl(`${cleanedBaseUrl}/${subdomain}/api`);
+      // setApiBaseUrl(`${cleanedBaseUrl}/api`);
     }
   }, [subdomain]);
   // useEffect(() => {
