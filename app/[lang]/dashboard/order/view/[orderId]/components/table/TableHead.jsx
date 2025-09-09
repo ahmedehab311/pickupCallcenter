@@ -3,7 +3,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-export default function TableHead() {
+export default function TableHeadOrder() {
     return (
         <TableHeader>
             <TableRow className="bg-gray-100 dark:bg-gray-900">
